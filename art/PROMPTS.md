@@ -77,7 +77,9 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 | `cay_buoi_qua` | The same pomelo tree with large round green-yellow pomelos. |
 | `cay_vai` | A lychee tree, bushy canopy, no fruit, standing directly on the ground: no base tile, no platform, no soil block underneath. |
 | `cay_vai_qua` | The same lychee tree covered in clusters of red lychees. |
-| `nep_1` / `nep_2` / `nep_3` | Như `lua_1/2/3` nhưng là **lúa nếp**: thay "rice" bằng "sticky rice". Bông chín ở `nep_3` màu vàng sẫm hơi ngả cam. |
+| `nep_1` | Young sticky-rice seedlings, small tufts with slightly darker blue-green leaves, planted in a neat 3x3 grid, plants only, no water, no ground. |
+| `nep_2` | Growing sticky-rice plants, taller lush clumps with deep blue-green leaves, in a 3x3 grid, plants only, no ground. |
+| `nep_3` | Ripe sticky rice ready to harvest, deep amber-orange stalks with heavy drooping grain heads (darker and more orange than ordinary golden rice), in a 3x3 grid, plants only, no ground. |
 | `ngo_1` / `ngo_2` / `ngo_3` | Corn plants in 3 rows: tiny sprouts / knee-high leafy stalks / tall stalks with ripe corn cobs and tassels. Plants only, no ground. |
 | `khoai_1` / `khoai_2` / `khoai_3` | Sweet potato vines in 3 rows: small sprouts / spreading heart-shaped leaves / thick leafy vines with purple sweet potatoes peeking out. Plants only, no ground. |
 | `lac_1` / `lac_2` / `lac_3` | Peanut plants in 3 rows: sprouts / bushy small plants with yellow flowers / mature bushes with peanuts visible at the roots. Plants only, no ground. |
