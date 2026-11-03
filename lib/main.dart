@@ -7,6 +7,7 @@ import 'core/farm.dart';
 import 'render/sprites.dart';
 import 'services/ads.dart';
 import 'services/cloud.dart';
+import 'services/leaderboard.dart';
 import 'services/save.dart';
 import 'services/sound.dart';
 import 'ui/farm_screen.dart';
@@ -59,7 +60,7 @@ class _BootState extends State<_Boot> {
       return;
     }
     final cloud = CloudSave.instance;
-    Future.wait([_save.load(), sprites, cloud.init()]).then((r) {
+    Future.wait([_save.load(), sprites, cloud.init(), Leaderboard.instance.load()]).then((r) {
       if (!mounted) return;
       final farm = r[0] as Farm;
       _save.active = farm;

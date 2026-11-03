@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/farm.dart';
 import '../core/sync_plan.dart';
 import 'analytics.dart';
+import 'leaderboard.dart';
 
 /// The account's copy of the farm, as read from Firestore.
 class CloudCopy {
@@ -212,12 +213,14 @@ class CloudSave extends ChangeNotifier {
       'updated': FieldValue.serverTimestamp(),
     });
     await _markSynced(f.savedAt);
+    await Leaderboard.instance.submit(f);
   }
 
   Future<void> _restore(CloudCopy c) async {
     final farm = Farm.fromJson(jsonDecode(c.data) as Map<String, dynamic>);
     await replace?.call(farm);
     await _markSynced(farm.savedAt);
+    unawaited(Leaderboard.instance.submit(farm));
     Analytics.instance.log('cloud_restore', {'level': farm.level});
   }
 
@@ -282,6 +285,7 @@ class CloudSave extends ChangeNotifier {
     _dirty = false;
     conflict = null;
     if (!available || user == null) return;
+    await Leaderboard.instance.withdraw();
     try {
       await _doc.delete().timeout(const Duration(seconds: 10));
     } catch (e) {
@@ -303,6 +307,7 @@ class CloudSave extends ChangeNotifier {
     _dirty = false;
     notifyListeners();
     try {
+      await Leaderboard.instance.withdraw();
       await _doc.delete();
       try {
         await u.delete();

@@ -1,13 +1,39 @@
 rules_version = '2';
 // Paste into Firebase console > Firestore Database > Rules.
-// Each player reads and writes only their own farm.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Each player reads and writes only their own farm.
     match /farms/{uid} {
       allow read, delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.data is string
         && request.resource.data.data.size() < 900000;
+    }
+
+    // Public leaderboard: anyone reads; a signed-in player writes only
+    // their own row, with sane values.
+    match /leaderboard/{uid} {
+      allow read: if true;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'level', 'score', 'orders', 'village', 'house', 'updated'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 24
+        && request.resource.data.level is int
+        && request.resource.data.level >= 1
+        && request.resource.data.level <= 300
+        && request.resource.data.score is int
+        && request.resource.data.score >= request.resource.data.level * 1000000
+        && request.resource.data.score < (request.resource.data.level + 1) * 1000000
+        && request.resource.data.orders is int
+        && request.resource.data.orders >= 0
+        && request.resource.data.orders < 1000000
+        && request.resource.data.village is int
+        && request.resource.data.village >= 0
+        && request.resource.data.village < 100000
+        && request.resource.data.house is int
+        && request.resource.data.updated == request.time;
     }
   }
 }

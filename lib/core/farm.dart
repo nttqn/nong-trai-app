@@ -93,6 +93,8 @@ class Farm {
   void _ev(String name, [Map<String, Object> p = const {}]) => onEvent?.call(name, p);
   /// When this farm was last saved (ms since epoch); newest wins in cloud sync.
   int savedAt = 0;
+  /// Farm name shown on the leaderboard (empty until the player picks one).
+  String name = '';
 
   Farm({NowFn? now}) : now = now ?? wallClock;
 
@@ -804,6 +806,7 @@ class Farm {
         'stats': stats,
         'quest': quest, 'questBase': questBase,
         'savedAt': savedAt,
+        if (name.isNotEmpty) 'name': name,
       };
 
   static Farm fromJson(Map<String, dynamic> j, {NowFn? now}) {
@@ -815,7 +818,8 @@ class Farm {
       ..seed = j['seed'] ?? 7
       ..quest = j['quest'] ?? 0
       ..questBase = j['questBase'] ?? 0
-      ..savedAt = j['savedAt'] ?? 0;
+      ..savedAt = j['savedAt'] ?? 0
+      ..name = j['name'] ?? '';
     f.lots.addAll((j['lots'] as List).cast<int>());
     f.inv.addAll(Map<String, int>.from(j['inv']));
     f.objs.addAll([for (final o in j['objs']) Obj.fromJson(o)]);

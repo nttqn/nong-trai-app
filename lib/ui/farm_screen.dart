@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 
 import '../core/defs.dart';
 import '../core/farm.dart';
+import '../core/quests.dart';
 import '../render/farm_painter.dart';
 import '../render/iso.dart' show clearTextCache;
 import '../services/ads.dart';
@@ -18,6 +19,7 @@ import '../services/cloud.dart';
 import '../services/save.dart';
 import '../services/sound.dart';
 import 'cloud_tile.dart';
+import 'leaderboard_sheet.dart';
 import 'panels.dart';
 import 'sheets.dart';
 import 'widgets.dart';
@@ -701,8 +703,28 @@ class _FarmScreenState extends State<FarmScreen>
           ),
         ]),
         const SizedBox(height: 6),
-        if (q != null)
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(child: Align(alignment: Alignment.centerLeft, child: q == null ? const SizedBox.shrink() : _questChip(q))),
+          const SizedBox(width: 6),
           GestureDetector(
+            onTap: _openLeaderboard,
+            child: _chip(const Text('🏆', style: TextStyle(fontSize: 19))),
+          ),
+        ]),
+        const SizedBox(height: 4),
+        _chip(Text('🏘️ ${villageTitle(farm.projects.length)}',
+            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brown)), small: true),
+      ]),
+    );
+  }
+
+  void _openLeaderboard() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => LeaderboardSheet(farm), height: .8);
+  }
+
+  Widget _questChip(QuestDef q) => GestureDetector(
             onTap: farm.questDone
                 ? () {
                     final c = q.coins;
@@ -733,13 +755,7 @@ class _FarmScreenState extends State<FarmScreen>
                       style: const TextStyle(fontWeight: FontWeight.w800, color: greenDark)),
               ]),
             ),
-          ),
-        const SizedBox(height: 4),
-        _chip(Text('🏘️ ${villageTitle(farm.projects.length)}',
-            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brown)), small: true),
-      ]),
-    );
-  }
+          );
 
   Widget _chip(Widget child, {bool small = false}) => Container(
         height: small ? 26 : 40,
