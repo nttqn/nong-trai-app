@@ -47,3 +47,9 @@ app.*.map.json
 # AI source art (large); processed sprites live in assets/sprites
 /art_src/*
 !/art_src/README.txt
+
+# Release signing (never commit)
+*.jks
+*.keystore
+key.properties
+keystore-base64.txt

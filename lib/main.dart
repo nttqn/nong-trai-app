@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'core/demo.dart';
 import 'core/farm.dart';
 import 'render/sprites.dart';
+import 'services/ads.dart';
+import 'services/cloud.dart';
 import 'services/save.dart';
 import 'services/sound.dart';
 import 'ui/farm_screen.dart';
@@ -22,6 +24,7 @@ class NongTraiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: 'Làng Quê Yên Bình',
+        navigatorKey: AdsService.navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: green),
@@ -40,6 +43,7 @@ class _Boot extends StatefulWidget {
 class _BootState extends State<_Boot> {
   final _save = SaveService();
   Farm? _farm;
+  int _gen = 0; // bumps when a cloud restore swaps the farm
 
   @override
   void initState() {
@@ -54,9 +58,33 @@ class _BootState extends State<_Boot> {
       });
       return;
     }
-    Future.wait([_save.load(), sprites]).then((r) {
-      if (mounted) setState(() => _farm = r[0] as Farm);
+    final cloud = CloudSave.instance;
+    Future.wait([_save.load(), sprites, cloud.init()]).then((r) {
+      if (!mounted) return;
+      final farm = r[0] as Farm;
+      _save.active = farm;
+      setState(() => _farm = farm);
+      cloud.current = () => _farm!;
+      cloud.replace = _replace;
+      SaveService.onSaved = cloud.queueUpload;
+      // After the farm is on screen: the consent form needs a frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        AdsService.instance.init();
+        cloud.start();
+      });
     });
+  }
+
+  /// Swaps in the farm restored from the cloud.
+  Future<void> _replace(Farm f) async {
+    _save.active = f;
+    await _save.saveNow(f, keepStamp: true);
+    if (mounted) {
+      setState(() {
+        _farm = f;
+        _gen++;
+      });
+    }
   }
 
   @override
@@ -76,6 +104,6 @@ class _BootState extends State<_Boot> {
         ),
       );
     }
-    return FarmScreen(_farm!, _save);
+    return FarmScreen(_farm!, _save, key: ValueKey(_gen));
   }
 }

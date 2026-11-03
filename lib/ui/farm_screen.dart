@@ -12,8 +12,12 @@ import '../core/defs.dart';
 import '../core/farm.dart';
 import '../render/farm_painter.dart';
 import '../render/iso.dart' show clearTextCache;
+import '../services/ads.dart';
+import '../services/analytics.dart';
+import '../services/cloud.dart';
 import '../services/save.dart';
 import '../services/sound.dart';
+import 'cloud_tile.dart';
 import 'panels.dart';
 import 'sheets.dart';
 import 'widgets.dart';
@@ -52,7 +56,16 @@ class _FarmScreenState extends State<FarmScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    farm.onLevelUp = (l) => _levelUps.add(l);
+    farm.onLevelUp = (l) {
+      _levelUps.add(l);
+      Analytics.instance.levelUp(l);
+    };
+    farm.onEvent = (name, params) {
+      Analytics.instance.log(name, params);
+      if (name == 'order_delivered') AdsService.instance.onOrderDelivered(farm.level);
+    };
+    CloudSave.instance.addListener(_onCloud);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onCloud());
     farm.onSound = (c) => SoundService.instance.play(c);
     _ticker = createTicker((e) {
       final prev = _clock.value;
@@ -80,6 +93,7 @@ class _FarmScreenState extends State<FarmScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    CloudSave.instance.removeListener(_onCloud);
     _ticker.dispose();
     _hud?.cancel();
     _toastTimer?.cancel();
@@ -149,10 +163,95 @@ class _FarmScreenState extends State<FarmScreen>
           ],
         ]),
         actions: [
-          Center(child: PillButton('Tuyệt vời!', onTap: () => Navigator.pop(c))),
+          Center(
+            child: Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.center, children: [
+              ValueListenableBuilder<bool>(
+                valueListenable: AdsService.instance.rewardedReady,
+                builder: (_, ready, _) => ready
+                    ? PillButton('📺 Nhân đôi',
+                        color: gold,
+                        leading: Coin(20 * l, size: 12, color: Colors.white),
+                        onTap: () async {
+                          Navigator.pop(c);
+                          if (await AdsService.instance.showRewarded('levelup_double')) farm.bonusCoins(20 * l);
+                        })
+                    : const SizedBox.shrink(),
+              ),
+              PillButton('Tuyệt vời!', onTap: () => Navigator.pop(c)),
+            ]),
+          ),
         ],
       ),
     );
+  }
+
+  // ---------------------------------------------------------------- cloud
+  bool _askingCloud = false;
+  String? _cloudMsg;
+
+  void _onCloud() {
+    final cs = CloudSave.instance;
+    if (!mounted) return;
+    if (cs.message != null && cs.message != _cloudMsg) {
+      _cloudMsg = cs.message;
+      _say(cs.message!, error: true);
+    }
+    if (cs.conflict != null && !_askingCloud) _askCloud();
+  }
+
+  Future<void> _askCloud() async {
+    final cs = CloudSave.instance;
+    final c = cs.conflict;
+    if (c == null) return;
+    _askingCloud = true;
+    final when = DateTime.fromMillisecondsSinceEpoch(c.info.savedAt);
+    String ago(DateTime t) {
+      final d = DateTime.now().difference(t);
+      if (d.inMinutes < 1) return 'vừa xong';
+      if (d.inHours < 1) return '${d.inMinutes} phút trước';
+      if (d.inDays < 1) return '${d.inHours} giờ trước';
+      return '${d.inDays} ngày trước';
+    }
+
+    Widget option(String title, String sub, VoidCallback onTap, Color color) => Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Material(
+            color: color,
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                  Text(sub, style: const TextStyle(color: Colors.white, fontSize: 12.5)),
+                ]),
+              ),
+            ),
+          ),
+        );
+    final cloud = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (d) => AlertDialog(
+        backgroundColor: cream,
+        title: const Text('Chọn nông trại', style: TextStyle(fontWeight: FontWeight.w900, color: brown)),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text('Tài khoản ${cs.who} đã có một nông trại khác với nông trại trên máy này. Giữ bản nào? Bản còn lại sẽ bị thay thế.',
+              style: const TextStyle(color: brown)),
+          option('☁️ Bản trên mây', 'Cấp ${c.info.level} · lưu ${ago(when)}', () => Navigator.pop(d, true), green),
+          option('📱 Bản trên máy này', 'Cấp ${farm.level} · đang chơi', () => Navigator.pop(d, false), const Color(0xFF8D6E4C)),
+        ]),
+      ),
+    );
+    _askingCloud = false;
+    if (cloud == true) {
+      await cs.takeCloud();
+    } else {
+      await cs.keepLocal();
+      if (mounted) _say('Đã lưu nông trại này lên tài khoản');
+    }
   }
 
   // ---------------------------------------------------------------- camera
@@ -373,6 +472,8 @@ class _FarmScreenState extends State<FarmScreen>
     showFarmSheet(
       context,
       (c) => ListView(padding: const EdgeInsets.all(8), children: [
+        const SheetHeader('Lưu trữ đám mây'),
+        const CloudTile(),
         const SheetHeader('Âm thanh'),
         ValueListenableBuilder<bool>(
           valueListenable: snd.musicOn,
@@ -405,7 +506,8 @@ class _FarmScreenState extends State<FarmScreen>
             '• Giao đơn hàng cho bà con để có nhiều xu và kinh nghiệm.\n'
             '• Góp xu và nông sản xây công trình nông thôn mới: mỗi công trình cho một lợi ích lâu dài.\n'
             '• Nâng cấp nhà để kho chứa được nhiều hơn. Mua thêm đất bằng biển "Mua đất".\n'
-            '• Kéo hai ngón để phóng to/thu nhỏ bản đồ.',
+            '• Kéo hai ngón để phóng to/thu nhỏ bản đồ.\n'
+            '• Đăng nhập Google để lưu nông trại lên mây, đổi máy không mất.',
             style: TextStyle(color: brown, height: 1.45),
           ),
         ),
@@ -417,7 +519,7 @@ class _FarmScreenState extends State<FarmScreen>
                 context: c,
                 builder: (d) => AlertDialog(
                   title: const Text('Chơi lại từ đầu?'),
-                  content: const Text('Toàn bộ nông trại hiện tại sẽ bị xóa.'),
+                  content: const Text('Toàn bộ nông trại hiện tại sẽ bị xóa, kể cả bản lưu trên mây.'),
                   actions: [
                     TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('Thôi')),
                     TextButton(onPressed: () => Navigator.pop(d, true), child: const Text('Xóa và chơi lại')),
@@ -426,6 +528,7 @@ class _FarmScreenState extends State<FarmScreen>
               );
               if (yes == true) {
                 await widget.save.reset();
+                await CloudSave.instance.wipeCloudFarm();
                 SystemNavigator.pop();
               }
             },

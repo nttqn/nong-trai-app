@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/defs.dart';
 import '../core/farm.dart';
+import '../services/ads.dart';
 import 'sheets.dart' show Report;
 import 'widgets.dart';
 
@@ -105,14 +106,36 @@ class ObjPanel extends StatelessWidget {
         builder: (_, _) {
           final p = farm.progress(o);
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('$label — còn ${fmtTime(farm.remainingMs(o))}',
-                style: const TextStyle(fontWeight: FontWeight.w700, color: brown)),
+            Row(children: [
+              Expanded(
+                child: Text('$label — còn ${fmtTime(farm.remainingMs(o))}',
+                    style: const TextStyle(fontWeight: FontWeight.w700, color: brown)),
+              ),
+              _speedUp(),
+            ]),
             const SizedBox(height: 4),
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(value: p, minHeight: 9, color: green, backgroundColor: creamDark),
             ),
           ]);
+        },
+      );
+
+  /// Rewarded ad: finish what is growing/working now. Shown only when an
+  /// ad is loaded and there is more than half a minute left.
+  Widget _speedUp() => ValueListenableBuilder<bool>(
+        valueListenable: AdsService.instance.rewardedReady,
+        builder: (_, ready, _) {
+          if (!ready || farm.speedUpMs(o) < 30 * 1000) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.only(left: 6),
+            child: PillButton('📺 Xong ngay', dense: true, color: gold, onTap: () async {
+              if (await AdsService.instance.showRewarded('speedup_${o.def.kind.name}')) {
+                _do(farm.speedUp(o));
+              }
+            }),
+          );
         },
       );
 
@@ -284,8 +307,13 @@ class ObjPanel extends StatelessWidget {
             if (next.isEmpty) return const SizedBox.shrink();
             return Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Text('Mẻ đang làm xong sau ${fmtTime(next.first.end - now)}',
-                  style: const TextStyle(fontSize: 12, color: brownLight)),
+              child: Row(children: [
+                Expanded(
+                  child: Text('Mẻ đang làm xong sau ${fmtTime(next.first.end - now)}',
+                      style: const TextStyle(fontSize: 12, color: brownLight)),
+                ),
+                _speedUp(),
+              ]),
             );
           },
         ),

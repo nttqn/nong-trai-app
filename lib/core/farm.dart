@@ -88,6 +88,11 @@ class Farm {
   /// Sound cue for each successful action (file names in SoundService).
   void Function(String cue)? onSound;
   void _snd(String cue) => onSound?.call(cue);
+  /// Analytics event for milestones (build, order, quest, ...).
+  void Function(String name, Map<String, Object> params)? onEvent;
+  void _ev(String name, [Map<String, Object> p = const {}]) => onEvent?.call(name, p);
+  /// When this farm was last saved (ms since epoch); newest wins in cloud sync.
+  int savedAt = 0;
 
   Farm({NowFn? now}) : now = now ?? wallClock;
 
@@ -305,12 +310,14 @@ class Farm {
     if (d.kind == BKind.project) {
       projects.add(type);
       _stat('project:$type');
+      _ev('village_project', {'type': type, 'level': level});
     }
     if (d.w > 0) {
       final o = _add(type, x, y);
       _fx(o, d.xp > 0 ? '+${d.xp} KN' : '✓');
     }
     _stat('build:$type');
+    _ev('build', {'type': type, 'level': level});
     _snd('build');
     addXp(d.xp);
     _changed();
@@ -380,6 +387,7 @@ class Farm {
     coins -= nextLotPrice;
     lots.add(lot);
     _stat('lot');
+    _ev('buy_lot', {'lots': lots.length});
     _snd('build');
     addXp(10 * lots.length);
     _changed();
@@ -577,6 +585,51 @@ class Farm {
     return err;
   }
 
+  // ---------------------------------------------------------------- rewards
+
+  /// What [speedUp] would skip on [o], in ms (0 = nothing to speed up).
+  int speedUpMs(Obj o) {
+    final t = now();
+    if (o.def.kind == BKind.factory) {
+      for (final j in o.jobs) {
+        if (j.end > t) return j.end - t;
+      }
+      return 0;
+    }
+    return o.end > t ? o.end - t : 0;
+  }
+
+  /// Rewarded-ad boost: finishes what [o] is growing/making right now (for
+  /// a workshop, the batch in progress; the queue behind it moves up).
+  String? speedUp(Obj o) {
+    final d = speedUpMs(o);
+    if (d <= 0) return 'Không có gì để làm nhanh';
+    if (o.def.kind == BKind.factory) {
+      for (final j in o.jobs) {
+        if (j.end > now()) j.end -= d;
+      }
+    } else {
+      o.start -= d;
+      o.end -= d;
+    }
+    _stat('speedup');
+    _snd('sparkle');
+    _fx(o, '⚡');
+    _changed();
+    return null;
+  }
+
+  /// Extra coins (rewarded ad on level-up).
+  void bonusCoins(int n) {
+    coins += n;
+    _fx(house ?? objs.first, '+$n 🪙');
+    _snd('coin');
+    _changed();
+  }
+
+  /// Rough progress score: compares two saves of the same farm.
+  int get progressScore => level * 1000000 + xp;
+
   // ---------------------------------------------------------------- house
   HouseLevel? get nextHouse =>
       houseLevel + 1 < houseLevels.length ? houseLevels[houseLevel + 1] : null;
@@ -589,6 +642,7 @@ class Farm {
     coins -= n.cost;
     house!.level++;
     stats['house'] = house!.level;
+    _ev('house_upgrade', {'house': house!.level, 'level': level});
     _snd('build');
     addXp(25 * house!.level);
     _fx(house!, '🏠 ${n.name}');
@@ -697,6 +751,7 @@ class Farm {
     coins += o.coins;
     addXp(o.xp);
     _stat('order');
+    _ev('order_delivered', {'count': stats['order']!, 'level': level});
     _snd('cash');
     final i = orders.indexOf(o);
     orders[i] = Order(nextId++, '', const {}, 0, 0, waitUntil: now() + 20 * 1000);
@@ -731,6 +786,7 @@ class Farm {
     addXp(q.xp);
     quest++;
     _snd('quest');
+    _ev('quest_done', {'index': quest, 'level': level});
     final n = currentQuest;
     questBase = n == null ? 0 : (stats[n.key] ?? 0);
     _changed();
@@ -747,6 +803,7 @@ class Farm {
         'orders': [for (final o in orders) o.toJson()],
         'stats': stats,
         'quest': quest, 'questBase': questBase,
+        'savedAt': savedAt,
       };
 
   static Farm fromJson(Map<String, dynamic> j, {NowFn? now}) {
@@ -757,7 +814,8 @@ class Farm {
       ..nextId = j['nextId']
       ..seed = j['seed'] ?? 7
       ..quest = j['quest'] ?? 0
-      ..questBase = j['questBase'] ?? 0;
+      ..questBase = j['questBase'] ?? 0
+      ..savedAt = j['savedAt'] ?? 0;
     f.lots.addAll((j['lots'] as List).cast<int>());
     f.inv.addAll(Map<String, int>.from(j['inv']));
     f.objs.addAll([for (final o in j['objs']) Obj.fromJson(o)]);
