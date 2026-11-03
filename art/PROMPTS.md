@@ -53,6 +53,9 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 
 ## Đợt 2 — vật nuôi, ao, cây trồng, xưởng
 
+> **Cây trồng (luống):** mỗi ảnh một giai đoạn, đính kèm ảnh `rau_1`/`rau_2`/`rau_3` cùng số làm mẫu bố cục để cây xếp đúng hình thoi và cùng cỡ.
+
+
 | Tên file | Lời nhắc riêng |
 |---|---|
 | `vit` | One white Vietnamese duck with orange bill, standing, facing lower-left, full body. |
@@ -80,14 +83,30 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 | `nep_1` | Young sticky-rice seedlings, small tufts with slightly darker blue-green leaves, planted in a neat 3x3 grid, plants only, no water, no ground. |
 | `nep_2` | Growing sticky-rice plants, taller lush clumps with deep blue-green leaves, in a 3x3 grid, plants only, no ground. |
 | `nep_3` | Ripe sticky rice ready to harvest, deep amber-orange stalks with heavy drooping grain heads (darker and more orange than ordinary golden rice), in a 3x3 grid, plants only, no ground. |
-| `ngo_1` / `ngo_2` / `ngo_3` | Corn plants in 3 rows: tiny sprouts / knee-high leafy stalks / tall stalks with ripe corn cobs and tassels. Plants only, no ground. |
-| `khoai_1` / `khoai_2` / `khoai_3` | Sweet potato vines in 3 rows: small sprouts / spreading heart-shaped leaves / thick leafy vines with purple sweet potatoes peeking out. Plants only, no ground. |
-| `lac_1` / `lac_2` / `lac_3` | Peanut plants in 3 rows: sprouts / bushy small plants with yellow flowers / mature bushes with peanuts visible at the roots. Plants only, no ground. |
-| `dau_1` / `dau_2` / `dau_3` | Mung bean plants in 3 rows: sprouts / leafy bushes / bushes with long dark bean pods. Plants only, no ground. |
-| `mia_1` / `mia_2` / `mia_3` | Sugarcane in 3 rows: short shoots / medium canes / tall purple sugarcane stalks with long leaves. Plants only, no ground. |
-| `ot_1` / `ot_2` / `ot_3` | Chili plants in 3 rows: sprouts / small bushes with white flowers / bushes full of red chili peppers. Plants only, no ground. |
-| `dua_1` / `dua_2` / `dua_3` | Watermelon vines in 3 rows: sprouts / spreading vines with yellow flowers / vines with big striped green watermelons. Plants only, no ground. |
-| `cuc_1` / `cuc_2` / `cuc_3` | Chrysanthemum plants in 3 rows: sprouts / green bushes with buds / bushes full of bright yellow chrysanthemum flowers. Plants only, no ground. |
+| `ngo_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: tiny corn sprouts with two or three small leaves. Plants only, no ground. |
+| `ngo_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: knee-high leafy green corn stalks, no cobs yet. Plants only, no ground. |
+| `ngo_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: tall corn stalks with long leaves, golden tassels on top and one ripe yellow corn cob on each stalk. Plants only, no ground. |
+| `khoai_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small sweet-potato sprouts with a few heart-shaped leaves. Plants only, no ground. |
+| `khoai_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: spreading sweet-potato vines with many heart-shaped green leaves. Plants only, no ground. |
+| `khoai_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: thick leafy sweet-potato vines with purple sweet potatoes peeking out of the soil at their base. Plants only, no ground. |
+| `lac_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small peanut sprouts with tiny oval leaves. Plants only, no ground. |
+| `lac_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: bushy small peanut plants with little yellow flowers. Plants only, no ground. |
+| `lac_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: mature peanut bushes with a few peanut pods visible at the roots. Plants only, no ground. |
+| `dau_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small mung bean sprouts. Plants only, no ground. |
+| `dau_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: leafy green mung bean bushes. Plants only, no ground. |
+| `dau_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: mung bean bushes hung with long dark-green bean pods. Plants only, no ground. |
+| `mia_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: short purple sugarcane shoots with a few leaves. Plants only, no ground. |
+| `mia_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: medium purple sugarcane canes with long green leaves. Plants only, no ground. |
+| `mia_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: tall jointed purple sugarcane stalks with long arching green leaves. Plants only, no ground. |
+| `ot_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small chili sprouts. Plants only, no ground. |
+| `ot_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: small chili bushes with tiny white flowers. Plants only, no ground. |
+| `ot_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: chili bushes full of shiny red chili peppers. Plants only, no ground. |
+| `dua_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small watermelon sprouts. Plants only, no ground. |
+| `dua_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: spreading watermelon vines with yellow flowers. Plants only, no ground. |
+| `dua_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: watermelon vines each with one big round striped green watermelon. Plants only, no ground. |
+| `cuc_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small chrysanthemum sprouts. Plants only, no ground. |
+| `cuc_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: green chrysanthemum bushes with closed buds. Plants only, no ground. |
+| `cuc_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: chrysanthemum bushes covered in bright yellow flowers. Plants only, no ground. |
 
 ## Đợt 3 — nâng cấp nhà, công trình, trang trí
 
