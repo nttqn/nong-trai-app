@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'core/demo.dart';
 import 'core/farm.dart';
 import 'services/save.dart';
+import 'services/sound.dart';
 import 'ui/farm_screen.dart';
 import 'ui/widgets.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SoundService.instance.init();
   runApp(const NongTraiApp());
 }
 

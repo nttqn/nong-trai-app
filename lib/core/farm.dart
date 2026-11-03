@@ -85,6 +85,9 @@ class Farm {
   int rev = 0; // bumps on every change (render caches, autosave)
   final List<Fx> fx = [];
   void Function(int level)? onLevelUp;
+  /// Sound cue for each successful action (file names in SoundService).
+  void Function(String cue)? onSound;
+  void _snd(String cue) => onSound?.call(cue);
 
   Farm({NowFn? now}) : now = now ?? wallClock;
 
@@ -308,6 +311,7 @@ class Farm {
       _fx(o, d.xp > 0 ? '+${d.xp} KN' : '✓');
     }
     _stat('build:$type');
+    _snd('build');
     addXp(d.xp);
     _changed();
     return null;
@@ -317,6 +321,7 @@ class Farm {
     if (!canPlace(o.type, x, y, ignore: o.id)) return 'Không đặt được ở đây';
     o.x = x;
     o.y = y;
+    _snd('place');
     _changed();
     return null;
   }
@@ -329,6 +334,7 @@ class Farm {
 
   void remove(Obj o) {
     objs.remove(o);
+    _snd('remove');
     _changed();
   }
 
@@ -339,6 +345,7 @@ class Farm {
     coins -= d.cost;
     objs.remove(o);
     _stat('clear');
+    _snd('chop');
     addXp(d.xp);
     fx.add(Fx(o.x + .5, o.y + .5, '+${d.xp} KN'));
     _changed();
@@ -373,6 +380,7 @@ class Farm {
     coins -= nextLotPrice;
     lots.add(lot);
     _stat('lot');
+    _snd('build');
     addXp(10 * lots.length);
     _changed();
     return null;
@@ -405,6 +413,7 @@ class Farm {
     f.start = now();
     f.end = f.start + cropMs(c);
     _stat('plant:$cropId');
+    _snd('plant');
     _changed();
     return null;
   }
@@ -417,6 +426,7 @@ class Farm {
     _gain(c.product, c.yield);
     if (c.bonus != null) _gain(c.bonus!, 1);
     _stat('harvest:${c.id}');
+    _snd('harvest');
     addXp(c.xp);
     _fx(f, '+${c.yield} ${item(c.product).icon}');
     f.crop = null;
@@ -432,6 +442,7 @@ class Farm {
     final t = now();
     f.end = t + (f.end - t) ~/ 2;
     _stat('fertilize');
+    _snd('sparkle');
     _fx(f, '⚡');
     _changed();
     return null;
@@ -443,6 +454,7 @@ class Farm {
     if (!isReady(o)) return null;
     if (!roomFor(t.yield)) return 'Kho đầy!';
     _gain(t.product, t.yield);
+    _snd('pick');
     addXp(t.xp);
     _fx(o, '+${t.yield} ${item(t.product).icon}');
     o.start = now();
@@ -459,6 +471,7 @@ class Farm {
     coins -= a.price;
     pen.count++;
     _stat('buy:${a.id}');
+    _snd(a.id);
     addXp(1);
     _changed();
     return null;
@@ -475,6 +488,7 @@ class Farm {
     pen.start = now();
     pen.end = pen.start + animalMs(a);
     _stat('feed:${a.id}');
+    _snd('feed');
     _changed();
     return null;
   }
@@ -484,6 +498,7 @@ class Farm {
     if (!isReady(pen)) return null;
     if (!roomFor(pen.count)) return 'Kho đầy!';
     _gain(a.product, pen.count);
+    _snd(a.id);
     addXp(a.xp * pen.count);
     _fx(pen, '+${pen.count} ${item(a.product).icon}');
     pen.start = pen.end = 0;
@@ -502,6 +517,7 @@ class Farm {
     pond.start = now();
     pond.end = pond.start + fishMs(f);
     _stat('stock:$fishId');
+    _snd('splash');
     _changed();
     return null;
   }
@@ -511,6 +527,7 @@ class Farm {
     final f = fishes[pond.crop]!;
     if (!roomFor(f.yield)) return 'Kho đầy!';
     _gain(f.product, f.yield);
+    _snd('splash');
     addXp(f.xp);
     _fx(pond, '+${f.yield} ${item(f.product).icon}');
     pond.crop = null;
@@ -530,6 +547,7 @@ class Farm {
     final t = now();
     final begin = fac.jobs.isEmpty ? t : math.max(t, fac.jobs.last.end);
     fac.jobs.add(Job(recipeId, begin + recipeMs(r)));
+    _snd('work');
     _changed();
     return null;
   }
@@ -552,7 +570,10 @@ class Farm {
       _fx(fac, '+${r.out} ${item(r.product).icon}');
       got++;
     }
-    if (got > 0) _changed();
+    if (got > 0) {
+      _snd('collect');
+      _changed();
+    }
     return err;
   }
 
@@ -568,6 +589,7 @@ class Farm {
     coins -= n.cost;
     house!.level++;
     stats['house'] = house!.level;
+    _snd('build');
     addXp(25 * house!.level);
     _fx(house!, '🏠 ${n.name}');
     _changed();
@@ -582,6 +604,7 @@ class Farm {
     _spend({id: n});
     coins += sellPrice(id) * n;
     _stat('sell', n);
+    _snd('coin');
     _changed();
     return null;
   }
@@ -674,6 +697,7 @@ class Farm {
     coins += o.coins;
     addXp(o.xp);
     _stat('order');
+    _snd('cash');
     final i = orders.indexOf(o);
     orders[i] = Order(nextId++, '', const {}, 0, 0, waitUntil: now() + 20 * 1000);
     _changed();
@@ -706,6 +730,7 @@ class Farm {
     coins += q.coins;
     addXp(q.xp);
     quest++;
+    _snd('quest');
     final n = currentQuest;
     questBase = n == null ? 0 : (stats[n.key] ?? 0);
     _changed();

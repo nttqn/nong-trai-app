@@ -13,6 +13,7 @@ import '../core/farm.dart';
 import '../render/farm_painter.dart';
 import '../render/iso.dart' show clearTextCache;
 import '../services/save.dart';
+import '../services/sound.dart';
 import 'panels.dart';
 import 'sheets.dart';
 import 'widgets.dart';
@@ -52,6 +53,7 @@ class _FarmScreenState extends State<FarmScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     farm.onLevelUp = (l) => _levelUps.add(l);
+    farm.onSound = (c) => SoundService.instance.play(c);
     _ticker = createTicker((e) {
       final prev = _clock.value;
       _clock.value = e.inMicroseconds / 1e6;
@@ -96,6 +98,7 @@ class _FarmScreenState extends State<FarmScreen>
   void _report(String? err, {String? ok}) {
     if (err != null) {
       _say(err, error: true);
+      SoundService.instance.play('error');
       HapticFeedback.lightImpact();
     } else if (ok != null) {
       _say(ok);
@@ -117,6 +120,7 @@ class _FarmScreenState extends State<FarmScreen>
   Future<void> _showLevelUp() async {
     final l = _levelUps.removeAt(0);
     _levelUps.clear();
+    SoundService.instance.play('levelup');
     final unlocked = <String>[
       for (final c in crops.values)
         if (c.level == l) '🌱 ${c.name}',
@@ -203,6 +207,7 @@ class _FarmScreenState extends State<FarmScreen>
     if (o == null) {
       if (gx >= 0 && gy >= 0 && gx < mapSize && gy < mapSize &&
           !farm.owned(gx, gy) && Farm.terrain(gx, gy) != 'water') {
+        SoundService.instance.play('tap');
         _select(null, lot: Farm.lotOf(gx, gy));
       } else {
         _select(null);
@@ -246,6 +251,10 @@ class _FarmScreenState extends State<FarmScreen>
       case BKind.factory:
         if (farm.readyJobs(o) > 0) _report(farm.collectJobs(o));
       default:
+    }
+    if (o != _sel) {
+      final a = o.def.kind == BKind.pen && o.count > 0 ? animalForPen(o.type) : null;
+      SoundService.instance.play(a?.id ?? 'tap', volume: a != null ? .6 : 1);
     }
     _select(o);
   }
@@ -333,31 +342,58 @@ class _FarmScreenState extends State<FarmScreen>
 
   // ---------------------------------------------------------------- sheets
   Future<void> _openShop() async {
+    SoundService.instance.play('tap');
     _select(null);
     final type = await showFarmSheet<String>(context, (_) => ShopSheet(farm));
     if (type != null) _startPlace(type);
   }
 
   Future<void> _openProjects() async {
+    SoundService.instance.play('tap');
     _select(null);
     final type = await showFarmSheet<String>(context, (_) => ProjectsSheet(farm, _report), height: .8);
     if (type != null) _startPlace(type);
   }
 
   void _openStorage() {
+    SoundService.instance.play('tap');
     _select(null);
     showFarmSheet(context, (_) => StorageSheet(farm, _report));
   }
 
   void _openOrders() {
+    SoundService.instance.play('tap');
     _select(null);
     showFarmSheet(context, (_) => OrdersSheet(farm, _report), height: .78);
   }
 
   void _openMenu() {
+    SoundService.instance.play('tap');
+    final snd = SoundService.instance;
     showFarmSheet(
       context,
       (c) => ListView(padding: const EdgeInsets.all(8), children: [
+        const SheetHeader('Âm thanh'),
+        ValueListenableBuilder<bool>(
+          valueListenable: snd.musicOn,
+          builder: (_, on, _) => SwitchListTile(
+            dense: true,
+            activeThumbColor: green,
+            title: const Text('🎵 Nhạc nền đồng quê', style: TextStyle(color: brown, fontWeight: FontWeight.w700)),
+            value: on,
+            onChanged: (_) => snd.toggleMusic(),
+          ),
+        ),
+        ValueListenableBuilder<bool>(
+          valueListenable: snd.sfxOn,
+          builder: (_, on, _) => SwitchListTile(
+            dense: true,
+            activeThumbColor: green,
+            title: const Text('🔔 Hiệu ứng âm thanh', style: TextStyle(color: brown, fontWeight: FontWeight.w700)),
+            value: on,
+            onChanged: (_) => snd.toggleSfx(),
+          ),
+        ),
         const SheetHeader('Hướng dẫn'),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
@@ -397,7 +433,7 @@ class _FarmScreenState extends State<FarmScreen>
           ),
         ),
       ]),
-      height: .62,
+      height: .75,
     );
   }
 
