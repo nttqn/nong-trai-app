@@ -10,7 +10,7 @@
 //     a fake grey/white checkerboard) is flood-filled away from the borders,
 //     with a soft edge so outlines do not look cut out;
 //  2. trimmed to the visible object;
-//  3. scaled down to at most 512 px wide and written as PNG.
+//  3. scaled down to its on-map size (see maxWidthFor) and written as PNG.
 // Then it lists which expected sprites are still missing (see art/PROMPTS.md).
 import 'dart:io';
 import 'dart:math' as math;
@@ -34,7 +34,18 @@ final expected = [
   'bui', 'da', 'goc_cay',
 ];
 
-const maxWidth = 512;
+/// Max width by on-map size: about 3x the largest zoom on a 3x phone.
+int maxWidthFor(String key) {
+  const animals = {'ga', 'vit', 'lon', 'trau', 'bo'};
+  const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa'};
+  if (animals.contains(key)) return 160;
+  if (key.startsWith('nha_') || big.contains(key)) return 512;
+  if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',
+      'tram_bom', 'tram_y_te', 'cong_lang', 'cay_da'}.contains(key)) {
+    return 400;
+  }
+  return 256;
+}
 const tol = 46.0;
 
 void main(List<String> args) {
@@ -62,6 +73,7 @@ void main(List<String> args) {
     final hadAlpha = _transparentShare(im) > .03;
     if (!hadAlpha) _removeBackground(im);
     im = _trim(im);
+    final maxWidth = maxWidthFor(key);
     if (im.width > maxWidth) {
       im = img.copyResize(im, width: maxWidth, interpolation: img.Interpolation.cubic);
     }
