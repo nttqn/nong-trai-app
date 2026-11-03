@@ -1,3 +1,35 @@
 {
-  "goc_cay": {"scale": 0.85}
+  "goc_cay": {
+    "scale": 0.85
+  },
+  "cay_chuoi": {
+    "scale": 1.3
+  },
+  "cay_chuoi_qua": {
+    "scale": 1.3
+  },
+  "cay_xoai": {
+    "scale": 1.3
+  },
+  "cay_xoai_qua": {
+    "scale": 1.3
+  },
+  "cay_dua": {
+    "scale": 1.3
+  },
+  "cay_dua_qua": {
+    "scale": 1.3
+  },
+  "cay_buoi": {
+    "scale": 1.3
+  },
+  "cay_buoi_qua": {
+    "scale": 1.3
+  },
+  "cay_vai": {
+    "scale": 1.3
+  },
+  "cay_vai_qua": {
+    "scale": 1.3
+  }
 }
