@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 // Turns AI-generated art in art_src/ into game sprites in assets/sprites/.
 //
 //   dart run tool/sprites.dart            (all files)
