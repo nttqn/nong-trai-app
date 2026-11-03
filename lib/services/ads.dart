@@ -28,7 +28,7 @@ class AdsService {
   static String get rewardedUnit =>
       _ios ? 'ca-app-pub-3940256099942544/1712485313' : 'ca-app-pub-3940256099942544/5224354917';
   static String get interstitialUnit =>
-      _ios ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-3940256099942544/1033173712';
+      _ios ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-9078637596840810/5042851680';
 
   /// No interstitial within this long of any other full-screen ad or of
   /// the app starting, never before [interstitialLevel], and only after
