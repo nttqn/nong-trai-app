@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'core/demo.dart';
 import 'core/farm.dart';
+import 'render/sprites.dart';
 import 'services/save.dart';
 import 'services/sound.dart';
 import 'ui/farm_screen.dart';
@@ -44,12 +45,17 @@ class _BootState extends State<_Boot> {
   void initState() {
     super.initState();
     final q = kIsWeb ? Uri.base.queryParameters : const <String, String>{};
+    final sprites = Sprites.load().timeout(const Duration(seconds: 10), onTimeout: () {});
     if (q['demo'] != null) {
-      _farm = demoFarm(int.parse(q['demo']!), house: int.tryParse(q['house'] ?? '') ?? -1);
+      sprites.then((_) {
+        if (mounted) {
+          setState(() => _farm = demoFarm(int.parse(q['demo']!), house: int.tryParse(q['house'] ?? '') ?? -1));
+        }
+      });
       return;
     }
-    _save.load().then((f) {
-      if (mounted) setState(() => _farm = f);
+    Future.wait([_save.load(), sprites]).then((r) {
+      if (mounted) setState(() => _farm = r[0] as Farm);
     });
   }
 

@@ -11,6 +11,7 @@ import 'animals.dart';
 import 'ground.dart' show hash2;
 import 'iso.dart';
 import 'plants.dart';
+import 'sprites.dart';
 
 const mudWall = Color(0xFFD9C29A), plaster = Color(0xFFF3DC8E), brick = Color(0xFFB5523B);
 const wood = Color(0xFF8A5A33), woodDark = Color(0xFF6B4226);
@@ -19,6 +20,8 @@ const doorCol = Color(0xFF6D4126), windowCol = Color(0xFF3E5566);
 void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   final x = o.x.toDouble(), y = o.y.toDouble();
   final foot = iso.p(x + o.w / 2, y + o.h / 2);
+  final w = o.w.toDouble(), h = o.h.toDouble();
+  bool sprite(String key) => Sprites.foot(c, iso, key, x, y, w, h);
   switch (o.def.kind) {
     case BKind.paddy:
       _paddy(c, iso, farm, o, t);
@@ -30,23 +33,47 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
       _pond(c, iso, farm, o, t);
     case BKind.tree:
       final fruit = farm.progress(o);
-      drawTree(c, o.type, foot, fruit >= 1 ? 1 : fruit * .7, t, o.id);
+      if (!(farm.isReady(o) && sprite('${o.type}_qua')) && !sprite(o.type)) {
+        drawTree(c, o.type, foot, fruit >= 1 ? 1 : fruit * .7, t, o.id);
+      }
     case BKind.factory:
-      _factory(c, iso, farm, o, t);
+      if (sprite(o.type)) {
+        if (o.jobs.isNotEmpty && farm.now() < o.jobs.last.end) _smoke(c, iso.p(x + 1, y + .8, 52), t);
+      } else {
+        _factory(c, iso, farm, o, t);
+      }
     case BKind.house:
-      drawHouse(c, iso, x, y, o.level, t);
+      if (!sprite('nha_${o.level}')) drawHouse(c, iso, x, y, o.level, t);
     case BKind.project:
-      _project(c, iso, o.type, x, y, t);
+      if (!sprite(o.type)) _project(c, iso, o.type, x, y, t);
     case BKind.deco:
-      _deco(c, iso, o.type, x, y, foot, t, o.id);
+      if (!sprite(o.type)) _deco(c, iso, o.type, x, y, foot, t, o.id);
     case BKind.obstacle:
-      _obstacle(c, o.type, foot, o.id);
+      if (!sprite(o.type)) _obstacle(c, o.type, foot, o.id);
   }
 }
+
+void _smoke(Canvas c, Offset top, double t) {
+  for (var i = 0; i < 3; i++) {
+    final k = (t * .5 + i / 3) % 1;
+    circle(c, top + Offset(math.sin(k * 6 + i) * 4, -k * 22), 3 + k * 5, Color.fromRGBO(240, 240, 240, .55 * (1 - k)));
+  }
+}
+
+/// Crop growth stage for sprites: 1 seedling, 2 growing, 3 ripe.
+int cropStage(Farm farm, Obj o) => farm.isReady(o) ? 3 : (farm.progress(o) < .4 ? 1 : 2);
+
+/// One crop sprite filling the plot; false when missing.
+bool _cropSprite(Canvas c, Iso iso, Farm farm, Obj o, double z) =>
+    Sprites.foot(c, iso, '${o.crop}_${cropStage(farm, o)}', o.x + .06, o.y + .06, .88, .88, z: z);
 
 // ------------------------------------------------------------------ plots
 void _paddy(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   final x = o.x.toDouble(), y = o.y.toDouble();
+  if (Sprites.foot(c, iso, 'ruong', x, y, 1, 1)) {
+    if (o.crop != null && !_cropSprite(c, iso, farm, o, 0)) _paddyCrops(c, iso, farm, o, t);
+    return;
+  }
   fillPoly(c, diamond(iso, x, y, 1, 1), const Color(0xFF9C7A4D)); // dike
   final inner = diamond(iso, x + .1, y + .1, .8, .8, -1);
   fillPoly(c, inner, const Color(0xFF6FA9A0));
@@ -54,7 +81,12 @@ void _paddy(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   final r = (math.sin(t * .8 + o.id) + 1) / 2;
   line(c, iso.p(x + .25, y + .3, -1), iso.p(x + .5, y + .3, -1), Color.fromRGBO(255, 255, 255, .25 + .2 * r), 1.2);
   strokePoly(c, diamond(iso, x, y, 1, 1), const Color(0xFF8A6A40), 1);
-  if (o.crop == null) return;
+  if (o.crop == null || _cropSprite(c, iso, farm, o, -1)) return;
+  _paddyCrops(c, iso, farm, o, t);
+}
+
+void _paddyCrops(Canvas c, Iso iso, Farm farm, Obj o, double t) {
+  final x = o.x.toDouble(), y = o.y.toDouble();
   final g = farm.progress(o);
   final ripe = farm.isReady(o);
   for (var j = 0; j < 3; j++) {
@@ -66,6 +98,10 @@ void _paddy(Canvas c, Iso iso, Farm farm, Obj o, double t) {
 
 void _bed(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   final x = o.x.toDouble(), y = o.y.toDouble();
+  if (Sprites.foot(c, iso, 'luong', x, y, 1, 1)) {
+    if (o.crop != null && !_cropSprite(c, iso, farm, o, 0)) _bedCrops(c, iso, farm, o, t);
+    return;
+  }
   fillPoly(c, diamond(iso, x + .04, y + .04, .92, .92), const Color(0xFF8B5E3C));
   for (var k = 0; k < 3; k++) {
     final yy = y + .2 + k * .3;
@@ -73,7 +109,12 @@ void _bed(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         const Color(0xFFA0714A));
     line(c, iso.p(x + .1, yy + .08, 1.5), iso.p(x + .9, yy + .08, 1.5), const Color(0xFF6E4A2C), 1);
   }
-  if (o.crop == null) return;
+  if (o.crop == null || _cropSprite(c, iso, farm, o, 1.5)) return;
+  _bedCrops(c, iso, farm, o, t);
+}
+
+void _bedCrops(Canvas c, Iso iso, Farm farm, Obj o, double t) {
+  final x = o.x.toDouble(), y = o.y.toDouble();
   final g = farm.progress(o);
   final ripe = farm.isReady(o);
   for (var k = 0; k < 3; k++) {
@@ -87,6 +128,17 @@ void _bed(Canvas c, Iso iso, Farm farm, Obj o, double t) {
 void _pen(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   final x = o.x.toDouble(), y = o.y.toDouble();
   final a = animalForPen(o.type)!;
+  final penSprite = Sprites.foot(c, iso, o.type, x, y, 2, 2);
+  if (!penSprite) _penBack(c, iso, farm, o, a);
+  _penAnimals(c, iso, farm, o, a, t);
+  if (!penSprite) _fence(c, iso, x, y, 2, 2, gateFront: true, back: false);
+}
+
+/// Animal sprite widths (px at zoom 1; a tile is 64 wide).
+const _animalWidth = {'ga': 20.0, 'vit': 20.0, 'lon': 30.0, 'trau': 42.0, 'bo': 40.0};
+
+void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
+  final x = o.x.toDouble(), y = o.y.toDouble();
   final ground = switch (a.id) {
     'lon' => const Color(0xFF9E7B57),
     'vit' => const Color(0xFFA9B76A),
@@ -117,6 +169,10 @@ void _pen(Canvas c, Iso iso, Farm farm, Obj o, double t) {
       fillPoly(c, diamond(iso, x + 1.25, y + .23, .5, .19, 4), a.feed == 'cam' ? const Color(0xFFBCAAA4) : const Color(0xFFE8C766));
     }
   }
+}
+
+void _penAnimals(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a, double t) {
+  final x = o.x.toDouble(), y = o.y.toDouble();
   // animals wander
   final n = o.count;
   final producing = o.end != 0;
@@ -125,7 +181,12 @@ void _pen(Canvas c, Iso iso, Farm farm, Obj o, double t) {
     final px = x + 1 + math.cos(t * speed + i * 2.1) * .55 + (i % 3 - 1) * .18;
     final py = y + 1.15 + math.sin(t * speed * .8 + i * 1.3) * .5 + (i ~/ 3 - .5) * .25;
     final dir = -math.sin(t * speed + i * 2.1) >= 0 ? 1.0 : -1.0;
-    drawAnimal(c, a.id, iso.p(px.clamp(x + .35, x + 1.7), py.clamp(y + .9, y + 1.8)), dir, t, i.toDouble());
+    final pos = iso.p(px.clamp(x + .35, x + 1.7), py.clamp(y + .9, y + 1.8));
+    // Sprites face lower-left; a gentle bob stands in for walking.
+    final bob = Offset(0, -(math.sin(t * 6 * speed + i * 1.7).abs()) * 1.5);
+    if (!Sprites.at(c, a.id, pos + bob, _animalWidth[a.id] ?? 24, flipX: dir > 0)) {
+      drawAnimal(c, a.id, pos, dir, t, i.toDouble());
+    }
   }
   // products on the ground
   if (farm.isReady(o)) {
@@ -136,7 +197,6 @@ void _pen(Canvas c, Iso iso, Farm farm, Obj o, double t) {
       }
     }
   }
-  _fence(c, iso, x, y, 2, 2, gateFront: true, back: false);
 }
 
 void _fence(Canvas c, Iso iso, double x, double y, double w, double h, {bool gateFront = false, required bool back}) {
@@ -170,6 +230,11 @@ void _fence(Canvas c, Iso iso, double x, double y, double w, double h, {bool gat
 void _pond(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   final x = o.x.toDouble(), y = o.y.toDouble();
   final cx = iso.p(x + 1, y + 1);
+  if (!Sprites.foot(c, iso, 'ao', x, y, 2, 2)) _pondBase(c, iso, x, y, cx, t);
+  _pondFish(c, farm, o, cx, t);
+}
+
+void _pondBase(Canvas c, Iso iso, double x, double y, Offset cx, double t) {
   oval(c, cx, 54, 27, const Color(0xFF8A6A42));
   oval(c, cx + const Offset(0, 2), 50, 24, const Color(0xFF3B86B0));
   oval(c, cx + const Offset(0, 4), 44, 20, const Color(0xFF4A9CC6));
@@ -184,6 +249,9 @@ void _pond(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   circle(c, cx + const Offset(-27, 6), 2.4, const Color(0xFFF48FB1));
   // little wooden jetty
   box(c, iso, x + 1.55, y + 1.6, .4, .35, 2, 4, const Color(0xFFB08455), wood, woodDark);
+}
+
+void _pondFish(Canvas c, Farm farm, Obj o, Offset cx, double t) {
   if (o.crop != null) {
     final ready = farm.isReady(o);
     final n = ready ? 5 : 3;
@@ -260,13 +328,7 @@ void _factory(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         oval(c, p + const Offset(-2, -8), 2, 4, const Color(0x33FFFFFF));
       }
   }
-  if (working) {
-    final top = iso.p(x + 1, y + .8, 48);
-    for (var i = 0; i < 3; i++) {
-      final k = (t * .5 + i / 3) % 1;
-      circle(c, top + Offset(math.sin(k * 6 + i) * 4, -k * 22), 3 + k * 5, Color.fromRGBO(240, 240, 240, .55 * (1 - k)));
-    }
-  }
+  if (working) _smoke(c, iso.p(x + 1, y + .8, 48), t);
 }
 
 // ------------------------------------------------------------------ house
