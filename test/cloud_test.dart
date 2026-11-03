@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nong_trai/core/farm.dart';
+import 'package:nong_trai/core/quests.dart';
 import 'package:nong_trai/core/sync_plan.dart';
 
 void main() {
@@ -56,5 +57,13 @@ void main() {
     // any buildable workshop on free grass
     expect(f.build('may_xay', 3, 3) == null || f.build('may_xay', 18, 3) == null || f.build('may_xay', 3, 18) == null, isTrue);
     expect(events, contains('build'));
+  });
+
+  test('a village project built before its quest still counts', () {
+    final f = Farm.fresh(now: () => 1000, seed: 3);
+    f.stats['project:gieng'] = 1;
+    f.quest = questChain.indexWhere((q) => q.key == 'project:gieng');
+    f.questBase = 1; // baseline taken when the quest came up
+    expect(f.questDone, isTrue);
   });
 }
