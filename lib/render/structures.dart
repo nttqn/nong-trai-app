@@ -135,7 +135,7 @@ void _pen(Canvas c, Iso iso, Farm farm, Obj o, double t) {
 }
 
 /// Animal sprite widths (px at zoom 1; a tile is 64 wide).
-const _animalWidth = {'ga': 15.0, 'vit': 16.0, 'lon': 26.0, 'trau': 38.0, 'bo': 36.0};
+const _animalWidth = {'ga': 15.0, 'vit': 16.0, 'lon': 24.0, 'trau': 31.0, 'bo': 30.0};
 
 void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
   final x = o.x.toDouble(), y = o.y.toDouble();
