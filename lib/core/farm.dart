@@ -152,11 +152,20 @@ class Farm {
   static int lotIndex(int lx, int ly) => lx + ly * lotsPerSide;
   static int lotOf(int x, int y) => lotIndex(x ~/ lotSize, y ~/ lotSize);
 
+  static const roadX = 11;
+
   static String terrain(int x, int y) {
     if (y <= 1) return 'water';
-    if (x == 11) return 'road';
+    if (x == roadX) return 'road';
     return 'grass';
   }
+
+  /// Buildings that stand across the village road (the gate).
+  static bool spansRoad(String type) => type == 'cong_lang';
+
+  /// Where a placement preview of [type] may sit along x: a road-spanning
+  /// building is centred on the road, everything else stays put.
+  static int snapX(String type, int x) => spansRoad(type) ? roadX - bdef(type).w ~/ 2 : x;
 
   bool owned(int x, int y) => lots.contains(lotOf(x, y));
 
@@ -204,7 +213,44 @@ class Farm {
 
   bool canPlace(String type, int x, int y, {int? ignore}) {
     final d = bdef(type);
+    if (spansRoad(type)) return _canSpanRoad(d, x, y, ignore: ignore);
     return _canPlaceRaw(d.w, d.h, x, y, ignore: ignore);
+  }
+
+  /// The gate: centred on the road, every tile owned and free, the side
+  /// tiles on grass.
+  bool _canSpanRoad(BuildingDef d, int x, int y, {int? ignore}) {
+    if (x != snapX(d.id, x) || y <= 1 || y + d.h > mapSize) return false;
+    for (var dx = 0; dx < d.w; dx++) {
+      for (var dy = 0; dy < d.h; dy++) {
+        final tx = x + dx, ty = y + dy;
+        if (tx == roadX) {
+          if (!owned(tx, ty)) return false;
+          final id = occ[tx + ty * mapSize];
+          if (id != null && id != ignore) return false;
+        } else if (!_canPlaceRaw(1, 1, tx, ty, ignore: ignore)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /// Saves from before the gate spanned the road: move it onto the road
+  /// (nearest free row), or leave it where it is if there is no room.
+  void _fixRoadBuildings() {
+    for (final o in objs) {
+      if (!spansRoad(o.type) || canPlace(o.type, o.x, o.y, ignore: o.id)) continue;
+      final rows = [for (var y = 2; y < mapSize; y++) y]..sort((a, b) => (a - o.y).abs().compareTo((b - o.y).abs()));
+      for (final y in rows) {
+        if (canPlace(o.type, snapX(o.type, o.x), y, ignore: o.id)) {
+          o.x = snapX(o.type, o.x);
+          o.y = y;
+          _occ = null;
+          break;
+        }
+      }
+    }
   }
 
   // ---------------------------------------------------------------- bonuses
@@ -827,6 +873,7 @@ class Farm {
     f.orders.addAll([for (final o in j['orders']) Order.fromJson(o)]);
     f.stats.addAll(Map<String, int>.from(j['stats']));
     f.objs.removeWhere((o) => !buildings.containsKey(o.type));
+    f._fixRoadBuildings();
     return f;
   }
 }

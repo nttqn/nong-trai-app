@@ -226,7 +226,8 @@ const buildings = <String, BuildingDef>{
   'gieng': BuildingDef('gieng', 'Giếng làng', BKind.project, 1, 1, 3, 300,
       goods: {'thoc': 10}, unique: true, xp: 20,
       desc: 'Nước sạch tưới rau: luống rau màu lớn nhanh hơn 10%.'),
-  'cong_lang': BuildingDef('cong_lang', 'Cổng làng', BKind.project, 2, 1, 5, 1200,
+  // 3 tiles wide: pillars on the grass either side, the arch over the road.
+  'cong_lang': BuildingDef('cong_lang', 'Cổng làng', BKind.project, 3, 1, 5, 1200,
       goods: {'rom': 10, 'gao': 5}, unique: true, xp: 40,
       desc: 'Cổng làng khang trang: +10% kinh nghiệm.'),
   'duong_be_tong': BuildingDef('duong_be_tong', 'Bê tông hóa đường làng',

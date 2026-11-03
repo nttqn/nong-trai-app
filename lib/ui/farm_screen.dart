@@ -282,7 +282,7 @@ class _FarmScreenState extends State<FarmScreen>
     if (_placeType != null || _moving != null) {
       final d = bdef(_placeType ?? _moving!.type);
       setState(() {
-        _view.ghostX = (gx - (d.w - 1) / 2).round();
+        _view.ghostX = Farm.snapX(d.id, (gx - (d.w - 1) / 2).round());
         _view.ghostY = (gy - (d.h - 1) / 2).round();
       });
       return;
@@ -377,7 +377,7 @@ class _FarmScreenState extends State<FarmScreen>
       _plantCrop = null;
       _placeType = type;
       _view.ghostType = type;
-      _view.ghostX = cx - d.w ~/ 2;
+      _view.ghostX = Farm.snapX(d.id, cx - d.w ~/ 2);
       _view.ghostY = cy - d.h ~/ 2;
       _nudgeGhost(type);
     });

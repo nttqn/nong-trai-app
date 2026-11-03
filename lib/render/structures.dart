@@ -443,13 +443,16 @@ void _project(Canvas c, Iso iso, String type, double x, double y, double t) {
       line(c, f + const Offset(0, -34), f + const Offset(0, -22), const Color(0xFF6D6D6D), .8);
       c.drawRect(Rect.fromLTWH(f.dx - 3, f.dy - 24, 6, 5), Paint()..color = const Color(0xFF8D6E63));
     case 'cong_lang':
-      fillPoly(c, diamond(iso, x, y, 2, 1), const Color(0xFFCFCBC0));
-      for (final xx in [.15, 1.65]) {
-        wallBox(c, iso, x + xx, y + .3, .2, .4, 0, 40, const Color(0xFFEAE0C8));
+      // pillars on the grass either side, the arch over the road between
+      for (final xx in [0.0, 2.0]) {
+        fillPoly(c, diamond(iso, x + xx + .1, y + .1, .8, .8), const Color(0xFFCFCBC0));
       }
-      box(c, iso, x + .05, y + .25, 1.9, .5, 40, 50, const Color(0xFFEAE0C8), const Color(0xFFE0D3B5), const Color(0xFFC9BC9E));
-      hipRoof(c, iso, x + .05, y + .25, 1.9, .5, 50, 10, RoofStyle.tile, curl: true, over: .1);
-      final sign = iso.p(x + 1, y + .75, 45);
+      for (final xx in [.45, 2.35]) {
+        wallBox(c, iso, x + xx, y + .3, .2, .4, 0, 44, const Color(0xFFEAE0C8));
+      }
+      box(c, iso, x + .3, y + .25, 2.4, .5, 44, 54, const Color(0xFFEAE0C8), const Color(0xFFE0D3B5), const Color(0xFFC9BC9E));
+      hipRoof(c, iso, x + .3, y + .25, 2.4, .5, 54, 10, RoofStyle.tile, curl: true, over: .1);
+      final sign = iso.p(x + 1.5, y + .75, 49);
       final tp = textPainter('LÀNG QUÊ', 6.5, color: const Color(0xFFB71C1C), weight: FontWeight.w900);
       c.save();
       c.translate(sign.dx, sign.dy);

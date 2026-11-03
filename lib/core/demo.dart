@@ -81,11 +81,15 @@ Farm demoFarm(int stage, {int house = -1}) {
   if (stage >= 2) {
     f.level = 20;
     for (final (p, x, y) in [
-      ('gieng', 10, 10), ('cong_lang', 12, 5), ('tram_bom', 19, 8), ('tram_dien', 18, 6),
+      ('gieng', 10, 10), ('tram_bom', 19, 8), ('tram_dien', 18, 6),
       ('truong', 0, 8), ('tram_y_te', 3, 10), ('cho_que', 19, 17), ('nha_van_hoa', 0, 13),
       ('dinh_lang', 2, 15),
     ]) {
       put(p, x, y);
+    }
+    // the gate goes on the first free row of the road
+    for (var y = 2; y < mapSize && !f.has('cong_lang'); y++) {
+      put('cong_lang', Farm.snapX('cong_lang', 0), y);
     }
     f.build('duong_be_tong', 0, 0);
   }

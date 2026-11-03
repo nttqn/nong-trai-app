@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nong_trai/core/defs.dart';
 import 'package:nong_trai/core/farm.dart';
 import 'package:nong_trai/core/quests.dart';
 import 'package:nong_trai/core/sync_plan.dart';
@@ -65,5 +66,22 @@ void main() {
     f.quest = questChain.indexWhere((q) => q.key == 'project:gieng');
     f.questBase = 1; // baseline taken when the quest came up
     expect(f.questDone, isTrue);
+  });
+
+  test('the village gate only stands across the road; old saves move onto it', () {
+    final f = Farm.fresh(now: () => 1000, seed: 3);
+    f.objs.removeWhere((o) => o.def.kind == BKind.obstacle);
+    // Starting lots cover rows 6-11 on both sides of the road.
+    expect(f.canPlace('cong_lang', 12, 8), isFalse); // off the road
+    expect(f.canPlace('cong_lang', 10, 8), isTrue); // pillars at x 10 and 12
+    expect(Farm.snapX('cong_lang', 7), 10);
+    expect(Farm.snapX('chuong_ga', 7), 7);
+    // A gate saved on plain grass is moved onto the road when loaded.
+    final j = f.toJson();
+    (j['objs'] as List).add({'i': 999, 't': 'cong_lang', 'x': 13, 'y': 9});
+    final g = Farm.fromJson(jsonDecode(jsonEncode(j)) as Map<String, dynamic>);
+    final gate = g.objs.firstWhere((o) => o.type == 'cong_lang');
+    expect(gate.x, 10);
+    expect(g.canPlace('cong_lang', gate.x, gate.y, ignore: gate.id), isTrue);
   });
 }
