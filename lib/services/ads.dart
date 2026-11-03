@@ -10,7 +10,7 @@ import 'analytics.dart';
 /// pen or workshop; double level-up coins) and a rare interstitial after
 /// delivering an order.
 ///
-/// Unit ids are Google's sample ids until the game's own AdMob app exists
+/// Android uses the game's own AdMob units; iOS still uses Google samples
 /// (App ID in android/app/build.gradle.kts). A no-op on web and in tests;
 /// any ad failure just means "no ad", never a blocked game.
 class AdsService {
@@ -24,9 +24,9 @@ class AdsService {
       !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
   static bool get _ios => defaultTargetPlatform == TargetPlatform.iOS;
 
-  // TODO(ads): replace with the game's own units once the AdMob app exists.
+  // Android: the game's own units. iOS: Google samples (no iOS app yet).
   static String get rewardedUnit =>
-      _ios ? 'ca-app-pub-3940256099942544/1712485313' : 'ca-app-pub-3940256099942544/5224354917';
+      _ios ? 'ca-app-pub-3940256099942544/1712485313' : 'ca-app-pub-9078637596840810/6352898077';
   static String get interstitialUnit =>
       _ios ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-9078637596840810/5042851680';
 
