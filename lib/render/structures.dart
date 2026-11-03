@@ -65,7 +65,7 @@ int cropStage(Farm farm, Obj o) => farm.isReady(o) ? 3 : (farm.progress(o) < .4 
 
 /// One crop sprite filling the plot; false when missing.
 bool _cropSprite(Canvas c, Iso iso, Farm farm, Obj o, double z) =>
-    Sprites.foot(c, iso, '${o.crop}_${cropStage(farm, o)}', o.x + .06, o.y + .06, .88, .88, z: z);
+    Sprites.foot(c, iso, '${o.crop}_${cropStage(farm, o)}', o.x + .1, o.y + .1, .8, .8, z: z);
 
 // ------------------------------------------------------------------ plots
 void _paddy(Canvas c, Iso iso, Farm farm, Obj o, double t) {
@@ -135,7 +135,7 @@ void _pen(Canvas c, Iso iso, Farm farm, Obj o, double t) {
 }
 
 /// Animal sprite widths (px at zoom 1; a tile is 64 wide).
-const _animalWidth = {'ga': 20.0, 'vit': 20.0, 'lon': 30.0, 'trau': 42.0, 'bo': 40.0};
+const _animalWidth = {'ga': 15.0, 'vit': 16.0, 'lon': 26.0, 'trau': 38.0, 'bo': 36.0};
 
 void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
   final x = o.x.toDouble(), y = o.y.toDouble();
