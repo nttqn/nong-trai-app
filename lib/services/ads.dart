@@ -8,12 +8,12 @@ import 'analytics.dart';
 
 /// AdMob: rewarded ads the player chooses to watch ("xong ngay" on a crop,
 /// pen or workshop; double level-up coins) and a rare interstitial after
-/// delivering an order.
+/// delivering an order, plus an App Open ad when the player comes back.
 ///
 /// Android uses the game's own AdMob units; iOS still uses Google samples
 /// (App ID in android/app/build.gradle.kts). A no-op on web and in tests;
 /// any ad failure just means "no ad", never a blocked game.
-class AdsService {
+class AdsService with WidgetsBindingObserver {
   AdsService._();
   static final AdsService instance = AdsService._();
 
@@ -30,6 +30,18 @@ class AdsService {
   static String get interstitialUnit =>
       _ios ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-9078637596840810/5042851680';
 
+  static String get appOpenUnit => _ios ? '' : 'ca-app-pub-9078637596840810/5039816409';
+
+  /// App Open: on a cold start (if the ad loads within [appOpenColdWait])
+  /// and when coming back after [appOpenAway] in the background; never
+  /// before [appOpenLevel] or within [interstitialGap] of another ad.
+  static const appOpenAway = Duration(minutes: 30);
+  static const appOpenColdWait = Duration(seconds: 6);
+  static const appOpenLevel = 3;
+
+  /// The player's level, set by the farm screen.
+  int Function() playerLevel = () => 1;
+
   /// No interstitial within this long of any other full-screen ad or of
   /// the app starting, never before [interstitialLevel], and only after
   /// every [interstitialEvery]-th delivered order.
@@ -42,6 +54,10 @@ class AdsService {
   bool _started = false, _loadingRewarded = false;
   RewardedAd? _rewarded;
   InterstitialAd? _interstitial;
+  AppOpenAd? _appOpen;
+  DateTime? _pausedAt;
+  DateTime? _coldUntil;
+  bool _showing = false;
   DateTime _lastFullScreen = DateTime.now();
   int _orders = 0;
 
@@ -52,8 +68,11 @@ class AdsService {
       if (!await ConsentInformation.instance.canRequestAds()) return;
       await MobileAds.instance.initialize();
       _started = true;
+      _coldUntil = DateTime.now().add(appOpenColdWait);
+      _loadAppOpen();
       _loadRewarded();
       _loadInterstitial();
+      WidgetsBinding.instance.addObserver(this);
     } catch (e) {
       debugPrint('ads off: $e');
     }
@@ -144,17 +163,20 @@ class AdsService {
     ad.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
+        _showing = false;
         _lastFullScreen = DateTime.now();
         _loadRewarded();
         if (!result.isCompleted) result.complete(earned);
       },
       onAdFailedToShowFullScreenContent: (ad, _) {
         ad.dispose();
+        _showing = false;
         _loadRewarded();
         if (!result.isCompleted) result.complete(false);
       },
     );
     await _leadIn();
+    _showing = true;
     await ad.show(onUserEarnedReward: (_, _) {
       earned = true;
       Analytics.instance.log('ad_reward', {'placement': placement});
@@ -190,15 +212,81 @@ class AdsService {
     ad.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
+        _showing = false;
         _lastFullScreen = DateTime.now();
         _loadInterstitial();
       },
       onAdFailedToShowFullScreenContent: (ad, _) {
         ad.dispose();
+        _showing = false;
         _loadInterstitial();
       },
     );
     Analytics.instance.log('ad_interstitial');
-    _leadIn().then((_) => ad.show());
+    _leadIn().then((_) {
+      _showing = true;
+      ad.show();
+    });
+  }
+
+  // ------------------------------------------------------------ app open
+
+  void _loadAppOpen() {
+    if (!_started || _appOpen != null || appOpenUnit.isEmpty) return;
+    AppOpenAd.load(
+      adUnitId: appOpenUnit,
+      request: const AdRequest(),
+      adLoadCallback: AppOpenAdLoadCallback(
+        onAdLoaded: (ad) {
+          _appOpen = ad;
+          final cold = _coldUntil;
+          _coldUntil = null;
+          if (cold != null && DateTime.now().isBefore(cold)) _maybeShowAppOpen(cold: true);
+        },
+        onAdFailedToLoad: (_) {
+          _appOpen = null;
+          _coldUntil = null;
+        },
+      ),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_showing) return;
+    if (state == AppLifecycleState.paused) {
+      _pausedAt = DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      final away = _pausedAt == null ? Duration.zero : DateTime.now().difference(_pausedAt!);
+      _pausedAt = null;
+      if (away >= appOpenAway) _maybeShowAppOpen();
+    }
+  }
+
+  void _maybeShowAppOpen({bool cold = false}) {
+    final ad = _appOpen;
+    if (!_started || ad == null || _showing) {
+      _loadAppOpen();
+      return;
+    }
+    if (playerLevel() < appOpenLevel) return;
+    if (!cold && DateTime.now().difference(_lastFullScreen) < interstitialGap) return;
+    _appOpen = null;
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        _showing = false;
+        _lastFullScreen = DateTime.now();
+        _loadAppOpen();
+      },
+      onAdFailedToShowFullScreenContent: (ad, _) {
+        ad.dispose();
+        _showing = false;
+        _loadAppOpen();
+      },
+    );
+    Analytics.instance.log('ad_app_open', {'cold': cold ? 1 : 0});
+    _showing = true;
+    ad.show();
   }
 }

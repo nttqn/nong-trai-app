@@ -60,6 +60,7 @@ class _FarmScreenState extends State<FarmScreen>
       _levelUps.add(l);
       Analytics.instance.levelUp(l);
     };
+    AdsService.instance.playerLevel = () => farm.level;
     farm.onEvent = (name, params) {
       Analytics.instance.log(name, params);
       if (name == 'order_delivered') AdsService.instance.onOrderDelivered(farm.level);
