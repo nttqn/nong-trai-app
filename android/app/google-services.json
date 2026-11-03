@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "898577851357",
+    "project_id": "nong-trai-26f99",
+    "storage_bucket": "nong-trai-26f99.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898577851357:android:5bf7632921efd496df8c34",
+        "android_client_info": {
+          "package_name": "com.trungsmail.nongtrai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "898577851357-n6p49u71evttbqbaofqfsagvdis6nh6e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trungsmail.nongtrai",
+            "certificate_hash": "2fd57da4214035503c510347278eb68e9715ebaf"
+          }
+        },
+        {
+          "client_id": "898577851357-8av10gui3gdfd04v7f03taq1ee3lgskc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2FyGFv42zMeUHN7siOcji_tpc1h26C84"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "898577851357-8av10gui3gdfd04v7f03taq1ee3lgskc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
