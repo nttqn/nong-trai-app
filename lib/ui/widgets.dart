@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../core/defs.dart';
@@ -152,4 +154,35 @@ Future<T?> showFarmSheet<T>(BuildContext context, Widget Function(BuildContext) 
       child: SafeArea(top: false, child: builder(ctx)),
     ),
   );
+}
+
+/// Rebuilds [builder] every [every]. Unlike StreamBuilder(Stream.periodic),
+/// it can be unmounted and mounted again (e.g. scrolled out of a ListView
+/// and back), which made release builds show a grey error box.
+class Ticking extends StatefulWidget {
+  final Duration every;
+  final WidgetBuilder builder;
+  const Ticking(this.every, {required this.builder, super.key});
+  @override
+  State<Ticking> createState() => _TickingState();
+}
+
+class _TickingState extends State<Ticking> {
+  Timer? _timer;
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(widget.every, (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context);
 }

@@ -245,19 +245,20 @@ class _OrdersSheetState extends State<OrdersSheet> {
     final done = f.daily.where((o) => o.waitUntil < 0).length;
     return [
       Row(children: [
-        const Text('⭐ Đơn đặc biệt hôm nay',
-            style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFB7791F), fontSize: 15.5)),
-        const Spacer(),
-        StreamBuilder(
-          stream: Stream.periodic(const Duration(seconds: 30)),
-          builder: (_, _) => Text('Đổi sau ${fmtTime(f.dailyResetMs)}',
+        const Expanded(
+          child: Text('⭐ Đơn đặc biệt hôm nay',
+              style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFB7791F), fontSize: 15.5)),
+        ),
+        Ticking(const Duration(seconds: 30), builder: (_) => Text('Đổi sau ${fmtTime(f.dailyResetMs)}',
               style: const TextStyle(fontSize: 12, color: brownLight, fontWeight: FontWeight.w700)),
         ),
       ]),
       Padding(
         padding: const EdgeInsets.only(top: 2, bottom: 6),
         child: Row(children: [
-          Text('Giao đủ 3 đơn ($done/3) thưởng thêm ', style: const TextStyle(fontSize: 12.5, color: brown)),
+          Flexible(
+              child: Text('Giao đủ 3 đơn ($done/3) thưởng thêm ',
+                  style: const TextStyle(fontSize: 12.5, color: brown))),
           Coin(f.dailyAllBonus, size: 12.5),
           if (f.dailyAllDone) const Text('  ✅', style: TextStyle(fontSize: 12.5)),
         ]),
@@ -284,8 +285,10 @@ class _OrdersSheetState extends State<OrdersSheet> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('⭐ ${o.who}', style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15)),
-          const Spacer(),
+          Expanded(
+              child: Text('⭐ ${o.who}',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15))),
           Coin(o.coins, size: 14),
           const SizedBox(width: 8),
           Text('⭐ ${o.xp}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1E88E5))),
@@ -325,9 +328,7 @@ class _OrdersSheetState extends State<OrdersSheet> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: cardDeco(color: const Color(0xFFEFE6D2)),
-        child: StreamBuilder(
-          stream: Stream.periodic(const Duration(seconds: 1)),
-          builder: (_, _) {
+        child: Ticking(const Duration(seconds: 1), builder: (_) {
             final left = o.waitUntil - f.now();
             if (left <= 0) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -347,8 +348,10 @@ class _OrdersSheetState extends State<OrdersSheet> {
       decoration: cardDeco(color: ok ? const Color(0xFFF1F8E4) : Colors.white),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text('👤 ${o.who}', style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15)),
-          const Spacer(),
+          Expanded(
+              child: Text('👤 ${o.who}',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15))),
           Coin(o.coins, size: 14),
           const SizedBox(width: 8),
           Text('⭐ ${o.xp}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1E88E5))),

@@ -104,9 +104,7 @@ class ObjPanel extends StatelessWidget {
     }
   }
 
-  Widget _timer(String label) => StreamBuilder(
-        stream: Stream.periodic(const Duration(seconds: 1)),
-        builder: (_, _) {
+  Widget _timer(String label) => Ticking(const Duration(seconds: 1), builder: (_) {
           final p = farm.progress(o);
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
@@ -302,9 +300,7 @@ class ObjPanel extends StatelessWidget {
         if (ready > 0) PillButton('Lấy hàng ($ready)', dense: true, onTap: () => _do(farm.collectJobs(o))),
       ]),
       if (o.jobs.isNotEmpty)
-        StreamBuilder(
-          stream: Stream.periodic(const Duration(seconds: 1)),
-          builder: (_, _) {
+        Ticking(const Duration(seconds: 1), builder: (_) {
             final now = farm.now();
             final next = o.jobs.where((j) => j.end > now).toList();
             if (next.isEmpty) return const SizedBox.shrink();
