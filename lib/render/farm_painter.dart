@@ -51,6 +51,24 @@ double objHeight(Obj o) => switch (o.def.kind) {
       _ => 12,
     };
 
+/// The object's body is its footprint pushed straight up by [objHeight]
+/// (a prism), slightly inset: a point hits it when some point below it,
+/// within that height, lies on the footprint. Unlike a bounding box this
+/// leaves the tiles beside and behind a building's roof tappable.
+bool _bodyHit(Obj o, Offset s) {
+  // (x, y, w, h) of the tall part on the grid, and its height in px
+  final (bx, by, bw, bh, hgt) = switch (o.type) {
+    // code-drawn: a small pump house on a wide concrete pad
+    'tram_bom' => (o.x + .25, o.y + .25, 1.2, 1.1, 30.0),
+    _ => (o.x + .12, o.y + .12, o.w - .24, o.h - .24, objHeight(o)),
+  };
+  for (var h = 0.0; h <= hgt; h += 3) {
+    final (gx, gy) = worldIso.toGrid(s + Offset(0, h));
+    if (gx > bx && gx < bx + bw && gy > by && gy < by + bh) return true;
+  }
+  return false;
+}
+
 int depthOf(Obj o) => (o.x + o.w) + (o.y + o.h);
 
 /// Frontmost object under a screen point (footprint or its tall body).
@@ -93,15 +111,7 @@ Obj? hitTest(Farm farm, Offset s) {
   Obj? best;
   var bestDepth = -1;
   for (final o in farm.objs) {
-    var hit = o.contains(gx.floor(), gy.floor());
-    if (!hit) {
-      final l = worldIso.p(o.x.toDouble(), o.y + o.h.toDouble()).dx;
-      final r = worldIso.p(o.x + o.w.toDouble(), o.y.toDouble()).dx;
-      final top = worldIso.p(o.x.toDouble(), o.y.toDouble()).dy - objHeight(o);
-      final bottom = worldIso.p(o.x + o.w.toDouble(), o.y + o.h.toDouble()).dy;
-      final midY = worldIso.p(o.x + o.w / 2, o.y + o.h / 2).dy;
-      hit = s.dx > l + 6 && s.dx < r - 6 && s.dy > top && s.dy < math.min(bottom, midY + 4);
-    }
+    var hit = o.contains(gx.floor(), gy.floor()) || _bodyHit(o, s);
     if (hit && depthOf(o) > bestDepth) {
       best = o;
       bestDepth = depthOf(o);

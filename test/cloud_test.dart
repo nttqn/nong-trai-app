@@ -107,6 +107,24 @@ void main() {
     expect(hitTest(f, bubbleAt(worldIso, tree) + const Offset(6, 4)), same(tree));
   });
 
+  test('plots behind the pump station can still be tapped', () {
+    final f = Farm.fresh(now: () => 1000, seed: 3);
+    f.objs.clear();
+    const x = 5, y = 5;
+    final pump = Obj(f.nextId++, 'tram_bom', x, y);
+    // fields beside its back corner, tapped in the middle; the one straight
+    // behind it is half hidden by the roof, so tapped on its visible part
+    final side = [Obj(f.nextId++, 'ruong', x + 1, y - 1), Obj(f.nextId++, 'ruong', x - 1, y + 1)];
+    final back = Obj(f.nextId++, 'ruong', x - 1, y - 1);
+    f.objs.addAll([pump, ...side, back]);
+    for (final p in side) {
+      expect(hitTest(f, worldIso.p(p.x + .5, p.y + .5)), same(p));
+    }
+    expect(hitTest(f, worldIso.p(back.x + .25, back.y + .25)), same(back));
+    // the pump house itself still selects the pump
+    expect(hitTest(f, worldIso.p(x + .85, y + .8, 20)), same(pump));
+  });
+
   test('warehouses add storage, cost more each, upgrade, max 3', () {
     final f = Farm.fresh(now: () => 1000, seed: 3);
     f.objs.removeWhere((o) => o.def.kind == BKind.obstacle);
