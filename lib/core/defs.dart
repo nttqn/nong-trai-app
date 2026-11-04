@@ -428,12 +428,19 @@ const houseLevels = [
 int xpToNext(int level) => (20 * math.pow(level, 1.55)).round();
 
 /// Land is sold in lots of [lotSize]×[lotSize] tiles.
-const mapSize = 24, lotSize = 6, lotsPerSide = mapSize ~/ lotSize;
+/// The map grew from 24 (4x4 lots) to 36 (6x6 lots) on 2026-11-04; older
+/// saves are moved over in Farm.fromJson (see legacyMapSize).
+const mapSize = 36, lotSize = 6, lotsPerSide = mapSize ~/ lotSize;
+const legacyMapSize = 24;
 
 int lotPrice(int nth) => const [0, 0, 400, 1000, 2000, 3500, 5500, 8000,
-    11000, 15000, 20000, 26000, 33000, 41000, 50000, 60000][nth.clamp(0, 15)];
+    11000, 15000, 20000, 26000, 33000, 41000, 50000, 60000,
+    // the outer ring added with the bigger map
+    80000, 92000, 105000, 120000, 137000, 156000, 178000, 203000, 231000, 263000,
+    300000, 342000, 390000, 445000, 507000, 578000, 659000, 751000, 856000, 980000][nth.clamp(0, 35)];
 int lotLevel(int nth) => const [1, 1, 2, 4, 6, 8, 10, 12, 13, 14, 15, 16, 17,
-    18, 19, 20][nth.clamp(0, 15)];
+    18, 19, 20,
+    21, 21, 22, 22, 23, 24, 24, 25, 26, 26, 27, 28, 28, 29, 30, 31, 32, 33, 34, 35][nth.clamp(0, 35)];
 
 const villagers = [
   'Bà Tư', 'Ông Sáu', 'Cô Lan', 'Chú Bảy', 'Anh Hai', 'Chị Ba', 'Bác Năm',

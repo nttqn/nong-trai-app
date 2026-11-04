@@ -47,7 +47,7 @@ service cloud.firestore {
         && request.resource.data.name.size() <= 24
         && request.resource.data.level is int
         && request.resource.data.objs is list
-        && request.resource.data.objs.size() <= 600
+        && request.resource.data.objs.size() <= 1400
         && request.resource.data.updated == request.time;
     }
 

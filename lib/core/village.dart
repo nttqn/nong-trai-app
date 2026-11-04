@@ -1,10 +1,12 @@
 // The public face of a farm: what neighbours see when they visit. Only the
 // layout and what is growing (no coins, storage, orders or stats).
 
+import 'defs.dart';
 import 'farm.dart';
 
 Map<String, dynamic> villageSnapshot(Farm f) => {
       'v': 1,
+      'map': mapSize,
       'name': f.name.length > 24 ? f.name.substring(0, 24) : f.name,
       'level': f.level,
       'house': f.houseLevel,
@@ -25,6 +27,7 @@ Farm farmFromVillage(Map<String, dynamic> m, {NowFn? now}) => Farm.fromJson({
       'nextId': 1 << 30,
       'seed': 7,
       'lots': m['lots'] ?? const [],
+      'map': m['map'] ?? legacyMapSize,
       'inv': const <String, int>{},
       'objs': m['objs'] ?? const [],
       'projects': m['projects'] ?? const [],

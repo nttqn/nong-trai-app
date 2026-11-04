@@ -172,7 +172,10 @@ class FarmPainter extends CustomPainter {
         return d != 0 ? d : a.x.compareTo(b.x);
       });
     view.drawn.clear();
+    // only what is on screen (the map is big; zoomed in most of it is not)
+    final shown = c.getLocalClipBounds().inflate(160);
     for (final o in list) {
+      if (!shown.contains(iso.p(o.x + o.w / 2, o.y + o.h / 2))) continue;
       Sprites.rec = view.drawn[o.id] = [];
       drawObj(c, iso, farm, o, t);
     }
@@ -185,7 +188,7 @@ class FarmPainter extends CustomPainter {
     _egrets(c, iso, t);
     if (!view.visiting) _tutArrow(c, iso, t);
     _floats(c, iso, t);
-    _weather(c, size, t);
+    _weather(c, (Offset.zero & size).intersect(c.getLocalClipBounds()), t);
   }
 
   /// Bouncing arrow over what the tutorial asks the player to tap.
@@ -209,22 +212,24 @@ class FarmPainter extends CustomPainter {
   }
 
   /// Rain streaks, or a warm haze in a dry spell (the same for everyone).
-  void _weather(Canvas c, Size size, double t) {
+  void _weather(Canvas c, Rect area, double t) {
     switch (weatherAt(farm.now())) {
       case Weather.rain:
-        c.drawRect(Offset.zero & size, Paint()..color = const Color(0x1A33506A));
+        c.drawRect(area, Paint()..color = const Color(0x1A33506A));
         final p = Paint()
           ..color = const Color(0x66E3F2FD)
           ..strokeWidth = 1.4
           ..strokeCap = StrokeCap.round;
+        // streaks are laid out over the visible area, so the rain stays put
+        // on screen while panning and nothing off screen is drawn
         for (var i = 0; i < 320; i++) {
-          final x0 = (i * 97.31) % size.width;
-          final y = (i * 53.17 + t * (380 + (i % 5) * 40)) % size.height;
-          final x = (x0 - (y * .18)) % size.width;
-          c.drawLine(Offset(x, y), Offset(x - 3, y + 13), p);
+          final x0 = (i * 97.31) % area.width;
+          final y = (i * 53.17 + t * (380 + (i % 5) * 40)) % area.height;
+          final x = (x0 - (y * .18)) % area.width;
+          c.drawLine(area.topLeft + Offset(x, y), area.topLeft + Offset(x - 3, y + 13), p);
         }
       case Weather.drought:
-        c.drawRect(Offset.zero & size, Paint()..color = Color.fromRGBO(255, 160, 40, .10 + .02 * math.sin(t * 1.5)));
+        c.drawRect(area, Paint()..color = Color.fromRGBO(255, 160, 40, .10 + .02 * math.sin(t * 1.5)));
       case Weather.sunny:
     }
   }

@@ -150,10 +150,12 @@ class Farm {
     return o;
   }
 
-  void _scatterObstacles() {
-    final rng = math.Random(seed);
+  /// Bushes, rocks and stumps to clear, on every lot (or only [only]).
+  void _scatterObstacles([bool Function(int lot)? only, int salt = 0]) {
+    final rng = math.Random(seed + salt);
     const kinds = ['bui', 'bui', 'da', 'goc_cay'];
     for (var lot = 0; lot < lotsPerSide * lotsPerSide; lot++) {
+      if (only != null && !only(lot)) continue;
       final starting = lots.contains(lot);
       final n = starting ? 3 : 4 + rng.nextInt(4);
       final lx = (lot % lotsPerSide) * lotSize, ly = (lot ~/ lotsPerSide) * lotSize;
@@ -176,9 +178,15 @@ class Farm {
   static const roadX = 11;
 
   static String terrain(int x, int y) {
-    if (y <= 1) return 'water';
+    if (y <= 1 || isLake(x, y)) return 'water';
     if (x == roadX) return 'road';
     return 'grass';
+  }
+
+  /// The lake (hồ sen) in the south-east of the outer ring.
+  static bool isLake(int x, int y) {
+    final dx = (x + .5 - 29.5) / 3.3, dy = (y + .5 - 29.5) / 2.6;
+    return dx * dx + dy * dy <= 1;
   }
 
   /// Buildings that stand across the village road (the gate).
@@ -1149,6 +1157,7 @@ class Farm {
   // ---------------------------------------------------------------- save
   Map<String, dynamic> toJson() => {
         'v': 1,
+        'map': mapSize,
         'coins': coins, 'xp': xp, 'level': level, 'nextId': nextId, 'seed': seed,
         'lots': lots.toList(),
         'inv': inv,
@@ -1190,9 +1199,17 @@ class Farm {
     }
     f.ach.addAll(Map<String, int>.from(j['ach'] ?? const {}));
     f.stalls.addAll([for (final s in (j['stalls'] as List? ?? const [])) Stall.fromJson(Map<String, dynamic>.from(s))]);
-    f.lots.addAll((j['lots'] as List).cast<int>());
+    // saves from the smaller map: same tiles, lots renumbered, and the new
+    // outer lots get their bushes and rocks
+    final oldSide = ((j['map'] as num?)?.toInt() ?? legacyMapSize) ~/ lotSize;
+    for (final lot in (j['lots'] as List).cast<int>()) {
+      f.lots.add(oldSide == lotsPerSide ? lot : lotIndex(lot % oldSide, lot ~/ oldSide));
+    }
     f.inv.addAll(Map<String, int>.from(j['inv']));
     f.objs.addAll([for (final o in j['objs']) Obj.fromJson(o)]);
+    if (oldSide < lotsPerSide) {
+      f._scatterObstacles((lot) => lot % lotsPerSide >= oldSide || lot ~/ lotsPerSide >= oldSide, 1);
+    }
     f.projects.addAll((j['projects'] as List).cast<String>());
     f.projectLv.addAll(Map<String, int>.from(j['projectLv'] ?? const {}));
     f.dailyDay = j['dailyDay'] ?? 0;
