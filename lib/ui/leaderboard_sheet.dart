@@ -8,6 +8,35 @@ import '../services/cloud.dart';
 import '../services/leaderboard.dart';
 import 'widgets.dart';
 
+/// Asks for the farm's name (leaderboard, region map). True if it changed.
+Future<bool> askFarmName(BuildContext context, Farm farm) async {
+  final ctl = TextEditingController(text: farm.name);
+  final name = await showDialog<String>(
+    context: context,
+    builder: (d) => AlertDialog(
+      backgroundColor: cream,
+      title: const Text('Tên nông trại'),
+      content: TextField(
+        controller: ctl,
+        autofocus: true,
+        maxLength: 20,
+        textCapitalization: TextCapitalization.words,
+        decoration: const InputDecoration(hintText: 'VD: Trang trại Bác Ba'),
+        onSubmitted: (v) => Navigator.pop(d, v),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(d), child: const Text('Thôi')),
+        TextButton(onPressed: () => Navigator.pop(d, ctl.text), child: const Text('Lưu')),
+      ],
+    ),
+  );
+  final n = name?.trim().replaceAll(RegExp(r'\s+'), ' ') ?? '';
+  if (n.isEmpty || n == farm.name) return false;
+  farm.name = n;
+  farm.rev++; // saves (and later uploads) the new name
+  return true;
+}
+
 class LeaderboardSheet extends StatefulWidget {
   final Farm farm;
   const LeaderboardSheet(this.farm, {super.key});
@@ -84,31 +113,7 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
   }
 
   Future<void> _rename() async {
-    final ctl = TextEditingController(text: farm.name);
-    final name = await showDialog<String>(
-      context: context,
-      builder: (d) => AlertDialog(
-        backgroundColor: cream,
-        title: const Text('Tên nông trại'),
-        content: TextField(
-          controller: ctl,
-          autofocus: true,
-          maxLength: 20,
-          textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(hintText: 'VD: Trang trại Bác Ba'),
-          onSubmitted: (v) => Navigator.pop(d, v),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(d), child: const Text('Thôi')),
-          TextButton(onPressed: () => Navigator.pop(d, ctl.text), child: const Text('Lưu')),
-        ],
-      ),
-    );
-    final n = name?.trim().replaceAll(RegExp(r'\s+'), ' ') ?? '';
-    if (n.isEmpty || n == farm.name) return;
-    farm.name = n;
-    farm.rev++; // saves (and later uploads) the new name
-    await _load(submit: true);
+    if (await askFarmName(context, farm)) await _load(submit: true);
   }
 
   String _value(LbEntry e) => switch (_board) {

@@ -25,6 +25,7 @@ class Obj {
   int start = 0, end = 0; // growth/production window, ms epoch; end 0 = idle
   int count = 0; // animals in a pen
   int level = 0; // house level
+  int stolen = 0; // taken by neighbours from the current harvest
   List<Job> jobs = [];
   Obj(this.id, this.type, this.x, this.y);
 
@@ -40,6 +41,7 @@ class Obj {
         if (end != 0) 'e': end,
         if (count != 0) 'n': count,
         if (level != 0) 'l': level,
+        if (stolen != 0) 'st': stolen,
         if (jobs.isNotEmpty) 'j': [for (final j in jobs) j.toJson()],
       };
   factory Obj.fromJson(Map<String, dynamic> j) => Obj(j['i'], j['t'], j['x'], j['y'])
@@ -48,6 +50,7 @@ class Obj {
     ..end = j['e'] ?? 0
     ..count = j['n'] ?? 0
     ..level = j['l'] ?? 0
+    ..stolen = j['st'] ?? 0
     ..jobs = [for (final e in (j['j'] as List? ?? [])) Job.fromJson(e)];
 }
 
@@ -550,15 +553,17 @@ class Farm {
     if (f.crop == null || !isReady(f)) return null;
     final c = crops[f.crop]!;
     final extra = c.bonus != null ? 1 : 0;
-    if (!roomFor(c.yield + extra)) return 'Kho đầy! Bán bớt hoặc nâng cấp nhà';
-    _gain(c.product, c.yield);
+    final n = readyYield(f);
+    if (!roomFor(n + extra)) return 'Kho đầy! Bán bớt hoặc nâng cấp nhà';
+    _gain(c.product, n);
     if (c.bonus != null) _gain(c.bonus!, 1);
     _stat('harvest:${c.id}');
     _snd('harvest');
     addXp(c.xp);
-    _fx(f, '+${c.yield} ${item(c.product).icon}');
+    _fx(f, '+$n ${item(c.product).icon}');
     f.crop = null;
     f.start = f.end = 0;
+    f.stolen = 0;
     _changed();
     return null;
   }
@@ -580,11 +585,13 @@ class Farm {
   String? pickTree(Obj o) {
     final t = trees[o.type]!;
     if (!isReady(o)) return null;
-    if (!roomFor(t.yield)) return 'Kho đầy!';
-    _gain(t.product, t.yield);
+    final n = readyYield(o);
+    if (!roomFor(n)) return 'Kho đầy!';
+    _gain(t.product, n);
     _snd('pick');
     addXp(t.xp);
-    _fx(o, '+${t.yield} ${item(t.product).icon}');
+    _fx(o, '+$n ${item(t.product).icon}');
+    o.stolen = 0;
     o.start = now();
     o.end = o.start + _dur(t.seconds, _treeSpeed);
     _changed();
@@ -624,12 +631,14 @@ class Farm {
   String? collect(Obj pen) {
     final a = animalForPen(pen.type)!;
     if (!isReady(pen)) return null;
-    if (!roomFor(pen.count)) return 'Kho đầy!';
-    _gain(a.product, pen.count);
+    final n = readyYield(pen);
+    if (!roomFor(n)) return 'Kho đầy!';
+    _gain(a.product, n);
     _snd(a.id);
     addXp(a.xp * pen.count);
-    _fx(pen, '+${pen.count} ${item(a.product).icon}');
+    _fx(pen, '+$n ${item(a.product).icon}');
     pen.start = pen.end = 0;
+    pen.stolen = 0;
     _changed();
     return null;
   }
@@ -653,13 +662,15 @@ class Farm {
   String? catchFish(Obj pond) {
     if (pond.crop == null || !isReady(pond)) return null;
     final f = fishes[pond.crop]!;
-    if (!roomFor(f.yield)) return 'Kho đầy!';
-    _gain(f.product, f.yield);
+    final n = readyYield(pond);
+    if (!roomFor(n)) return 'Kho đầy!';
+    _gain(f.product, n);
     _snd('splash');
     addXp(f.xp);
-    _fx(pond, '+${f.yield} ${item(f.product).icon}');
+    _fx(pond, '+$n ${item(f.product).icon}');
     pond.crop = null;
     pond.start = pond.end = 0;
+    pond.stolen = 0;
     _changed();
     return null;
   }
@@ -844,6 +855,120 @@ class Farm {
     }
   }
 
+  // ---------------------------------------------------------------- neighbours
+  /// What a ripe [o] gives (product id), or null if nothing is ready.
+  String? readyProduct(Obj o) {
+    if (!isReady(o)) return null;
+    return switch (o.def.kind) {
+      BKind.paddy || BKind.bed => o.crop == null ? null : crops[o.crop]!.product,
+      BKind.tree => trees[o.type]!.product,
+      BKind.pen => o.count > 0 ? animalForPen(o.type)!.product : null,
+      BKind.pond => o.crop == null ? null : fishes[o.crop]!.product,
+      _ => null,
+    };
+  }
+
+  /// How many [o] gives now, less what neighbours took (never below 1).
+  int readyYield(Obj o) {
+    final full = switch (o.def.kind) {
+      BKind.paddy || BKind.bed => o.crop == null ? 0 : crops[o.crop]!.yield,
+      BKind.tree => trees[o.type]!.yield,
+      BKind.pen => o.count,
+      BKind.pond => o.crop == null ? 0 : fishes[o.crop]!.yield,
+      _ => 0,
+    };
+    return math.max(1, full - o.stolen);
+  }
+
+  /// Something a neighbour could still take one of.
+  bool canBeStolen(Obj o) => readyProduct(o) != null && readyYield(o) > 1;
+
+  /// Harvest/pick/collect/catch, whichever fits [o].
+  String? harvestAny(Obj o) => switch (o.def.kind) {
+        BKind.paddy || BKind.bed => harvest(o),
+        BKind.tree => pickTree(o),
+        BKind.pen => collect(o),
+        BKind.pond => catchFish(o),
+        _ => null,
+      };
+
+  static const helpLimit = 10, stealLimit = 3;
+
+  /// Per-day counts of what this player did at each neighbour.
+  final Map<String, int> visitLog = {};
+  String _vk(String uid, String kind) => '${dayKey(now())}|$uid|$kind';
+  int visitCount(String uid, String kind) => visitLog[_vk(uid, kind)] ?? 0;
+
+  void _visitAdd(String uid, String kind) {
+    final today = '${dayKey(now())}|';
+    visitLog.removeWhere((k, _) => !k.startsWith(today));
+    visitLog[_vk(uid, kind)] = visitCount(uid, kind) + 1;
+  }
+
+  /// Reward for harvesting [product] for a neighbour: xp and coins.
+  (int, int) helpReward(String product) => (math.max(2, item(product).price ~/ 4), 2 * level);
+
+  /// Visitor side: helped neighbour [uid] harvest [product].
+  String? rewardHelp(String uid, String product) {
+    if (visitCount(uid, 'help') >= helpLimit) return 'Hôm nay đã giúp nhà này đủ $helpLimit lần';
+    final (x, c) = helpReward(product);
+    _visitAdd(uid, 'help');
+    coins += c;
+    addXp(x);
+    _stat('help');
+    _snd('harvest');
+    _changed();
+    return null;
+  }
+
+  /// Fine when a scarecrow catches you picking.
+  int get stealFine => 10 * level;
+
+  /// Visitor side: took one [product] from neighbour [uid].
+  String? takeStolen(String uid, String product) {
+    if (visitCount(uid, 'steal') >= stealLimit) return 'Hôm nay đã hái trộm nhà này đủ $stealLimit lần';
+    if (!roomFor(1)) return 'Kho đầy!';
+    _visitAdd(uid, 'steal');
+    _gain(product, 1);
+    _stat('steal');
+    _snd('pick');
+    _changed();
+    return null;
+  }
+
+  /// Visitor side: caught by a scarecrow; pays the fine.
+  int payFine(String uid) {
+    _visitAdd(uid, 'steal');
+    final f = math.min(coins, stealFine);
+    coins -= f;
+    _stat('caught');
+    _snd('error');
+    _changed();
+    return f;
+  }
+
+  /// Chance a steal is caught: 15% per scarecrow, at most 45%.
+  double get catchChance => math.min(.45, .15 * objs.where((o) => o.type == 'bu_nhin').length);
+
+  /// Owner side: applies what a neighbour did while away. Returns false
+  /// when it no longer fits (already harvested, replanted, storage full).
+  bool applyVisit(String kind, int objId, int start, {int fine = 0}) {
+    if (kind == 'caught') {
+      coins += fine;
+      _changed();
+      return true;
+    }
+    final o = byId(objId);
+    if (o == null || o.start != start || readyProduct(o) == null) return false;
+    if (kind == 'help') return harvestAny(o) == null;
+    if (kind == 'steal' && canBeStolen(o)) {
+      o.stolen++;
+      _changed();
+      return true;
+    }
+    return false;
+  }
+
   // ---------------------------------------------------------------- daily
   static const dailyLevel = 6;
 
@@ -1000,6 +1125,7 @@ class Farm {
         if (projectLv.isNotEmpty) 'projectLv': projectLv,
         if (dailyDay != 0) 'dailyDay': dailyDay,
         if (daily.isNotEmpty) 'daily': [for (final o in daily) o.toJson()],
+        if (visitLog.isNotEmpty) 'visitLog': visitLog,
         'orders': [for (final o in orders) o.toJson()],
         'stats': stats,
         'quest': quest, 'questBase': questBase,
@@ -1024,6 +1150,7 @@ class Farm {
     f.projects.addAll((j['projects'] as List).cast<String>());
     f.projectLv.addAll(Map<String, int>.from(j['projectLv'] ?? const {}));
     f.dailyDay = j['dailyDay'] ?? 0;
+    f.visitLog.addAll(Map<String, int>.from(j['visitLog'] ?? const {}));
     f.daily.addAll([for (final o in (j['daily'] as List? ?? const [])) Order.fromJson(o)]);
     f.orders.addAll([for (final o in j['orders']) Order.fromJson(o)]);
     f.stats.addAll(Map<String, int>.from(j['stats']));

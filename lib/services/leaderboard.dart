@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/farm.dart';
 import 'cloud.dart';
+import 'neighbors.dart';
 
 enum LbBoard { level, orders, village }
 
@@ -138,5 +139,6 @@ class Leaderboard extends ChangeNotifier {
     } else {
       await submit(f, force: true);
     }
+    await Neighbors.instance.publish(f);
   }
 }

@@ -29,6 +29,8 @@ class ViewState {
   String? ghostType;
   int ghostX = 0, ghostY = 0;
   Obj? moving;
+  /// Visiting a neighbour: no "Mua đất" signs.
+  bool visiting = false;
   final List<FloatFx> floats = [];
 }
 
@@ -148,7 +150,7 @@ class FarmPainter extends CustomPainter {
     }
 
     _ghost(c, iso, t);
-    _lotSigns(c, iso);
+    if (!view.visiting) _lotSigns(c, iso);
     _readyBubbles(c, iso, t, list);
     if (sel != null && view.moving == null) _progressBar(c, iso, sel);
     _egrets(c, iso, t);

@@ -20,6 +20,8 @@ import '../services/save.dart';
 import '../services/sound.dart';
 import 'cloud_tile.dart';
 import 'leaderboard_sheet.dart';
+import 'world_map.dart';
+import '../services/neighbors.dart';
 import 'panels.dart';
 import 'quest_sheet.dart';
 import 'sheets.dart';
@@ -69,6 +71,7 @@ class _FarmScreenState extends State<FarmScreen>
       if (name == 'order_delivered') AdsService.instance.onOrderDelivered(farm.level);
     };
     CloudSave.instance.addListener(_onCloud);
+    Neighbors.instance.addListener(_onNeighbors);
     WidgetsBinding.instance.addPostFrameCallback((_) => _onCloud());
     farm.onSound = (c) => SoundService.instance.play(c);
     _ticker = createTicker((e) {
@@ -98,6 +101,7 @@ class _FarmScreenState extends State<FarmScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     CloudSave.instance.removeListener(_onCloud);
+    Neighbors.instance.removeListener(_onNeighbors);
     _ticker.dispose();
     _hud?.cancel();
     _toastTimer?.cancel();
@@ -109,6 +113,8 @@ class _FarmScreenState extends State<FarmScreen>
   void didChangeAppLifecycleState(AppLifecycleState s) {
     if (s == AppLifecycleState.paused || s == AppLifecycleState.inactive) {
       widget.save.saveNow(farm);
+    } else if (s == AppLifecycleState.resumed) {
+      Neighbors.instance.pull(farm);
     }
   }
 
@@ -187,6 +193,49 @@ class _FarmScreenState extends State<FarmScreen>
         ],
       ),
     );
+  }
+
+  // ---------------------------------------------------------------- neighbours
+  bool _showingVisits = false;
+
+  Future<void> _onNeighbors() async {
+    final nb = Neighbors.instance;
+    if (!mounted || _showingVisits || nb.inbox.isEmpty) return;
+    _showingVisits = true;
+    final lines = List<String>.of(nb.inbox);
+    nb.inbox.clear();
+    SoundService.instance.play('quest');
+    await showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: cream,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('🏡 Hàng xóm ghé thăm', style: TextStyle(fontWeight: FontWeight.w900, color: brown)),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          for (final l in lines)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(l, style: const TextStyle(color: brown, fontWeight: FontWeight.w600)),
+            ),
+          const SizedBox(height: 4),
+          const Text('Đặt bù nhìn để bắt kẻ hái trộm!', style: TextStyle(color: brownLight, fontSize: 12.5)),
+        ]),
+        actions: [Center(child: PillButton('Biết rồi', onTap: () => Navigator.pop(c)))],
+      ),
+    );
+    _showingVisits = false;
+    if (Neighbors.instance.inbox.isNotEmpty) _onNeighbors();
+  }
+
+  void _openMap() {
+    SoundService.instance.play('tap');
+    _select(null);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (ctx) => WorldMapScreen(farm, onNameNeeded: () => askFarmName(ctx, farm))),
+    ).then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   // ---------------------------------------------------------------- cloud
@@ -713,8 +762,15 @@ class _FarmScreenState extends State<FarmScreen>
           ),
         ]),
         const SizedBox(height: 4),
-        _chip(Text('🏘️ ${villageTitle(farm.projects.length)}',
-            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brown)), small: true),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _chip(Text('🏘️ ${villageTitle(farm.projects.length)}',
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brown)), small: true),
+          const Spacer(),
+          GestureDetector(
+            onTap: _openMap,
+            child: _chip(const Text('🗺️', style: TextStyle(fontSize: 19))),
+          ),
+        ]),
       ]),
     );
   }

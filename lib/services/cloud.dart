@@ -13,6 +13,7 @@ import '../core/farm.dart';
 import '../core/sync_plan.dart';
 import 'analytics.dart';
 import 'leaderboard.dart';
+import 'neighbors.dart';
 
 /// The account's copy of the farm, as read from Firestore.
 class CloudCopy {
@@ -195,6 +196,14 @@ class CloudSave extends ChangeNotifier {
         case SyncAction.none:
           await _markSynced(f.savedAt);
       }
+      if (conflict == null) {
+        final cur = current?.call();
+        if (cur != null) {
+          Neighbors.instance.setMyName(cur.name);
+          unawaited(Neighbors.instance.publish(cur));
+          unawaited(Neighbors.instance.pull(cur, force: true));
+        }
+      }
     } catch (e) {
       debugPrint('sync failed: $e');
       message = 'Không kết nối được máy chủ, sẽ thử lại sau';
@@ -214,6 +223,8 @@ class CloudSave extends ChangeNotifier {
     });
     await _markSynced(f.savedAt);
     await Leaderboard.instance.submit(f);
+    Neighbors.instance.setMyName(f.name);
+    await Neighbors.instance.publish(f);
   }
 
   Future<void> _restore(CloudCopy c) async {
@@ -286,6 +297,7 @@ class CloudSave extends ChangeNotifier {
     conflict = null;
     if (!available || user == null) return;
     await Leaderboard.instance.withdraw();
+    await Neighbors.instance.withdraw();
     try {
       await _doc.delete().timeout(const Duration(seconds: 10));
     } catch (e) {
@@ -308,6 +320,7 @@ class CloudSave extends ChangeNotifier {
     notifyListeners();
     try {
       await Leaderboard.instance.withdraw();
+      await Neighbors.instance.withdraw();
       await _doc.delete();
       try {
         await u.delete();
