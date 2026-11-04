@@ -19,9 +19,9 @@ class ShopSheet extends StatefulWidget {
 
 class _ShopSheetState extends State<ShopSheet> {
   static const tabs = [
-    ('Trồng trọt', ['ruong', 'luong', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai']),
-    ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'ao']),
-    ('Chế biến', ['nha_kho', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca']),
+    ('Trồng trọt', ['ruong', 'luong', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong']),
+    ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'ao']),
+    ('Chế biến', ['nha_kho', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che']),
     ('Trang trí', ['tre', 'rom_dong', 'chum', 'bu_nhin', 'hoa_dao', 'cay_da']),
   ];
 
@@ -199,10 +199,102 @@ class _OrdersSheetState extends State<OrdersSheet> {
       Expanded(
         child: ListView(
           padding: const EdgeInsets.all(12),
-          children: [for (final o in f.orders) _order(o)],
+          children: [
+            ..._dailyBlock(),
+            for (final o in f.orders) _order(o),
+          ],
         ),
       ),
     ]);
+  }
+
+  List<Widget> _dailyBlock() {
+    final f = widget.farm;
+    if (f.level < Farm.dailyLevel) {
+      return [
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: cardDeco(color: const Color(0xFFF7F1E3)),
+          child: const Text('⭐ Đơn đặc biệt hằng ngày mở ở cấp ${Farm.dailyLevel}',
+              style: TextStyle(color: brownLight, fontWeight: FontWeight.w800)),
+        ),
+      ];
+    }
+    final done = f.daily.where((o) => o.waitUntil < 0).length;
+    return [
+      Row(children: [
+        const Text('⭐ Đơn đặc biệt hôm nay',
+            style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFB7791F), fontSize: 15.5)),
+        const Spacer(),
+        StreamBuilder(
+          stream: Stream.periodic(const Duration(seconds: 30)),
+          builder: (_, _) => Text('Đổi sau ${fmtTime(f.dailyResetMs)}',
+              style: const TextStyle(fontSize: 12, color: brownLight, fontWeight: FontWeight.w700)),
+        ),
+      ]),
+      Padding(
+        padding: const EdgeInsets.only(top: 2, bottom: 6),
+        child: Row(children: [
+          Text('Giao đủ 3 đơn ($done/3) thưởng thêm ', style: const TextStyle(fontSize: 12.5, color: brown)),
+          Coin(f.dailyAllBonus, size: 12.5),
+          if (f.dailyAllDone) const Text('  ✅', style: TextStyle(fontSize: 12.5)),
+        ]),
+      ),
+      for (final o in f.daily) _dailyOrder(o),
+      const Padding(
+        padding: EdgeInsets.only(top: 4, bottom: 8),
+        child: Text('Đơn thường', style: TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15.5)),
+      ),
+    ];
+  }
+
+  Widget _dailyOrder(Order o) {
+    final f = widget.farm;
+    final delivered = o.waitUntil < 0;
+    final ok = !delivered && o.need.entries.every((e) => f.countOf(e.key) >= e.value);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: delivered ? const Color(0xFFEFF5E4) : (ok ? const Color(0xFFFFF6D6) : const Color(0xFFFFFCF2)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: delivered ? const Color(0xFFB5D69A) : gold, width: 2),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text('⭐ ${o.who}', style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15)),
+          const Spacer(),
+          Coin(o.coins, size: 14),
+          const SizedBox(width: 8),
+          Text('⭐ ${o.xp}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1E88E5))),
+        ]),
+        const SizedBox(height: 6),
+        if (delivered)
+          const Text('✅ Đã giao', style: TextStyle(fontWeight: FontWeight.w800, color: greenDark))
+        else ...[
+          Wrap(children: [
+            for (final e in o.need.entries) NeedChip(e.key, e.value, f.countOf(e.key), size: 36),
+          ]),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerRight,
+            child: PillButton('Giao hàng',
+                color: gold,
+                onTap: ok
+                    ? () {
+                        final all = f.daily.where((d) => d.waitUntil >= 0).length == 1;
+                        widget.report(f.deliverDaily(o),
+                            ok: all
+                                ? '+${fmtNum(o.coins + f.dailyAllBonus)} xu (đủ 3 đơn!)'
+                                : '+${fmtNum(o.coins)} xu');
+                        setState(() {});
+                      }
+                    : null),
+          ),
+        ],
+      ]),
+    );
   }
 
   Widget _order(Order o) {
@@ -310,6 +402,53 @@ class _ProjectsSheetState extends State<ProjectsSheet> {
     ]);
   }
 
+  /// "Đã hoàn thành" plus the next upgrade: its new effect, cost and button.
+  List<Widget> _upgrade(String id) {
+    final f = widget.farm;
+    final u = f.nextProjectUpgrade(id);
+    final lv = f.projectLevel(id);
+    if (u == null) {
+      return [Text(lv >= 3 ? '🏆 Đã nâng cấp tối đa' : '✅ Đã hoàn thành',
+          style: const TextStyle(fontWeight: FontWeight.w800, color: greenDark))];
+    }
+    final err = f.canUpgradeProject(id);
+    return [
+      const Text('✅ Đã hoàn thành', style: TextStyle(fontWeight: FontWeight.w800, color: greenDark)),
+      const SizedBox(height: 6),
+      Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: const Color(0xFFFFF6DD), borderRadius: BorderRadius.circular(10)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('⬆️ Nâng cấp lên cấp ${lv + 1}: ${projectEffect(id, lv + 1)}',
+              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: brown)),
+          const SizedBox(height: 4),
+          if (f.level < u.level)
+            Text('🔒 Mở ở cấp ${u.level}', style: const TextStyle(fontWeight: FontWeight.w800, color: red))
+          else ...[
+            Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Coin(u.coins, size: 14, color: f.coins >= u.coins ? brown : red),
+              ),
+              for (final e in u.goods.entries) NeedChip(e.key, e.value, f.countOf(e.key), size: 28),
+            ]),
+            Align(
+              alignment: Alignment.centerRight,
+              child: PillButton('Nâng cấp',
+                  color: gold,
+                  onTap: err == null
+                      ? () {
+                          widget.report(f.upgradeProject(id), ok: '${bdef(id).name} lên cấp ${lv + 1}!');
+                          setState(() {});
+                        }
+                      : null),
+            ),
+          ],
+        ]),
+      ),
+    ];
+  }
+
   Widget _project(String id) {
     final f = widget.farm;
     final d = bdef(id);
@@ -332,12 +471,20 @@ class _ProjectsSheetState extends State<ProjectsSheet> {
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(d.name, style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15)),
+            Row(children: [
+              Expanded(
+                child: Text(d.name, style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15)),
+              ),
+              if (done)
+                Text('Cấp ${f.projectLevel(id)}',
+                    style: const TextStyle(fontWeight: FontWeight.w900, color: greenDark, fontSize: 12.5)),
+            ]),
             const SizedBox(height: 2),
-            Text(d.desc, style: const TextStyle(fontSize: 12.5, color: brownLight)),
+            Text(done ? '${projectEffect(id, f.projectLevel(id))}.' : d.desc,
+                style: const TextStyle(fontSize: 12.5, color: brownLight)),
             const SizedBox(height: 6),
             if (done)
-              const Text('✅ Đã hoàn thành', style: TextStyle(fontWeight: FontWeight.w800, color: greenDark))
+              ..._upgrade(id)
             else if (locked)
               Text('🔒 Mở ở cấp ${d.level}', style: const TextStyle(fontWeight: FontWeight.w800, color: red))
             else ...[

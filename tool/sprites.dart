@@ -20,14 +20,14 @@ import 'package:image/image.dart' as img;
 final expected = [
   // plots + crops (stage 1 seedling, 2 growing, 3 ripe)
   'ruong', 'luong',
-  for (final c in ['lua', 'nep', 'rau', 'ngo', 'khoai', 'lac', 'dau', 'mia', 'ot', 'dua', 'cuc'])
+  for (final c in ['lua', 'nep', 'rau', 'ngo', 'khoai', 'lac', 'dau', 'mia', 'ot', 'dua', 'cuc', 'dautuong', 'che', 'tam'])
     for (final s in [1, 2, 3]) '${c}_$s',
   // trees (+ _qua = with ripe fruit)
-  for (final t in ['cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai']) ...[t, '${t}_qua'],
+  for (final t in ['cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong']) ...[t, '${t}_qua'],
   // animals + pens
-  'ga', 'vit', 'lon', 'trau', 'bo',
-  'chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo',
-  'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',
+  'ga', 'vit', 'lon', 'trau', 'bo', 'de',
+  'chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong',
+  'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che',
   'nha_0', 'nha_1', 'nha_2', 'nha_3', 'nha_4',
   'nha_kho_0', 'nha_kho_1', 'nha_kho_2',
   'gieng', 'cong_lang', 'tram_bom', 'tram_dien', 'truong', 'tram_y_te', 'cho_que', 'nha_van_hoa', 'dinh_lang',
@@ -37,13 +37,13 @@ final expected = [
 
 /// Max width by on-map size: about 3x the largest zoom on a 3x phone.
 int maxWidthFor(String key) {
-  const animals = {'ga', 'vit', 'lon', 'trau', 'bo'};
+  const animals = {'ga', 'vit', 'lon', 'trau', 'bo', 'de'};
   const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa'};
   if (animals.contains(key)) return 160;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',
-      'tram_bom', 'tram_y_te', 'cong_lang', 'cay_da'}.contains(key)) {
+      'tram_bom', 'tram_y_te', 'cong_lang', 'cay_da', 'vuon_ong', 'xuong_dau', 'xuong_che'}.contains(key)) {
     return 400;
   }
   return 256;

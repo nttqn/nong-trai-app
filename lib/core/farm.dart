@@ -79,6 +79,10 @@ class Farm {
   final Map<String, int> inv = {};
   final List<Obj> objs = [];
   final Set<String> projects = {}; // finished village projects
+  final Map<String, int> projectLv = {}; // upgrades: 2 or 3 (absent = 1)
+  // Đơn đặc biệt hằng ngày: rolled each local day; waitUntil -1 = delivered.
+  int dailyDay = 0;
+  final List<Order> daily = [];
   final List<Order> orders = [];
   final Map<String, int> stats = {};
   int quest = 0, questBase = 0;
@@ -255,17 +259,58 @@ class Farm {
 
   // ---------------------------------------------------------------- bonuses
   bool has(String project) => projects.contains(project);
-  double get _all => has('dinh_lang') ? 0.10 : 0;
-  double get _bedSpeed => (has('gieng') ? 0.10 : 0) + _all;
-  double get _paddySpeed => (has('tram_bom') ? 0.20 : 0) + _all;
-  double get _factorySpeed => (has('tram_dien') ? 0.20 : 0) + _all;
-  double get _animalSpeed => (has('tram_y_te') ? 0.15 : 0) + _all;
+  int projectLevel(String id) => has(id) ? (projectLv[id] ?? 1) : 0;
+  /// A project's bonus (fraction): base × 1 / 1.5 / 2 by its level.
+  double _pb(String id) => has(id) ? projectEffects[id]!.$2 / 100 * projectMult[projectLevel(id) - 1] : 0;
+  double get _all => _pb('dinh_lang');
+  double get _bedSpeed => _pb('gieng') + _all;
+  double get _paddySpeed => _pb('tram_bom') + _all;
+  double get _factorySpeed => _pb('tram_dien') + _all;
+  double get _animalSpeed => _pb('tram_y_te') + _all;
   double get _treeSpeed => _all;
   double get _fishSpeed => _all;
-  double get xpBonus => (has('cong_lang') ? 0.10 : 0) + (has('truong') ? 0.15 : 0);
-  double get orderBonus =>
-      (has('duong_be_tong') ? 0.10 : 0) + (has('nha_van_hoa') ? 0.10 : 0);
-  double get marketBonus => has('cho_que') ? 0.15 : 0;
+  double get xpBonus => _pb('cong_lang') + _pb('truong');
+  double get orderBonus => _pb('duong_be_tong') + _pb('nha_van_hoa');
+  double get marketBonus => _pb('cho_que');
+
+  /// The next upgrade of a finished project, or null at the top.
+  ProjectUpgrade? nextProjectUpgrade(String id) {
+    final lv = projectLevel(id);
+    final ups = projectUpgrades[id];
+    if (lv == 0 || ups == null || lv - 1 >= ups.length) return null;
+    return ups[lv - 1];
+  }
+
+  String? canUpgradeProject(String id) {
+    final u = nextProjectUpgrade(id);
+    if (u == null) return 'Đã nâng cấp tối đa';
+    if (level < u.level) return 'Cần đạt cấp ${u.level}';
+    if (coins < u.coins) return 'Không đủ xu';
+    for (final e in u.goods.entries) {
+      if (countOf(e.key) < e.value) return 'Thiếu ${item(e.key).name}';
+    }
+    return null;
+  }
+
+  String? upgradeProject(String id) {
+    final err = canUpgradeProject(id);
+    if (err != null) return err;
+    final u = nextProjectUpgrade(id)!;
+    coins -= u.coins;
+    _spend(u.goods);
+    final lv = projectLevel(id) + 1;
+    projectLv[id] = lv;
+    stats['project_lv:$id'] = lv;
+    _stat('project_up');
+    _snd('build');
+    addXp(bdef(id).xp * lv);
+    for (final o in objs) {
+      if (o.type == id) _fx(o, '⬆️ Cấp $lv');
+    }
+    _ev('project_upgrade', {'type': id, 'to': lv});
+    _changed();
+    return null;
+  }
   int get orderSlots => 4 + (has('cho_que') ? 1 : 0) + (has('nha_van_hoa') ? 1 : 0);
 
   int _dur(int seconds, double speed) => (seconds * 1000 * (1 - speed)).round();
@@ -799,8 +844,85 @@ class Farm {
     }
   }
 
+  // ---------------------------------------------------------------- daily
+  static const dailyLevel = 6;
+
+  static int dayKey(int ms) {
+    final d = DateTime.fromMillisecondsSinceEpoch(ms);
+    return d.year * 10000 + d.month * 100 + d.day;
+  }
+
+  /// Ms until the daily orders change (local midnight).
+  int get dailyResetMs {
+    final d = DateTime.fromMillisecondsSinceEpoch(now());
+    return DateTime(d.year, d.month, d.day + 1).millisecondsSinceEpoch - now();
+  }
+
+  /// Coins for delivering all three daily orders.
+  int get dailyAllBonus => 150 * level;
+
+  bool get dailyAllDone => daily.isNotEmpty && daily.every((o) => o.waitUntil < 0);
+
+  /// New special orders when the day changes.
+  void rollDaily() {
+    if (level < dailyLevel) return;
+    final k = dayKey(now());
+    if (k == dailyDay && daily.isNotEmpty) return;
+    dailyDay = k;
+    daily.clear();
+    final rng = math.Random(seed * 31 + k);
+    for (var tier = 0; tier < 3; tier++) {
+      daily.add(_makeDaily(rng, tier));
+    }
+    _changed();
+  }
+
+  /// A special order: bigger, from the dearer goods, paid about double.
+  Order _makeDaily(math.Random rng, int tier) {
+    final pool = producible()..sort((a, b) => item(a).price.compareTo(item(b).price));
+    if (pool.isEmpty) pool.add('thoc');
+    final from = (pool.length * const [0.0, .35, .6][tier]).floor().clamp(0, pool.length - 1);
+    final top = pool.sublist(from);
+    final kinds = math.min(top.length, 2 + (tier == 2 ? 1 : 0));
+    final pick = <String>{};
+    while (pick.length < kinds) {
+      pick.add(top[rng.nextInt(top.length)]);
+    }
+    final need = <String, int>{};
+    var value = 0;
+    for (final id in pick) {
+      final p = item(id).price;
+      final base = p < 10 ? 8 : p < 30 ? 6 : p < 90 ? 4 : p < 200 ? 3 : 2;
+      final q = base + rng.nextInt(base) + tier;
+      need[id] = q;
+      value += p * q;
+    }
+    final coins = (value * (2.1 + tier * .3) * (1 + orderBonus)).round();
+    final xpGain = math.max(5, (value / 4).round());
+    return Order(nextId++, villagers[rng.nextInt(villagers.length)], need, coins, xpGain);
+  }
+
+  String? deliverDaily(Order o) {
+    if (o.waitUntil < 0) return 'Đã giao rồi';
+    if (!_spend(o.need)) return 'Chưa đủ hàng';
+    coins += o.coins;
+    addXp(o.xp);
+    o.waitUntil = -1;
+    _stat('daily');
+    _snd('cash');
+    _ev('daily_delivered', {'count': stats['daily']!, 'level': level});
+    if (dailyAllDone) {
+      coins += dailyAllBonus;
+      if (house != null) _fx(house!, '🎁 +${fmtNum(dailyAllBonus)} xu');
+      _ev('daily_all_done', {'level': level});
+    }
+    _changed();
+    return null;
+  }
+
   /// Turn waiting slots into fresh orders once their timer is up.
   void tickOrders() {
+    rollDaily();
     final t = now();
     final rng = math.Random(seed * 31 + nextId + t ~/ 1000);
     var changed = false;
@@ -875,6 +997,9 @@ class Farm {
         'inv': inv,
         'objs': [for (final o in objs) o.toJson()],
         'projects': projects.toList(),
+        if (projectLv.isNotEmpty) 'projectLv': projectLv,
+        if (dailyDay != 0) 'dailyDay': dailyDay,
+        if (daily.isNotEmpty) 'daily': [for (final o in daily) o.toJson()],
         'orders': [for (final o in orders) o.toJson()],
         'stats': stats,
         'quest': quest, 'questBase': questBase,
@@ -897,6 +1022,9 @@ class Farm {
     f.inv.addAll(Map<String, int>.from(j['inv']));
     f.objs.addAll([for (final o in j['objs']) Obj.fromJson(o)]);
     f.projects.addAll((j['projects'] as List).cast<String>());
+    f.projectLv.addAll(Map<String, int>.from(j['projectLv'] ?? const {}));
+    f.dailyDay = j['dailyDay'] ?? 0;
+    f.daily.addAll([for (final o in (j['daily'] as List? ?? const [])) Order.fromJson(o)]);
     f.orders.addAll([for (final o in j['orders']) Order.fromJson(o)]);
     f.stats.addAll(Map<String, int>.from(j['stats']));
     f.objs.removeWhere((o) => !buildings.containsKey(o.type));

@@ -47,4 +47,18 @@ const questChain = [
   QuestDef('Xây chợ quê', 'project:cho_que', 1, 2000, 200, absolute: true),
   QuestDef('Giao 60 đơn hàng', 'order', 60, 2500, 250),
   QuestDef('Xây đình làng', 'project:dinh_lang', 1, 5000, 500, absolute: true),
+  // cấp 20-30
+  QuestDef('Trồng 6 luống đậu tương', 'plant:dautuong', 6, 1500, 150),
+  QuestDef('Xây xưởng đậu phụ', 'build:xuong_dau', 1, 2000, 200, absolute: true),
+  QuestDef('Giao 3 đơn đặc biệt', 'daily', 3, 2500, 250),
+  QuestDef('Xây chuồng dê', 'build:chuong_de', 1, 2500, 250, absolute: true),
+  QuestDef('Trồng 6 luống chè', 'plant:che', 6, 2500, 250),
+  QuestDef('Xây lò sao sấy', 'build:xuong_che', 1, 3000, 300, absolute: true),
+  QuestDef('Nâng cấp 2 công trình làng', 'project_up', 2, 4000, 400),
+  QuestDef('Lập vườn ong', 'build:vuon_ong', 1, 4000, 400, absolute: true),
+  QuestDef('Thu 5 hũ mật ong', 'get:matong', 5, 4000, 400),
+  QuestDef('Cấy 8 ô lúa tám thơm', 'plant:tam', 8, 4500, 450),
+  QuestDef('Làm 3 bánh cốm', 'get:banhcom', 3, 6000, 600),
+  QuestDef('Giao 20 đơn đặc biệt', 'daily', 20, 8000, 800),
+  QuestDef('Nâng đình làng lên cấp 3', 'project_lv:dinh_lang', 3, 15000, 1500, absolute: true),
 ];

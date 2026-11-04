@@ -97,6 +97,23 @@ void drawBedCrop(Canvas c, String id, Offset b, double g, bool ripe, double t, i
       } else if (g > .6) {
         circle(c, b + Offset(2, -6 * s), 1.2, const Color(0xFFFFD54F));
       }
+    case 'dautuong':
+      oval(c, b + Offset(0, -4 * s), 6 * s, 5 * s, const Color(0xFF5E8F2E));
+      oval(c, b + Offset(-2 * s, -7 * s), 4 * s, 3 * s, const Color(0xFF79A83E));
+      if (ripe) {
+        for (var i = 0; i < 3; i++) {
+          oval(c, b + Offset(-4 + i * 4, -4), 1.6, 2.6, const Color(0xFFC9A34A));
+        }
+      }
+    case 'che':
+      // a clipped round tea bush, fresh tips when ready
+      oval(c, b + Offset(0, -5 * s), 7 * s, 5.5 * s, const Color(0xFF2F6B2A));
+      oval(c, b + Offset(-1, -7 * s), 5 * s, 3.2 * s, const Color(0xFF3F8A34));
+      if (ripe) {
+        for (var i = 0; i < 4; i++) {
+          circle(c, b + Offset(-5 + i * 3.3, -10 * s + (i % 2) * 1.5), 1.3, const Color(0xFFA5D66B));
+        }
+      }
     case 'dau':
       oval(c, b + Offset(0, -4 * s), 6 * s, 5 * s, const Color(0xFF4F9A34));
       oval(c, b + Offset(2 * s, -7 * s), 4 * s, 3 * s, const Color(0xFF68B347));
@@ -230,6 +247,8 @@ void drawTree(Canvas c, String type, Offset f, double fruit, double t, int seed)
         'cay_xoai' => (const Color(0xFF3F7F2A), const Color(0xFFFFB300), 17.0),
         'cay_buoi' => (const Color(0xFF5B9A36), const Color(0xFFD4E157), 16.0),
         'cay_vai' => (const Color(0xFF47852C), const Color(0xFFE53935), 16.0),
+        'cay_nhan' => (const Color(0xFF3E6E26), const Color(0xFFC8A165), 17.0),
+        'cay_hong' => (const Color(0xFF6B9A3A), const Color(0xFFFF7A1A), 15.0),
         _ => (leaf, const Color(0xFFFFC107), 15.0),
       };
       shadow(c, f, r * .9, r * .35);

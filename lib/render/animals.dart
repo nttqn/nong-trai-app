@@ -17,6 +17,38 @@ void drawAnimal(Canvas c, String id, Offset f, double dir, double t, double ph) 
       _cow(c, f, dir, t, ph, const Color(0xFFF5F1E8), spots: true);
     case 'trau':
       _buffalo(c, f, dir, t, ph);
+    case 'de':
+      _goat(c, f, dir, t, ph);
+    case 'ong':
+      _bees(c, f, t, ph);
+  }
+}
+
+void _goat(Canvas c, Offset f, double d, double t, double ph) {
+  const body = Color(0xFFF2EFE6);
+  shadow(c, f, 9, 2.6);
+  for (final x in [-5.0, -3.0, 3.0, 5.0]) {
+    line(c, _m(f, d, x, -5), _m(f, d, x, 0), const Color(0xFF9E9787), 1.6);
+  }
+  oval(c, _m(f, d, 0, -8), 8, 4.5, body);
+  final graze = math.sin(t * .8 + ph * 3) > .4 ? 4.0 : 0.0;
+  final head = _m(f, d, 8, -11 + graze);
+  oval(c, head, 3.2, 2.6, body);
+  line(c, head + Offset(-1 * d, -2), head + Offset(-3 * d, -6), const Color(0xFF8D7B5E), 1.3);
+  line(c, head + Offset(2.6 * d, 1.4), head + Offset(2.6 * d, 3.6), const Color(0xFFD9D2C0), 1.2); // beard
+  circle(c, head + Offset(.9 * d, -.6), .6, const Color(0xFF1B1B1B));
+  line(c, _m(f, d, -8, -10), _m(f, d, -10, -12 + math.sin(t * 5 + ph)), body, 1.6);
+}
+
+/// A few bees buzzing around a hive spot.
+void _bees(Canvas c, Offset f, double t, double ph) {
+  for (var i = 0; i < 3; i++) {
+    final a = t * (2.2 + i * .4) + ph * 2 + i * 2.1;
+    final p = f + Offset(math.cos(a) * 9, -12 + math.sin(a * 1.3) * 5);
+    oval(c, p, 2.2, 1.5, const Color(0xFFFFC107));
+    line(c, p + const Offset(-.6, -1.4), p + const Offset(-.6, 1.4), const Color(0xFF3E2A1A), .8);
+    final w = math.sin(t * 40 + i) * 1.2;
+    oval(c, p + Offset(0, -2 - w * .3), 1.6, 1, const Color(0xCCFFFFFF));
   }
 }
 

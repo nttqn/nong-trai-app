@@ -787,7 +787,8 @@ class _FarmScreenState extends State<FarmScreen>
       );
 
   Widget _bottomBar() {
-    final deliverable = farm.orders.where(farm.canDeliver).length;
+    final deliverable = farm.orders.where(farm.canDeliver).length +
+        farm.daily.where((o) => o.waitUntil >= 0 && o.need.entries.every((e) => farm.countOf(e.key) >= e.value)).length;
     Widget btn(String icon, String label, VoidCallback onTap, {int badge = 0}) => Expanded(
           child: InkWell(
             onTap: onTap,

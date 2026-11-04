@@ -132,3 +132,26 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 | `bu_nhin` | A field scarecrow made of straw wearing a conical hat (nón lá) and an old shirt, on a wooden cross, standing directly on the ground: no base tile, no platform, no soil block underneath. |
 | `hoa_dao` | A small Tết peach blossom tree (cây đào) covered in pink flowers, standing directly on the ground: no base tile, no platform, no soil block underneath. |
 | `cay_da` | A huge ancient banyan tree (cây đa) with a wide canopy and hanging aerial roots, standing directly on the ground: no base tile, no platform. |
+
+## Đợt 4 — nội dung cấp 20–30
+
+> Cây trồng: đính kèm `rau_N` (luống) hoặc `lua_N` (ruộng) cùng số làm mẫu bố cục, như đợt 2.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `dautuong_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small soybean sprouts. Plants only, no ground. |
+| `dautuong_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: bushy green soybean plants with trifoliate leaves. Plants only, no ground. |
+| `dautuong_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: mature soybean plants, leaves turning yellow, hung with fuzzy tan pods. Plants only, no ground. |
+| `che_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small young tea seedlings. Plants only, no ground. |
+| `che_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: round clipped dark-green tea bushes. Plants only, no ground. |
+| `che_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: round dark-green tea bushes covered in bright light-green new tea buds ready to pick. Plants only, no ground. |
+| `tam_1` / `tam_2` / `tam_3` | Như `lua_1/2/3` (đính kèm ảnh lúa cùng số) nhưng là lúa tám thơm: thân mảnh, cao hơn; bông chín ở `tam_3` vàng nhạt óng ánh, hạt thon dài. |
+| `cay_nhan` | A longan tree, wide dark-green canopy, no fruit, standing directly on the ground: no base tile, no platform, no soil block underneath. |
+| `cay_nhan_qua` | The same longan tree hung with clusters of small round tan-brown longan fruits. |
+| `cay_hong` | A persimmon tree with an open canopy of glossy leaves, no fruit, standing directly on the ground: no base tile, no platform, no soil block underneath. |
+| `cay_hong_qua` | The same persimmon tree full of bright orange persimmons. |
+| `de` | One white Vietnamese goat with small horns and a little beard, standing, facing lower-left, full body. |
+| `chuong_de` | A goat pen on a 2x2 tile base: grassy ground, wooden fence with gate, a small raised wooden goat house with a tiled roof at the back, a hay rack. No animals. |
+| `vuon_ong` | A bee garden on a 2x2 tile base: three wooden beehive boxes among yellow chrysanthemum flowers, low bamboo fence. No visible bees. |
+| `xuong_dau` | A small Vietnamese tofu workshop on a 2x2 tile base: whitewashed walls, red tile roof, big grey clay pots of soy milk and wooden tofu presses by the door on the lower-left face. |
+| `xuong_che` | A tea roasting and drying shed on a 2x2 tile base: mud walls, thatched roof, a big iron tea-roasting pan on a stove, round bamboo trays of drying tea and orange persimmons on trestles. |

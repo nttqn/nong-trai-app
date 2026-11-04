@@ -98,6 +98,29 @@ Farm demoFarm(int stage, {int house = -1}) {
     }
     f.build('duong_be_tong', 0, 0);
   }
+  if (stage >= 3) {
+    // late game: new pens, workshops, trees, upgraded projects, daily orders
+    f.level = 30;
+    f.lots.addAll([for (var i = 0; i < lotsPerSide * lotsPerSide; i++) i]);
+    f.objs.removeWhere((o) => o.def.kind == BKind.obstacle);
+    void anywhere(String type, {int count = 0, double prog = .5}) {
+      for (var i = 0; i < mapSize * mapSize; i++) {
+        final x = i % mapSize, y = i ~/ mapSize;
+        if (f.canPlace(type, x, y)) {
+          put(type, x, y, count: count, prog: prog);
+          return;
+        }
+      }
+    }
+    anywhere('chuong_de', count: 3, prog: .5);
+    anywhere('vuon_ong', count: 3, prog: 1.2);
+    anywhere('xuong_dau');
+    anywhere('xuong_che');
+    anywhere('cay_nhan', prog: 1.2);
+    anywhere('cay_hong', prog: 1.2);
+    f.projectLv.addAll({'gieng': 3, 'tram_bom': 2, 'dinh_lang': 2});
+    f.rollDaily();
+  }
   f.inv.clear();
   f.inv.addAll({'thoc': 24, 'rom': 6, 'trung': 5, 'gao': 4});
   f.coins = 12450;

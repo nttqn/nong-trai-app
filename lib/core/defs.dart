@@ -26,12 +26,17 @@ const items = <String, ItemDef>{
   'ot': ItemDef('ot', 'Ớt', '🌶️', 34, Color(0xFFE5533D)),
   'dua': ItemDef('dua', 'Dưa hấu', '🍉', 62, Color(0xFF4CAF50)),
   'cuc': ItemDef('cuc', 'Hoa cúc', '🌼', 78, Color(0xFFFFC93C)),
+  'dautuong': ItemDef('dautuong', 'Đậu tương', '🫘', 30, Color(0xFFE6C77A)),
+  'che': ItemDef('che', 'Chè búp', '🍃', 45, Color(0xFF6BAA45)),
+  'thoctam': ItemDef('thoctam', 'Thóc tám thơm', '🌾', 26, Color(0xFFF0D98A)),
   // animals
   'trung': ItemDef('trung', 'Trứng gà', '🥚', 12, Color(0xFFF3E3C3)),
   'trungvit': ItemDef('trungvit', 'Trứng vịt', '🥚', 18, Color(0xFFB9DCD2)),
   'thit': ItemDef('thit', 'Thịt lợn', '🥩', 70, Color(0xFFF08A8A)),
   'sua': ItemDef('sua', 'Sữa bò', '🥛', 55, Color(0xFFE3EEF7)),
   'phan': ItemDef('phan', 'Phân chuồng', '💩', 30, Color(0xFF8D6E4C)),
+  'suade': ItemDef('suade', 'Sữa dê', '🍼', 75, Color(0xFFF1F1E6)),
+  'matong': ItemDef('matong', 'Mật ong', '🍯', 120, Color(0xFFFFB300)),
   // fish
   'caro': ItemDef('caro', 'Cá rô phi', '🐟', 16, Color(0xFF7FB3D5)),
   'catram': ItemDef('catram', 'Cá trắm', '🐟', 30, Color(0xFF5D8AA8)),
@@ -43,6 +48,8 @@ const items = <String, ItemDef>{
   'dua_xiem': ItemDef('dua_xiem', 'Dừa', '🥥', 40, Color(0xFFA1887F)),
   'buoi': ItemDef('buoi', 'Bưởi', '🍈', 55, Color(0xFFC5E1A5)),
   'vai': ItemDef('vai', 'Vải thiều', '🍒', 70, Color(0xFFE57373)),
+  'nhan': ItemDef('nhan', 'Nhãn lồng', '🌰', 95, Color(0xFFC8A165)),
+  'hong': ItemDef('hong', 'Hồng', '🟠', 85, Color(0xFFFF8A3D)),
   // processed
   'gao': ItemDef('gao', 'Gạo', '🍚', 14, Color(0xFFFFFFFF)),
   'cam': ItemDef('cam', 'Cám', '🟫', 5, Color(0xFFBCAAA4)),
@@ -57,6 +64,16 @@ const items = <String, ItemDef>{
   'tuongot': ItemDef('tuongot', 'Tương ớt', '🥫', 260, Color(0xFFD84315)),
   'chaca': ItemDef('chaca', 'Chả cá', '🍥', 150, Color(0xFFFFCC80)),
   'sinhto': ItemDef('sinhto', 'Sinh tố xoài', '🥤', 150, Color(0xFFFFB74D)),
+  'dauphu': ItemDef('dauphu', 'Đậu phụ', '⬜', 130, Color(0xFFFFF8E1)),
+  'suadaunanh': ItemDef('suadaunanh', 'Sữa đậu nành', '🥛', 240, Color(0xFFFFECB3)),
+  'phomai': ItemDef('phomai', 'Phô mai dê', '🧀', 320, Color(0xFFFFE082)),
+  'chekho': ItemDef('chekho', 'Chè khô', '🍵', 190, Color(0xFF8BAA5A)),
+  'chemat': ItemDef('chemat', 'Trà mật ong', '🧋', 400, Color(0xFFD7A54B)),
+  'hongsay': ItemDef('hongsay', 'Hồng sấy', '🍊', 340, Color(0xFFE67E22)),
+  'gaotam': ItemDef('gaotam', 'Gạo tám thơm', '🍚', 105, Color(0xFFFFFDF5)),
+  'com': ItemDef('com', 'Cốm làng Vòng', '🟢', 110, Color(0xFFA5D66B)),
+  'banhdauxanh': ItemDef('banhdauxanh', 'Bánh đậu xanh', '🟨', 300, Color(0xFFFFE57F)),
+  'banhcom': ItemDef('banhcom', 'Bánh cốm', '🟩', 460, Color(0xFF7CB342)),
 };
 
 ItemDef item(String id) => items[id]!;
@@ -86,6 +103,9 @@ const crops = <String, CropDef>{
   'ot': CropDef('ot', 'Ớt', Plot.bed, 11, 2700, 12, 'ot', 2, 6),
   'dua': CropDef('dua', 'Dưa hấu', Plot.bed, 13, 5400, 20, 'dua', 2, 9),
   'cuc': CropDef('cuc', 'Hoa cúc', Plot.bed, 15, 7200, 25, 'cuc', 2, 11),
+  'dautuong': CropDef('dautuong', 'Đậu tương', Plot.bed, 20, 3600, 18, 'dautuong', 2, 9),
+  'che': CropDef('che', 'Chè', Plot.bed, 22, 6000, 22, 'che', 2, 12),
+  'tam': CropDef('tam', 'Lúa tám thơm', Plot.paddy, 25, 4800, 20, 'thoctam', 2, 11, bonus: 'rom'),
 };
 
 class TreeDef {
@@ -101,6 +121,8 @@ const trees = <String, TreeDef>{
   'cay_dua': TreeDef('cay_dua', 'Cây dừa', 11, 650, 5400, 'dua_xiem', 3, 7),
   'cay_buoi': TreeDef('cay_buoi', 'Cây bưởi', 14, 900, 7200, 'buoi', 3, 9),
   'cay_vai': TreeDef('cay_vai', 'Cây vải', 17, 1300, 9000, 'vai', 3, 11),
+  'cay_nhan': TreeDef('cay_nhan', 'Cây nhãn', 23, 1800, 10800, 'nhan', 3, 13),
+  'cay_hong': TreeDef('cay_hong', 'Cây hồng', 27, 2400, 12600, 'hong', 3, 15),
 };
 
 class AnimalDef {
@@ -116,6 +138,8 @@ const animals = <String, AnimalDef>{
   'lon': AnimalDef('lon', 'Lợn', 'chuong_lon', 8, 150, 'cam', 'thit', 3600, 4, 6),
   'bo': AnimalDef('bo', 'Bò sữa', 'chuong_bo', 12, 300, 'rom', 'sua', 2700, 4, 5),
   'trau': AnimalDef('trau', 'Trâu', 'chuong_trau', 10, 250, 'rom', 'phan', 2400, 3, 4),
+  'de': AnimalDef('de', 'Dê', 'chuong_de', 21, 400, 'rau', 'suade', 3000, 4, 7),
+  'ong': AnimalDef('ong', 'Đàn ong', 'vuon_ong', 24, 500, 'cuc', 'matong', 3600, 3, 9),
 };
 
 AnimalDef? animalForPen(String pen) {
@@ -162,6 +186,16 @@ const recipes = <String, RecipeDef>{
   'nuocmam': RecipeDef('nuocmam', 'xuong_ca', 13, {'caro': 4}, 'nuocmam', 1, 3600, 7),
   'chaca': RecipeDef('chaca', 'xuong_ca', 13, {'catram': 2, 'trung': 1}, 'chaca', 1, 1800, 8),
   'tuongot': RecipeDef('tuongot', 'xuong_ca', 14, {'ot': 3, 'duong': 1}, 'tuongot', 1, 2700, 10),
+  'gaotam': RecipeDef('gaotam', 'may_xay', 25, {'thoctam': 3}, 'gaotam', 1, 600, 6),
+  'com': RecipeDef('com', 'may_xay', 26, {'nep': 3}, 'com', 1, 1500, 8),
+  'banhdauxanh': RecipeDef('banhdauxanh', 'lo_banh', 23, {'dau': 3, 'duong': 1}, 'banhdauxanh', 1, 2700, 12),
+  'banhcom': RecipeDef('banhcom', 'lo_banh', 27, {'com': 2, 'duong': 1}, 'banhcom', 1, 3000, 14),
+  'dauphu': RecipeDef('dauphu', 'xuong_dau', 20, {'dautuong': 3}, 'dauphu', 1, 1800, 9),
+  'suadaunanh': RecipeDef('suadaunanh', 'xuong_dau', 21, {'dautuong': 2, 'duong': 1}, 'suadaunanh', 1, 1500, 10),
+  'phomai': RecipeDef('phomai', 'xuong_dau', 28, {'suade': 3}, 'phomai', 1, 3600, 16),
+  'chekho': RecipeDef('chekho', 'xuong_che', 22, {'che': 3}, 'chekho', 1, 2700, 12),
+  'chemat': RecipeDef('chemat', 'xuong_che', 24, {'chekho': 1, 'matong': 1}, 'chemat', 1, 2400, 15),
+  'hongsay': RecipeDef('hongsay', 'xuong_che', 29, {'hong': 3}, 'hongsay', 1, 4200, 17),
 };
 
 List<RecipeDef> recipesFor(String building) =>
@@ -207,6 +241,16 @@ const buildings = <String, BuildingDef>{
       desc: 'Nước mía, đường, kẹo lạc, sinh tố.', xp: 20),
   'xuong_ca': BuildingDef('xuong_ca', 'Xưởng nước mắm', BKind.factory, 2, 2, 13, 3200,
       desc: 'Nước mắm, chả cá, tương ớt.', xp: 25),
+  'chuong_de': BuildingDef('chuong_de', 'Chuồng dê', BKind.pen, 2, 2, 21, 2200,
+      desc: 'Dê ăn rau, cho sữa dê.', xp: 26),
+  'vuon_ong': BuildingDef('vuon_ong', 'Vườn ong', BKind.pen, 2, 2, 24, 2800,
+      desc: 'Ong hút mật hoa cúc, cho mật ong.', xp: 30),
+  'xuong_dau': BuildingDef('xuong_dau', 'Xưởng đậu phụ', BKind.factory, 2, 2, 20, 4500,
+      desc: 'Đậu phụ, sữa đậu nành, phô mai dê.', xp: 30),
+  'xuong_che': BuildingDef('xuong_che', 'Lò sao sấy', BKind.factory, 2, 2, 22, 6000,
+      desc: 'Sao chè khô, pha trà mật ong, sấy hồng.', xp: 35),
+  'cay_nhan': BuildingDef('cay_nhan', 'Cây nhãn', BKind.tree, 1, 1, 23, 1800),
+  'cay_hong': BuildingDef('cay_hong', 'Cây hồng', BKind.tree, 1, 1, 27, 2400),
   'cay_chuoi': BuildingDef('cay_chuoi', 'Cây chuối', BKind.tree, 1, 1, 4, 150),
   'cay_xoai': BuildingDef('cay_xoai', 'Cây xoài', BKind.tree, 1, 1, 8, 400),
   'cay_dua': BuildingDef('cay_dua', 'Cây dừa', BKind.tree, 1, 1, 11, 650),
@@ -265,6 +309,78 @@ const projectOrder = [
   'gieng', 'cong_lang', 'duong_be_tong', 'tram_bom', 'tram_dien', 'truong',
   'tram_y_te', 'cho_que', 'nha_van_hoa', 'dinh_lang',
 ];
+
+/// Upgrades of a finished village project (to level 2, then 3).
+class ProjectUpgrade {
+  final int level, coins;
+  final Map<String, int> goods;
+  const ProjectUpgrade(this.level, this.coins, this.goods);
+}
+
+const projectUpgrades = <String, List<ProjectUpgrade>>{
+  'gieng': [
+    ProjectUpgrade(20, 3000, {'dautuong': 10, 'rau': 30}),
+    ProjectUpgrade(25, 9000, {'che': 15, 'dauphu': 5}),
+  ],
+  'cong_lang': [
+    ProjectUpgrade(20, 5000, {'gao': 30, 'rom': 30}),
+    ProjectUpgrade(26, 14000, {'gaotam': 10, 'banhdauxanh': 3}),
+  ],
+  'duong_be_tong': [
+    ProjectUpgrade(21, 6000, {'gao': 30, 'trungvit': 20}),
+    ProjectUpgrade(26, 16000, {'dauphu': 8, 'nuocmam': 5}),
+  ],
+  'tram_bom': [
+    ProjectUpgrade(21, 7000, {'thoc': 60, 'nep': 20}),
+    ProjectUpgrade(27, 18000, {'thoctam': 30, 'gaotam': 10}),
+  ],
+  'tram_dien': [
+    ProjectUpgrade(22, 9000, {'ngo': 30, 'duong': 5}),
+    ProjectUpgrade(27, 20000, {'suadaunanh': 5, 'chekho': 5}),
+  ],
+  'truong': [
+    ProjectUpgrade(22, 11000, {'sua': 15, 'banhngo': 5}),
+    ProjectUpgrade(28, 24000, {'suade': 15, 'banhdauxanh': 5}),
+  ],
+  'tram_y_te': [
+    ProjectUpgrade(23, 13000, {'chuoi': 30, 'trung': 30}),
+    ProjectUpgrade(28, 26000, {'matong': 10, 'phomai': 3}),
+  ],
+  'cho_que': [
+    ProjectUpgrade(23, 16000, {'thit': 15, 'cachep': 10}),
+    ProjectUpgrade(29, 32000, {'chemat': 5, 'hongsay': 3}),
+  ],
+  'nha_van_hoa': [
+    ProjectUpgrade(24, 20000, {'xoi': 10, 'keolac': 5}),
+    ProjectUpgrade(29, 38000, {'banhcom': 5, 'chemat': 5}),
+  ],
+  'dinh_lang': [
+    ProjectUpgrade(25, 40000, {'banhchung': 10, 'nhan': 15}),
+    ProjectUpgrade(30, 80000, {'banhcom': 10, 'hongsay': 5, 'phomai': 5}),
+  ],
+};
+
+/// What a project does: text with {p} for its percentage, and the base
+/// percentage at level 1 (×1.5 at level 2, ×2 at level 3).
+const projectEffects = <String, (String, int)>{
+  'gieng': ('Luống rau màu lớn nhanh hơn {p}%', 10),
+  'cong_lang': ('+{p}% kinh nghiệm', 10),
+  'duong_be_tong': ('Đơn hàng thưởng thêm {p}% xu', 10),
+  'tram_bom': ('Ruộng lúa chín nhanh hơn {p}%', 20),
+  'tram_dien': ('Máy móc chế biến nhanh hơn {p}%', 20),
+  'truong': ('+{p}% kinh nghiệm', 15),
+  'tram_y_te': ('Vật nuôi cho sản phẩm nhanh hơn {p}%', 15),
+  'cho_que': ('Bán ở chợ được giá hơn {p}%, thêm 1 ô đơn hàng', 15),
+  'nha_van_hoa': ('Thêm 1 ô đơn hàng, đơn thưởng thêm {p}% xu', 10),
+  'dinh_lang': ('Mọi thứ lớn nhanh hơn {p}%', 10),
+};
+
+const projectMult = [1.0, 1.5, 2.0];
+
+String projectEffect(String id, int lv) {
+  final e = projectEffects[id]!;
+  return e.$1.replaceAll('{p}', '${(e.$2 * projectMult[lv - 1]).round()}');
+}
 
 /// Village title by number of finished projects.
 String villageTitle(int done) {

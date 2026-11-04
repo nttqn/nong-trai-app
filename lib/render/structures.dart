@@ -162,7 +162,7 @@ void _pen(Canvas c, Iso iso, Farm farm, Obj o, double t) {
 }
 
 /// Animal sprite widths (px at zoom 1; a tile is 64 wide).
-const _animalWidth = {'ga': 15.0, 'vit': 16.0, 'lon': 24.0, 'trau': 31.0, 'bo': 30.0};
+const _animalWidth = {'ga': 15.0, 'vit': 16.0, 'lon': 24.0, 'trau': 31.0, 'bo': 30.0, 'de': 22.0, 'ong': 14.0};
 
 void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
   final x = o.x.toDouble(), y = o.y.toDouble();
@@ -170,12 +170,26 @@ void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
     'lon' => const Color(0xFF9E7B57),
     'vit' => const Color(0xFFA9B76A),
     'trau' || 'bo' => const Color(0xFFB59B62),
+    'de' => const Color(0xFFA9B76A),
+    'ong' => const Color(0xFF9CC25A),
     _ => const Color(0xFFD7BE7E),
   };
   fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), ground);
   for (var i = 0; i < 14; i++) {
     final p = iso.p(x + .2 + hash2(o.id, i) * 1.6, y + .2 + hash2(i, o.id) * 1.6);
     line(c, p, p + const Offset(3, -1), shade(ground, .12), 1);
+  }
+  if (a.id == 'ong') {
+    // wooden hives among the flowers
+    for (var i = 0; i < 3; i++) {
+      final hx = x + .45 + (i % 2) * .8, hy = y + .45 + i * .4;
+      box(c, iso, hx, hy, .32, .32, 0, 12, const Color(0xFFE0B26A), const Color(0xFFB98543), const Color(0xFF9C6E35));
+      box(c, iso, hx - .03, hy - .03, .38, .38, 12, 14, const Color(0xFF8D6E4C), const Color(0xFF6D543A), const Color(0xFF5B4530));
+    }
+    for (var i = 0; i < 10; i++) {
+      final p = iso.p(x + .2 + hash2(o.id + 3, i) * 1.6, y + .2 + hash2(i + 5, o.id) * 1.6);
+      circle(c, p + const Offset(0, -2), 1.6, i.isEven ? const Color(0xFFFFD54F) : const Color(0xFFFFFFFF));
+    }
   }
   if (a.id == 'vit' || a.id == 'trau') {
     // small pool / mud wallow
@@ -344,6 +358,28 @@ void _factory(Canvas c, Iso iso, Farm farm, Obj o, double t) {
       ovalStroke(c, w, 7, 7, woodDark, 2);
       final ang = working ? t * 3 : 0.0;
       line(c, w, w + Offset(math.cos(ang) * 7, math.sin(ang) * 7), woodDark, 1.6);
+    case 'xuong_dau':
+      wallBox(c, iso, x + .25, y + .25, 1.4, 1.1, 0, 22, const Color(0xFFEDE3CF));
+      leftWallRect(c, iso, x + .5, y + 1.35, x + 1.0, 0, 15, doorCol);
+      gableRoof(c, iso, x + .25, y + .25, 1.4, 1.1, 22, 11, RoofStyle.tile, gableWall: const Color(0xFFEDE3CF));
+      // soy-milk pots and tofu trays
+      for (var i = 0; i < 2; i++) {
+        final p = iso.p(x + 1.55, y + .6 + i * .55);
+        oval(c, p + const Offset(0, -6), 6, 6, const Color(0xFF9E9E9E));
+        oval(c, p + const Offset(0, -11), 5, 1.8, const Color(0xFFFFF8E1));
+      }
+    case 'xuong_che':
+      wallBox(c, iso, x + .2, y + .3, 1.3, 1.1, 0, 20, mudWall);
+      leftWallRect(c, iso, x + .45, y + 1.4, x + .9, 0, 13, doorCol);
+      gableRoof(c, iso, x + .2, y + .3, 1.3, 1.1, 20, 11, RoofStyle.thatch, gableWall: mudWall);
+      // drying trays on trestles
+      for (var i = 0; i < 2; i++) {
+        final p = iso.p(x + 1.6, y + .55 + i * .6);
+        line(c, p + const Offset(-6, 0), p + const Offset(-6, -7), woodDark, 1.2);
+        line(c, p + const Offset(6, 0), p + const Offset(6, -7), woodDark, 1.2);
+        oval(c, p + const Offset(0, -8), 9, 3.5, const Color(0xFFC9A66B));
+        oval(c, p + const Offset(0, -8.5), 7, 2.4, i == 0 ? const Color(0xFF6B8E3A) : const Color(0xFFE67E22));
+      }
     case 'xuong_ca':
       wallBox(c, iso, x + .2, y + .2, 1.1, 1.0, 0, 18, const Color(0xFFDCCFB0));
       gableRoof(c, iso, x + .2, y + .2, 1.1, 1.0, 18, 11, RoofStyle.thatch, gableWall: const Color(0xFFDCCFB0));
