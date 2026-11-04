@@ -51,7 +51,41 @@ double objHeight(Obj o) => switch (o.def.kind) {
 int depthOf(Obj o) => (o.x + o.w) + (o.y + o.h);
 
 /// Frontmost object under a screen point (footprint or its tall body).
+/// The icon of the "ready" bubble floating over [o], or null.
+String? bubbleIcon(Farm farm, Obj o) {
+  switch (o.def.kind) {
+    case BKind.pen:
+      if (farm.isReady(o)) return item(animalForPen(o.type)!.product).icon;
+      if (o.end == 0 && o.count > 0) return '🍽️';
+    case BKind.pond:
+      if (o.crop != null && farm.isReady(o)) return item(fishes[o.crop]!.product).icon;
+    case BKind.tree:
+      if (farm.isReady(o)) return item(trees[o.type]!.product).icon;
+    case BKind.factory:
+      final n = farm.readyJobs(o);
+      if (n > 0) return item(recipes[o.jobs.first.recipe]!.product).icon;
+    default:
+  }
+  return null;
+}
+
+/// Centre of [o]'s bubble (without the bob).
+Offset bubbleAt(Iso iso, Obj o) => iso.p(o.x + o.w / 2, o.y + o.h / 2, objHeight(o) + 10);
+
 Obj? hitTest(Farm farm, Offset s) {
+  // Bubbles are drawn above everything, so a tap on one wins even when a
+  // building stands in front of its owner.
+  Obj? bub;
+  var bubD = 20.0 * 20.0;
+  for (final o in farm.objs) {
+    if (bubbleIcon(farm, o) == null) continue;
+    final d = (bubbleAt(worldIso, o) - s).distanceSquared;
+    if (d < bubD) {
+      bub = o;
+      bubD = d;
+    }
+  }
+  if (bub != null) return bub;
   final (gx, gy) = worldIso.toGrid(s);
   Obj? best;
   var bestDepth = -1;
@@ -168,23 +202,10 @@ class FarmPainter extends CustomPainter {
 
   void _readyBubbles(Canvas c, Iso iso, double t, List<Obj> list) {
     for (final o in list) {
-      String? icon;
-      switch (o.def.kind) {
-        case BKind.pen:
-          if (farm.isReady(o)) icon = item(animalForPen(o.type)!.product).icon;
-          if (o.end == 0 && o.count > 0) icon = '🍽️';
-        case BKind.pond:
-          if (o.crop != null && farm.isReady(o)) icon = item(fishes[o.crop]!.product).icon;
-        case BKind.tree:
-          if (farm.isReady(o)) icon = item(trees[o.type]!.product).icon;
-        case BKind.factory:
-          final n = farm.readyJobs(o);
-          if (n > 0) icon = item(recipes[o.jobs.first.recipe]!.product).icon;
-        default:
-      }
+      final icon = bubbleIcon(farm, o);
       if (icon == null) continue;
       final bob = math.sin(t * 3 + o.id) * 3;
-      final at = iso.p(o.x + o.w / 2, o.y + o.h / 2, objHeight(o) + 10 + bob);
+      final at = bubbleAt(iso, o) - Offset(0, bob);
       c.drawCircle(at + const Offset(0, 1.5), 13, Paint()..color = const Color(0x33000000));
       c.drawCircle(at, 13, Paint()..color = const Color(0xFFFFFDF5));
       c.drawCircle(at, 13,

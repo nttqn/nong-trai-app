@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nong_trai/core/defs.dart';
 import 'package:nong_trai/core/farm.dart';
 import 'package:nong_trai/core/quests.dart';
 import 'package:nong_trai/core/sync_plan.dart';
+import 'package:nong_trai/render/farm_painter.dart';
+
 
 void main() {
   group('planSync', () {
@@ -83,5 +86,25 @@ void main() {
     final gate = g.objs.firstWhere((o) => o.type == 'cong_lang');
     expect(gate.x, 10);
     expect(g.canPlace('cong_lang', gate.x, gate.y, ignore: gate.id), isTrue);
+  });
+
+  test('a tap on a ready bubble selects its owner even behind a building', () {
+    var t = 1000;
+    final f = Farm.fresh(now: () => t, seed: 3);
+    f.coins = 100000;
+    f.level = 30;
+    late Obj tree;
+    outer:
+    for (var y = 0; y < mapSize; y++) {
+      for (var x = 0; x < mapSize; x++) {
+        if (f.canPlace('cay_chuoi', x, y) && f.build('cay_chuoi', x, y) == null) {
+          tree = f.objs.last;
+          break outer;
+        }
+      }
+    }
+    t = tree.end + 1; // ripe
+    expect(bubbleIcon(f, tree), isNotNull);
+    expect(hitTest(f, bubbleAt(worldIso, tree) + const Offset(6, 4)), same(tree));
   });
 }
