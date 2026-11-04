@@ -705,6 +705,13 @@ class _FarmScreenState extends State<FarmScreen>
       padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
+          // level, coins and storage shrink to fit so the menu button never
+          // leaves the screen on narrow phones or with big numbers
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
           // level + xp
           Container(
             height: 40,
@@ -736,7 +743,7 @@ class _FarmScreenState extends State<FarmScreen>
             ]),
           ),
           const SizedBox(width: 6),
-          _chip(Coin(farm.coins, size: 15)),
+          _chip(Coin(farm.coins, size: 15, short: true)),
           const SizedBox(width: 6),
           GestureDetector(
             onTap: _openStorage,
@@ -746,7 +753,10 @@ class _FarmScreenState extends State<FarmScreen>
                     fontSize: 13.5,
                     color: farm.stored >= farm.storageCap ? red : brown))),
           ),
-          const Spacer(),
+              ]),
+            ),
+          ),
+          const SizedBox(width: 6),
           GestureDetector(
             onTap: _openMenu,
             child: _chip(const Icon(Icons.menu_rounded, color: brown, size: 22)),

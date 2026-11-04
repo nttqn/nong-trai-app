@@ -1170,6 +1170,20 @@ String fmtTime(int ms) {
 
 String fmtSecs(int s) => fmtTime(s * 1000);
 
+/// Compact amount for the HUD: 2,97tr above a million, 296k above 100.000.
+String fmtShort(int n) {
+  String dec(double v) {
+    var t = v.toStringAsFixed(v >= 100 ? 0 : (v >= 10 ? 1 : 2));
+    if (t.contains('.')) t = t.replaceFirst(RegExp(r'\.?0+$'), '');
+    return t.replaceAll('.', ',');
+  }
+
+  if (n.abs() >= 1000000000) return '${dec(n / 1e9)}tỷ';
+  if (n.abs() >= 1000000) return '${dec(n / 1e6)}tr';
+  if (n.abs() >= 100000) return '${n ~/ 1000}k';
+  return fmtNum(n);
+}
+
 String fmtNum(int n) {
   final s = n.abs().toString();
   final b = StringBuffer();

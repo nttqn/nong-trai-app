@@ -93,4 +93,12 @@ void main() {
       expect(plain.contains(q.key) || prefixes.any(q.key.startsWith), isTrue, reason: q.key);
     }
   });
+
+  test('fmtShort keeps the HUD short', () {
+    expect(fmtShort(99999), '99.999');
+    expect(fmtShort(296400), '296k');
+    expect(fmtShort(2967158), '2,97tr');
+    expect(fmtShort(12000000), '12tr');
+    expect(fmtShort(1500000000), '1,5tỷ');
+  });
 }

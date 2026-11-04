@@ -56,12 +56,14 @@ class Coin extends StatelessWidget {
   final int n;
   final double size;
   final Color? color;
-  const Coin(this.n, {super.key, this.size = 14, this.color});
+  /// Big amounts as 2,97tr / 296k (HUD).
+  final bool short;
+  const Coin(this.n, {super.key, this.size = 14, this.color, this.short = false});
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
         Text('🪙', style: TextStyle(fontSize: size)),
         const SizedBox(width: 2),
-        Text(fmtNum(n),
+        Text(short ? fmtShort(n) : fmtNum(n),
             style: TextStyle(fontSize: size, fontWeight: FontWeight.w800, color: color ?? brown)),
       ]);
 }
