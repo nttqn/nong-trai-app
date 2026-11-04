@@ -257,6 +257,8 @@ const buildings = <String, BuildingDef>{
   'cay_buoi': BuildingDef('cay_buoi', 'Cây bưởi', BKind.tree, 1, 1, 14, 900),
   'cay_vai': BuildingDef('cay_vai', 'Cây vải', BKind.tree, 1, 1, 17, 1300),
   'nha': BuildingDef('nha', 'Nhà', BKind.house, 3, 3, 1, 0, unique: true),
+  'nha_phu': BuildingDef('nha_phu', 'Nhà con cháu', BKind.house, 3, 3, 20, 60000, xp: 300,
+      desc: 'Nhà cho con cháu ra ở riêng: thêm chỗ chứa và con cháu phụ giao hàng (+5% xu mỗi đơn). Nâng cấp được như nhà chính.'),
   // decorations
   'rom_dong': BuildingDef('rom_dong', 'Đống rơm', BKind.deco, 1, 1, 2, 40, xp: 1),
   'chum': BuildingDef('chum', 'Chum nước', BKind.deco, 1, 1, 3, 60, xp: 1),
@@ -412,6 +414,12 @@ const warehouseLevels = [
   WarehouseLevel('Nhà kho gạch', 120, 3000, 8),
   WarehouseLevel('Nhà kho lớn', 200, 9000, 13),
 ];
+
+/// Extra houses (nhà con cháu): the n-th one needs this level and price.
+const extraHouseLevels = [20, 26, 32];
+const extraHouseBuildCost = [60000, 180000, 450000];
+/// Each extra house adds this share of its level's storage, and order coins.
+const extraHouseStorage = .5, extraHouseOrderBonus = .05;
 
 /// At most this many warehouses; each one built costs more.
 const warehouseMax = 3;

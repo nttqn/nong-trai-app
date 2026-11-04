@@ -65,7 +65,7 @@ bool _bodyHit(Obj o, Offset s) {
     // code-drawn: a small pump house on a wide concrete pad
     'tram_bom' => (o.x + .25, o.y + .25, 1.2, 1.1, 30.0),
     // code-drawn houses (the art ones are tested by their pixels)
-    'nha' => switch (o.level) {
+    'nha' || 'nha_phu' => switch (o.level) {
         0 => (o.x + .3, o.y + .3, 2.2, 1.3, 40.0),
         1 => (o.x + .3, o.y + .25, 2.3, 1.7, 42.0),
         2 => (o.x + .25, o.y + .25, 2.4, 1.6, 38.0),

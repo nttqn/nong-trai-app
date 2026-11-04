@@ -37,7 +37,7 @@ class ObjPanel extends StatelessWidget {
       BKind.pond => _pond(),
       BKind.tree => _tree(),
       BKind.factory => _factory(),
-      BKind.house => _house(),
+      BKind.house => o.type == 'nha' ? _house() : _extraHouse(),
       BKind.storage => _warehouse(),
       BKind.obstacle => _obstacle(),
       _ when o.type == 'cho' => _dog(),
@@ -79,6 +79,7 @@ class ObjPanel extends StatelessWidget {
   }
 
   String _title() {
+    if (o.type == 'nha_phu') return 'Nhà con cháu · ${houseLevels[o.level].name}';
     if (o.def.kind == BKind.house) return houseLevels[o.level].name;
     if (o.def.kind == BKind.storage) return warehouseLevels[o.level].name;
     if (o.def.kind == BKind.pen) return '${o.def.name} (${o.count}/${animalForPen(o.type)!.maxCount})';
@@ -399,6 +400,35 @@ class ObjPanel extends StatelessWidget {
               leading: Coin(n.cost, size: 12, color: Colors.white),
               onTap: farm.level >= n.level && farm.coins >= n.cost
                   ? () => _do(farm.upgradeHouse(), ok: 'Chúc mừng nhà mới!')
+                  : null),
+        ]),
+    ]);
+  }
+
+  Widget _extraHouse() {
+    final n = farm.nextExtraHouse(o);
+    final top = o.level + 1 >= houseLevels.length;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Chứa thêm ${farm.extraHouseCap(o)} · Kho chung: ${farm.stored}/${farm.storageCap}',
+          style: const TextStyle(color: brown, fontWeight: FontWeight.w700)),
+      Text('Con cháu phụ giao hàng: +${(extraHouseOrderBonus * 100).round()}% xu mỗi đơn',
+          style: const TextStyle(fontSize: 12.5, color: brownLight)),
+      const SizedBox(height: 6),
+      if (top)
+        const Text('Nhà đã khang trang nhất! 🎉', style: TextStyle(color: greenDark, fontWeight: FontWeight.w800))
+      else if (n == null)
+        Text('Nâng cấp nhà chính lên ${houseLevels[o.level + 1].name} trước đã.',
+            style: const TextStyle(fontSize: 12.5, color: brownLight))
+      else
+        Row(children: [
+          Expanded(
+            child: Text('Nâng lên ${n.name}\nChứa thêm ${(n.storage * extraHouseStorage).round()} · cần cấp ${n.level}',
+                style: const TextStyle(fontSize: 12.5, color: brownLight)),
+          ),
+          PillButton('Nâng cấp',
+              leading: Coin(n.cost, size: 12, color: Colors.white),
+              onTap: farm.level >= n.level && farm.coins >= n.cost
+                  ? () => _do(farm.upgradeExtraHouse(o), ok: 'Chúc mừng nhà mới!')
                   : null),
         ]),
     ]);

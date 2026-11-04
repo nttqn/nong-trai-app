@@ -295,7 +295,7 @@ class Farm {
   double get _treeSpeed => _all;
   double get _fishSpeed => _all;
   double get xpBonus => _pb('cong_lang') + _pb('truong');
-  double get orderBonus => _pb('duong_be_tong') + _pb('nha_van_hoa');
+  double get orderBonus => _pb('duong_be_tong') + _pb('nha_van_hoa') + extraHouseCount * extraHouseOrderBonus;
   double get marketBonus => _pb('cho_que');
 
   /// The next upgrade of a finished project, or null at the top.
@@ -367,8 +367,34 @@ class Farm {
     return null;
   }
 
+  /// The extra houses (nhà con cháu) built so far.
+  Iterable<Obj> get extraHouses => objs.where((o) => o.type == 'nha_phu');
+  int get extraHouseCount => extraHouses.length;
+  int extraHouseCap(Obj o) => (houseLevels[o.level].storage * extraHouseStorage).round();
+
+  /// An extra house can go one style up, but never past the main house.
+  HouseLevel? nextExtraHouse(Obj o) =>
+      o.level + 1 < houseLevels.length && o.level + 1 <= houseLevel ? houseLevels[o.level + 1] : null;
+
+  String? upgradeExtraHouse(Obj o) {
+    if (o.level + 1 >= houseLevels.length) return 'Nhà đã nâng cấp tối đa';
+    final n = nextExtraHouse(o);
+    if (n == null) return 'Nâng cấp nhà chính trước đã';
+    if (level < n.level) return 'Cần đạt cấp ${n.level}';
+    if (coins < n.cost) return 'Không đủ xu';
+    coins -= n.cost;
+    o.level++;
+    _ev('extra_house_upgrade', {'house': o.level, 'level': level});
+    _snd('build');
+    addXp(25 * o.level);
+    _fx(o, '🏡 ${n.name}');
+    _changed();
+    return null;
+  }
+
   int get storageCap =>
       houseLevels[houseLevel].storage +
+      extraHouses.fold<int>(0, (s, o) => s + extraHouseCap(o)) +
       objs.where((o) => o.def.kind == BKind.storage).fold(0, (s, o) => s + warehouseLevels[o.level].storage);
 
   int get warehouseCount => objs.where((o) => o.def.kind == BKind.storage).length;
@@ -440,6 +466,7 @@ class Farm {
     if (d.kind == BKind.storage) {
       return warehouseBuildCost[warehouseCount.clamp(0, warehouseBuildCost.length - 1)];
     }
+    if (type == 'nha_phu') return extraHouseBuildCost[extraHouseCount.clamp(0, extraHouseBuildCost.length - 1)];
     return d.cost;
   }
 
@@ -450,6 +477,11 @@ class Farm {
       return 'Đã xây rồi';
     }
     if (d.kind == BKind.storage && warehouseCount >= warehouseMax) return 'Tối đa $warehouseMax nhà kho';
+    if (type == 'nha_phu') {
+      final n = extraHouseCount;
+      if (n >= extraHouseLevels.length) return 'Tối đa ${extraHouseLevels.length} nhà con cháu';
+      if (level < extraHouseLevels[n]) return 'Cần đạt cấp ${extraHouseLevels[n]}';
+    }
     if (coins < buildCost(type)) return 'Không đủ xu';
     for (final e in d.goods.entries) {
       if (countOf(e.key) < e.value) return 'Thiếu ${item(e.key).name}';

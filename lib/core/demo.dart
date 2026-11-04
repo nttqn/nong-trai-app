@@ -121,6 +121,14 @@ Farm demoFarm(int stage, {int house = -1}) {
     anywhere('xuong_che');
     anywhere('cay_nhan', prog: 1.2);
     anywhere('cay_hong', prog: 1.2);
+    // a house for the children (nhà con cháu)
+    final coins = f.coins;
+    f.coins = 1 << 30;
+    anywhere('nha_phu');
+    f.coins = coins;
+    for (final o in f.extraHouses) {
+      o.level = 2;
+    }
     f.projectLv.addAll({'gieng': 3, 'tram_bom': 2, 'dinh_lang': 2});
     f.rollDaily();
   }
