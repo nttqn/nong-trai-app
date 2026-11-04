@@ -21,6 +21,7 @@ import '../services/sound.dart';
 import 'cloud_tile.dart';
 import 'leaderboard_sheet.dart';
 import 'panels.dart';
+import 'quest_sheet.dart';
 import 'sheets.dart';
 import 'widgets.dart';
 
@@ -724,14 +725,21 @@ class _FarmScreenState extends State<FarmScreen>
     showFarmSheet(context, (_) => LeaderboardSheet(farm), height: .8);
   }
 
+  void _claimQuest() {
+    final q = farm.currentQuest;
+    if (q == null || !farm.questDone) return;
+    farm.claimQuest();
+    _say('Nhận ${q.coins} xu thưởng nhiệm vụ!');
+  }
+
+  void _openQuests() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => QuestSheet(farm, _claimQuest), height: .75);
+  }
+
   Widget _questChip(QuestDef q) => GestureDetector(
-            onTap: farm.questDone
-                ? () {
-                    final c = q.coins;
-                    farm.claimQuest();
-                    _say('Nhận $c xu thưởng nhiệm vụ!');
-                  }
-                : null,
+            onTap: farm.questDone ? _claimQuest : _openQuests,
             child: Container(
               constraints: const BoxConstraints(maxWidth: 330),
               padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
