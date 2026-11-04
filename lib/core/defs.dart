@@ -167,7 +167,7 @@ const recipes = <String, RecipeDef>{
 List<RecipeDef> recipesFor(String building) =>
     recipes.values.where((r) => r.building == building).toList();
 
-enum BKind { paddy, bed, pen, pond, tree, factory, house, project, deco, obstacle }
+enum BKind { paddy, bed, pen, pond, tree, factory, house, storage, project, deco, obstacle }
 
 class BuildingDef {
   final String id, name, desc;
@@ -197,6 +197,8 @@ const buildings = <String, BuildingDef>{
       desc: 'Trâu ăn rơm, cho phân chuồng để bón ruộng.', xp: 18),
   'chuong_bo': BuildingDef('chuong_bo', 'Chuồng bò', BKind.pen, 2, 2, 12, 1600,
       desc: 'Bò sữa ăn rơm, cho sữa.', xp: 22),
+  'nha_kho': BuildingDef('nha_kho', 'Nhà kho', BKind.storage, 2, 2, 3, 600,
+      desc: 'Thêm chỗ chứa nông sản cho kho chung. Nâng cấp được.', xp: 10),
   'may_xay': BuildingDef('may_xay', 'Máy xay xát', BKind.factory, 2, 2, 3, 400,
       desc: 'Xay thóc thành gạo và cám.', xp: 8),
   'lo_banh': BuildingDef('lo_banh', 'Bếp làm bánh', BKind.factory, 2, 2, 7, 1200,
@@ -279,6 +281,23 @@ class HouseLevel {
   final int level, cost, storage;
   const HouseLevel(this.name, this.level, this.cost, this.storage);
 }
+
+/// A warehouse (nhà kho) per level: name, extra storage, cost to reach it.
+class WarehouseLevel {
+  final String name;
+  final int storage, cost, level;
+  const WarehouseLevel(this.name, this.storage, this.cost, this.level);
+}
+
+const warehouseLevels = [
+  WarehouseLevel('Nhà kho gỗ', 60, 0, 3),
+  WarehouseLevel('Nhà kho gạch', 120, 3000, 8),
+  WarehouseLevel('Nhà kho lớn', 200, 9000, 13),
+];
+
+/// At most this many warehouses; each one built costs more.
+const warehouseMax = 3;
+const warehouseBuildCost = [600, 2500, 7000];
 
 const houseLevels = [
   HouseLevel('Nhà tranh vách đất', 1, 0, 60),

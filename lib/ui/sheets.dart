@@ -21,7 +21,7 @@ class _ShopSheetState extends State<ShopSheet> {
   static const tabs = [
     ('Trồng trọt', ['ruong', 'luong', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai']),
     ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'ao']),
-    ('Chế biến', ['may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca']),
+    ('Chế biến', ['nha_kho', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca']),
     ('Trang trí', ['tre', 'rom_dong', 'chum', 'bu_nhin', 'hoa_dao', 'cay_da']),
   ];
 
@@ -63,7 +63,7 @@ class _ShopSheetState extends State<ShopSheet> {
     final d = bdef(id);
     final err = f.canBuy(id);
     final locked = f.level < d.level;
-    final owned = d.kind == BKind.pen || d.kind == BKind.factory || d.kind == BKind.pond
+    final owned = d.kind == BKind.pen || d.kind == BKind.factory || d.kind == BKind.pond || d.kind == BKind.storage
         ? f.objs.where((o) => o.type == id).length
         : null;
     return GestureDetector(

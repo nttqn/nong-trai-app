@@ -38,6 +38,7 @@ class ObjPanel extends StatelessWidget {
       BKind.tree => _tree(),
       BKind.factory => _factory(),
       BKind.house => _house(),
+      BKind.storage => _warehouse(),
       BKind.obstacle => _obstacle(),
       _ => _info(),
     };
@@ -78,6 +79,7 @@ class ObjPanel extends StatelessWidget {
 
   String _title() {
     if (o.def.kind == BKind.house) return houseLevels[o.level].name;
+    if (o.def.kind == BKind.storage) return warehouseLevels[o.level].name;
     if (o.def.kind == BKind.pen) return '${o.def.name} (${o.count}/${animalForPen(o.type)!.maxCount})';
     return o.def.name;
   }
@@ -361,6 +363,28 @@ class ObjPanel extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------- house
+  Widget _warehouse() {
+    final cur = warehouseLevels[o.level];
+    final n = farm.nextWarehouse(o);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Chứa thêm ${cur.storage} · Kho chung: ${farm.stored}/${farm.storageCap}',
+          style: const TextStyle(color: brown, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 6),
+      if (n == null)
+        const Text('Đã nâng cấp tối đa', style: TextStyle(color: brownLight))
+      else
+        Row(children: [
+          Expanded(
+            child: Text('Nâng lên ${n.name}\nChứa thêm ${n.storage}${farm.level < n.level ? ' · cần cấp ${n.level}' : ''}',
+                style: const TextStyle(fontSize: 12.5, color: brownLight)),
+          ),
+          PillButton('Nâng cấp',
+              leading: Coin(n.cost, size: 12, color: Colors.white),
+              onTap: farm.level >= n.level && farm.coins >= n.cost ? () => _do(farm.upgradeWarehouse(o)) : null),
+        ]),
+    ]);
+  }
+
   Widget _house() {
     final n = farm.nextHouse;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

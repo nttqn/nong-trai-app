@@ -106,4 +106,27 @@ void main() {
     expect(bubbleIcon(f, tree), isNotNull);
     expect(hitTest(f, bubbleAt(worldIso, tree) + const Offset(6, 4)), same(tree));
   });
+
+  test('warehouses add storage, cost more each, upgrade, max 3', () {
+    final f = Farm.fresh(now: () => 1000, seed: 3);
+    f.objs.removeWhere((o) => o.def.kind == BKind.obstacle);
+    f.coins = 1000000;
+    f.level = 20;
+    final base = f.storageCap;
+    expect(f.buildCost('nha_kho'), 600);
+    final spots = <(int, int)>[];
+    for (var y = 0; y < mapSize && spots.length < 4; y++) {
+      for (var x = 0; x < mapSize && spots.length < 4; x++) {
+        if (f.canPlace('nha_kho', x, y) && f.build('nha_kho', x, y) == null) spots.add((x, y));
+      }
+    }
+    expect(f.warehouseCount, 3);
+    expect(f.canBuy('nha_kho'), isNotNull); // max reached
+    expect(f.storageCap, base + 3 * warehouseLevels[0].storage);
+    final w = f.objs.firstWhere((o) => o.type == 'nha_kho');
+    expect(f.upgradeWarehouse(w), isNull);
+    expect(f.storageCap, base + 2 * warehouseLevels[0].storage + warehouseLevels[1].storage);
+    final g = Farm.fromJson(jsonDecode(jsonEncode(f.toJson())) as Map<String, dynamic>);
+    expect(g.storageCap, f.storageCap);
+  });
 }

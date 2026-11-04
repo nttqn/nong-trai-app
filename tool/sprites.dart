@@ -29,6 +29,7 @@ final expected = [
   'chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo',
   'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',
   'nha_0', 'nha_1', 'nha_2', 'nha_3', 'nha_4',
+  'nha_kho_0', 'nha_kho_1', 'nha_kho_2',
   'gieng', 'cong_lang', 'tram_bom', 'tram_dien', 'truong', 'tram_y_te', 'cho_que', 'nha_van_hoa', 'dinh_lang',
   'rom_dong', 'chum', 'bu_nhin', 'hoa_dao', 'tre', 'cay_da',
   'bui', 'da', 'goc_cay',
@@ -40,6 +41,7 @@ int maxWidthFor(String key) {
   const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa'};
   if (animals.contains(key)) return 160;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
+  if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',
       'tram_bom', 'tram_y_te', 'cong_lang', 'cay_da'}.contains(key)) {
     return 400;

@@ -40,6 +40,7 @@ class GroundCache {
 double objHeight(Obj o) => switch (o.def.kind) {
       BKind.house => 90,
       BKind.factory => 58,
+      BKind.storage => 60,
       BKind.project => 64,
       BKind.tree => 52,
       BKind.deco => o.type == 'cay_da' ? 80 : 40,

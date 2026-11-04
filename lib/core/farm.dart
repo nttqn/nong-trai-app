@@ -284,7 +284,29 @@ class Farm {
     return null;
   }
 
-  int get storageCap => houseLevels[houseLevel].storage;
+  int get storageCap =>
+      houseLevels[houseLevel].storage +
+      objs.where((o) => o.def.kind == BKind.storage).fold(0, (s, o) => s + warehouseLevels[o.level].storage);
+
+  int get warehouseCount => objs.where((o) => o.def.kind == BKind.storage).length;
+
+  WarehouseLevel? nextWarehouse(Obj o) =>
+      o.level + 1 < warehouseLevels.length ? warehouseLevels[o.level + 1] : null;
+
+  String? upgradeWarehouse(Obj o) {
+    final n = nextWarehouse(o);
+    if (n == null) return 'Nhà kho đã nâng cấp tối đa';
+    if (level < n.level) return 'Cần đạt cấp ${n.level}';
+    if (coins < n.cost) return 'Không đủ xu';
+    coins -= n.cost;
+    o.level++;
+    _snd('build');
+    addXp(15 * o.level);
+    _fx(o, '📦 +${n.storage - warehouseLevels[o.level - 1].storage}');
+    _ev('warehouse_upgrade', {'level': o.level});
+    _changed();
+    return null;
+  }
   int get stored => inv.values.fold(0, (a, b) => a + b);
   int countOf(String id) => inv[id] ?? 0;
   bool roomFor(int n) => stored + n <= storageCap;
@@ -332,6 +354,9 @@ class Farm {
       final n = objs.where((o) => o.type == type).length;
       return d.cost + n * 5; // each extra plot a bit dearer
     }
+    if (d.kind == BKind.storage) {
+      return warehouseBuildCost[warehouseCount.clamp(0, warehouseBuildCost.length - 1)];
+    }
     return d.cost;
   }
 
@@ -341,6 +366,7 @@ class Farm {
     if (d.unique && (projects.contains(type) || objs.any((o) => o.type == type))) {
       return 'Đã xây rồi';
     }
+    if (d.kind == BKind.storage && warehouseCount >= warehouseMax) return 'Tối đa $warehouseMax nhà kho';
     if (coins < buildCost(type)) return 'Không đủ xu';
     for (final e in d.goods.entries) {
       if (countOf(e.key) < e.value) return 'Thiếu ${item(e.key).name}';
@@ -384,6 +410,7 @@ class Farm {
   /// Plots, trees and decorations can be removed (no refund).
   bool canRemove(Obj o) {
     final k = o.def.kind;
+    if (k == BKind.storage) return stored <= storageCap - warehouseLevels[o.level].storage;
     return k == BKind.paddy || k == BKind.bed || k == BKind.tree || k == BKind.deco;
   }
 

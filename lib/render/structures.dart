@@ -44,12 +44,39 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
       }
     case BKind.house:
       if (!sprite('nha_${o.level}')) drawHouse(c, iso, x, y, o.level, t);
+    case BKind.storage:
+      if (!sprite('nha_kho_${o.level}') && !sprite('nha_kho')) _warehouse(c, iso, x, y, o.level);
     case BKind.project:
       if (!sprite(o.type)) _project(c, iso, o.type, x, y, t);
     case BKind.deco:
       if (!sprite(o.type)) _deco(c, iso, o.type, x, y, foot, t, o.id);
     case BKind.obstacle:
       if (!sprite(o.type)) _obstacle(c, o.type, foot, o.id);
+  }
+}
+
+/// Code-drawn warehouse: wooden barn, brick walls from level 1, a bigger
+/// tiled roof at level 2; sacks by the door.
+void _warehouse(Canvas c, Iso iso, double x, double y, int lv) {
+  fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), const Color(0xFFC9B48A));
+  final wall = lv == 0 ? const Color(0xFFA9774A) : const Color(0xFFC1603F);
+  final zTop = lv == 2 ? 40.0 : 32.0;
+  wallBox(c, iso, x + .25, y + .3, 1.5, 1.35, 0, zTop, wall);
+  if (lv == 0) {
+    for (var i = 1; i < 6; i++) {
+      final k = i / 6;
+      line(c, iso.p(x + .25 + 1.5 * k, y + 1.65, 0), iso.p(x + .25 + 1.5 * k, y + 1.65, zTop), shade(wall, -.2), 1);
+    }
+  }
+  // big double door on the front-left face
+  leftWallRect(c, iso, x + .6, y + 1.65, x + 1.4, 0, zTop * .7, const Color(0xFF6D4C2F));
+  line(c, iso.p(x + 1.0, y + 1.65, 0), iso.p(x + 1.0, y + 1.65, zTop * .7), const Color(0xFF4E342E), 1.2);
+  hipRoof(c, iso, x + .25, y + .3, 1.5, 1.35, zTop, lv == 2 ? 24 : 20,
+      lv == 0 ? RoofStyle.thatch : (lv == 1 ? RoofStyle.tile : RoofStyle.darkTile));
+  // sacks
+  for (final (dx, dy) in [(.2, 1.75), (.38, 1.82)]) {
+    final p = iso.p(x + dx, y + dy, 0);
+    oval(c, p + const Offset(0, -5), 6, 7, const Color(0xFFE8D7A9));
   }
 }
 

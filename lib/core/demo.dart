@@ -78,6 +78,11 @@ Farm demoFarm(int stage, {int house = -1}) {
     ..['banhchung'] = 100
     ..['cuc'] = 100
     ..['nuocmam'] = 100;
+  // a warehouse on the first free spot
+  for (var i = 0; i < mapSize * mapSize && f.warehouseCount == 0; i++) {
+    put('nha_kho', i % mapSize, i ~/ mapSize);
+  }
+  if (f.warehouseCount > 0) f.objs.last.level = stage >= 2 ? 2 : 0;
   if (stage >= 2) {
     f.level = 20;
     for (final (p, x, y) in [
