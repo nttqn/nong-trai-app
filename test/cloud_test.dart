@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nong_trai/core/defs.dart';
 import 'package:nong_trai/core/farm.dart';
