@@ -8,3 +8,15 @@
 -keep class * extends androidx.work.ListenableWorker {
     <init>(android.content.Context, androidx.work.WorkerParameters);
 }
+
+# flutter_local_notifications stores scheduled notifications as JSON with
+# Gson (reflection on its own model classes and generic type tokens).
+-keep class com.dexterous.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer

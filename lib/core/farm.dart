@@ -3,8 +3,12 @@
 
 import 'dart:math' as math;
 
+import 'achievements.dart';
 import 'defs.dart';
 import 'quests.dart';
+import 'weather.dart';
+
+part 'farm_more.dart';
 
 typedef NowFn = int Function();
 int wallClock() => DateTime.now().millisecondsSinceEpoch;
@@ -89,6 +93,15 @@ class Farm {
   final List<Order> orders = [];
   final Map<String, int> stats = {};
   int quest = 0, questBase = 0;
+  /// Quà đăng nhập: day key of the last gift and the streak day it was.
+  int loginDay = 0, loginStreak = 0;
+  /// Achievement tiers claimed, and the title shown to neighbours.
+  final Map<String, int> ach = {};
+  String title = '';
+  /// Goods on this player's market stall.
+  final List<Stall> stalls = [];
+  /// Tutorial step (new farms start at 0; [tutDone] when finished).
+  int tut = tutDone;
   int rev = 0; // bumps on every change (render caches, autosave)
   final List<Fx> fx = [];
   void Function(int level)? onLevelUp;
@@ -119,6 +132,7 @@ class Farm {
     f._add('rom_dong', 9, 6);
     f._scatterObstacles();
     f.inv['thoc'] = 6;
+    f.tut = 0;
     f._fillOrders();
     return f;
   }
@@ -317,8 +331,21 @@ class Farm {
   int get orderSlots => 4 + (has('cho_que') ? 1 : 0) + (has('nha_van_hoa') ? 1 : 0);
 
   int _dur(int seconds, double speed) => (seconds * 1000 * (1 - speed)).round();
-  int cropMs(CropDef c) =>
-      _dur(c.seconds, c.plot == Plot.paddy ? _paddySpeed : _bedSpeed);
+  /// Growing time of [c] if planted now: the village bonus, then the
+  /// weather (rain helps; a dry spell hurts fields without irrigation).
+  int cropMs(CropDef c) {
+    final ms = _dur(c.seconds, c.plot == Plot.paddy ? _paddySpeed : _bedSpeed);
+    return (ms * weatherCropMult(c)).round();
+  }
+
+  Weather get weather => weatherAt(now());
+
+  /// 0.8 under rain, 1.25 in a dry spell unless irrigated, else 1.
+  double weatherCropMult(CropDef c) => switch (weather) {
+        Weather.rain => 1 - rainSpeed,
+        Weather.drought => has(c.plot == Plot.paddy ? 'tram_bom' : 'gieng') ? 1 : 1 + droughtSlow,
+        Weather.sunny => 1,
+      };
   int animalMs(AnimalDef a) => _dur(a.seconds, _animalSpeed);
   int fishMs(FishDef f) => _dur(f.seconds, _fishSpeed);
   int recipeMs(RecipeDef r) => _dur(r.seconds, _factorySpeed);
@@ -947,8 +974,13 @@ class Farm {
     return f;
   }
 
-  /// Chance a steal is caught: 15% per scarecrow, at most 45%.
-  double get catchChance => math.min(.45, .15 * objs.where((o) => o.type == 'bu_nhin').length);
+  /// Chance a steal is caught: 15% per scarecrow (at most 45%), plus 25%
+  /// while the guard dog is fed.
+  double get catchChance {
+    final d = dog;
+    return math.min(.45, .15 * objs.where((o) => o.type == 'bu_nhin').length) +
+        (d != null && dogAwake(d) ? FarmMore.dogCatch : 0);
+  }
 
   /// Owner side: applies what a neighbour did while away. Returns false
   /// when it no longer fits (already harvested, replanted, storage full).
@@ -1131,6 +1163,11 @@ class Farm {
         'quest': quest, 'questBase': questBase,
         'savedAt': savedAt,
         if (name.isNotEmpty) 'name': name,
+        if (loginDay != 0) 'login': [loginDay, loginStreak],
+        if (ach.isNotEmpty) 'ach': ach,
+        if (title.isNotEmpty) 'title': title,
+        if (stalls.isNotEmpty) 'stalls': [for (final s in stalls) s.toJson()],
+        if (tut != tutDone) 'tut': tut,
       };
 
   static Farm fromJson(Map<String, dynamic> j, {NowFn? now}) {
@@ -1143,7 +1180,16 @@ class Farm {
       ..quest = j['quest'] ?? 0
       ..questBase = j['questBase'] ?? 0
       ..savedAt = j['savedAt'] ?? 0
-      ..name = j['name'] ?? '';
+      ..name = j['name'] ?? ''
+      ..title = j['title'] ?? ''
+      ..tut = j['tut'] ?? tutDone;
+    final login = j['login'] as List?;
+    if (login != null && login.length == 2) {
+      f.loginDay = login[0];
+      f.loginStreak = login[1];
+    }
+    f.ach.addAll(Map<String, int>.from(j['ach'] ?? const {}));
+    f.stalls.addAll([for (final s in (j['stalls'] as List? ?? const [])) Stall.fromJson(Map<String, dynamic>.from(s))]);
     f.lots.addAll((j['lots'] as List).cast<int>());
     f.inv.addAll(Map<String, int>.from(j['inv']));
     f.objs.addAll([for (final o in j['objs']) Obj.fromJson(o)]);

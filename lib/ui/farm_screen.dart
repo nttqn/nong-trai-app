@@ -11,14 +11,17 @@ import 'package:flutter/services.dart';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import '../core/quests.dart';
+import '../core/weather.dart';
 import '../render/farm_painter.dart';
 import '../render/iso.dart' show clearTextCache;
 import '../services/ads.dart';
 import '../services/analytics.dart';
 import '../services/cloud.dart';
+import '../services/notify.dart';
 import '../services/save.dart';
 import '../services/sound.dart';
 import 'cloud_tile.dart';
+import 'extras.dart';
 import 'leaderboard_sheet.dart';
 import 'world_map.dart';
 import '../services/neighbors.dart';
@@ -72,7 +75,10 @@ class _FarmScreenState extends State<FarmScreen>
     };
     CloudSave.instance.addListener(_onCloud);
     Neighbors.instance.addListener(_onNeighbors);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _onCloud());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onCloud();
+      Future.delayed(const Duration(milliseconds: 1500), _maybeLoginGift);
+    });
     farm.onSound = (c) => SoundService.instance.play(c);
     _ticker = createTicker((e) {
       final prev = _clock.value;
@@ -85,6 +91,7 @@ class _FarmScreenState extends State<FarmScreen>
         farm.fx.clear();
       }
       if (farm.rev != _lastRev) {
+        if (farm.tutCheck()) SoundService.instance.play('quest');
         _lastRev = farm.rev;
         widget.save.schedule(farm);
         if (mounted) setState(() {});
@@ -113,9 +120,29 @@ class _FarmScreenState extends State<FarmScreen>
   void didChangeAppLifecycleState(AppLifecycleState s) {
     if (s == AppLifecycleState.paused || s == AppLifecycleState.inactive) {
       widget.save.saveNow(farm);
+      if (s == AppLifecycleState.paused) NotifyService.instance.scheduleFor(farm);
     } else if (s == AppLifecycleState.resumed) {
+      NotifyService.instance.cancelAll();
       Neighbors.instance.pull(farm);
+      _maybeLoginGift();
     }
+  }
+
+  // ---------------------------------------------------------------- daily gift
+  bool _giftOpen = false;
+
+  /// Today's login gift, once the tutorial is over and nothing else is up.
+  Future<void> _maybeLoginGift() async {
+    if (!mounted || _giftOpen || _askingCloud || farm.tutActive || farm.loginClaimed) {
+      if (mounted && !farm.tutActive && farm.level >= 2) NotifyService.instance.askOnce();
+      return;
+    }
+    if (ModalRoute.of(context)?.isCurrent != true) return;
+    _giftOpen = true;
+    await showLoginGift(context, farm);
+    _giftOpen = false;
+    if (mounted) setState(() {});
+    if (farm.level >= 2) NotifyService.instance.askOnce();
   }
 
   // ---------------------------------------------------------------- feedback
@@ -210,7 +237,7 @@ class _FarmScreenState extends State<FarmScreen>
       builder: (c) => AlertDialog(
         backgroundColor: cream,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('🏡 Hàng xóm ghé thăm', style: TextStyle(fontWeight: FontWeight.w900, color: brown)),
+        title: const Text('📬 Tin trong làng', style: TextStyle(fontWeight: FontWeight.w900, color: brown)),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           for (final l in lines)
             Padding(
@@ -218,7 +245,7 @@ class _FarmScreenState extends State<FarmScreen>
               child: Text(l, style: const TextStyle(color: brown, fontWeight: FontWeight.w600)),
             ),
           const SizedBox(height: 4),
-          const Text('Đặt bù nhìn để bắt kẻ hái trộm!', style: TextStyle(color: brownLight, fontSize: 12.5)),
+          const Text('Đặt bù nhìn, nuôi chó giữ nhà để bắt kẻ hái trộm!', style: TextStyle(color: brownLight, fontSize: 12.5)),
         ]),
         actions: [Center(child: PillButton('Biết rồi', onTap: () => Navigator.pop(c)))],
       ),
@@ -337,7 +364,7 @@ class _FarmScreenState extends State<FarmScreen>
       });
       return;
     }
-    final o = hitTest(farm, p);
+    final o = hitTest(farm, p, _view);
     if (_plantCrop != null) {
       if (o != null && (o.def.kind == BKind.paddy || o.def.kind == BKind.bed)) {
         if (o.crop == null) {
@@ -548,6 +575,17 @@ class _FarmScreenState extends State<FarmScreen>
             onChanged: (_) => snd.toggleSfx(),
           ),
         ),
+        const SheetHeader('Thông báo'),
+        ValueListenableBuilder<bool>(
+          valueListenable: NotifyService.instance.enabled,
+          builder: (_, on, _) => SwitchListTile(
+            dense: true,
+            activeThumbColor: green,
+            title: const Text('🔔 Nhắc khi lúa chín, có quà', style: TextStyle(color: brown, fontWeight: FontWeight.w700)),
+            value: on,
+            onChanged: (v) => NotifyService.instance.setEnabled(v),
+          ),
+        ),
         const SheetHeader('Hướng dẫn'),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
@@ -559,6 +597,8 @@ class _FarmScreenState extends State<FarmScreen>
             '• Giao đơn hàng cho bà con để có nhiều xu và kinh nghiệm.\n'
             '• Góp xu và nông sản xây công trình nông thôn mới: mỗi công trình cho một lợi ích lâu dài.\n'
             '• Nâng cấp nhà để kho chứa được nhiều hơn. Mua thêm đất bằng biển "Mua đất".\n'
+            '• Thời tiết (góc trên) đổi 3 giờ một lần: gieo lúc mưa thì cây lớn nhanh, nắng hạn thì chậm nếu thiếu trạm bơm, giếng.\n'
+            '• Từ cấp 7 có chợ phiên: bày hàng thừa lên sạp (🛒 trong Kho) cho người chơi khác mua.\n'
             '• Kéo hai ngón để phóng to/thu nhỏ bản đồ.\n'
             '• Đăng nhập Google để lưu nông trại lên mây, đổi máy không mất.',
             style: TextStyle(color: brown, height: 1.45),
@@ -661,6 +701,8 @@ class _FarmScreenState extends State<FarmScreen>
               child: SafeArea(
                 top: false,
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  if (farm.tutActive && !placing)
+                    TutorialBanner(farm, onSkip: _skipTutorial, onFinish: _finishTutorial),
                   if (_plantCrop != null) _modeBanner('🌱 Đang gieo ${crops[_plantCrop]!.name} — chạm các ô trống', () => setState(() => _plantCrop = null)),
                   if (!placing && _sel != null && farm.objs.contains(_sel))
                     Padding(
@@ -773,9 +815,25 @@ class _FarmScreenState extends State<FarmScreen>
         ]),
         const SizedBox(height: 4),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _chip(Text('🏘️ ${villageTitle(farm.projects.length)}',
-              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brown)), small: true),
-          const Spacer(),
+          Flexible(
+            child: _chip(Flexible(
+              child: Text('🏘️ ${villageTitle(farm.projects.length)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brown)),
+            ), small: true),
+          ),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: () => showWeather(context, farm),
+            child: _chip(Text(weatherIcon(farm.weather), style: const TextStyle(fontSize: 19))),
+          ),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: _openAchievements,
+            child: _badged(_chip(const Text('🏅', style: TextStyle(fontSize: 19))), farm.achReadyCount),
+          ),
+          const SizedBox(width: 6),
           GestureDetector(
             onTap: _openMap,
             child: _chip(const Text('🗺️', style: TextStyle(fontSize: 19))),
@@ -784,6 +842,41 @@ class _FarmScreenState extends State<FarmScreen>
       ]),
     );
   }
+
+  void _openAchievements() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => AchievementsSheet(farm, _report), height: .82).then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  void _skipTutorial() {
+    farm.tutFinish();
+    setState(() {});
+    _maybeLoginGift();
+  }
+
+  void _finishTutorial() {
+    SoundService.instance.play('quest');
+    farm.tutFinish();
+    setState(() {});
+    _maybeLoginGift();
+  }
+
+  Widget _badged(Widget child, int n) => Stack(clipBehavior: Clip.none, children: [
+        child,
+        if (n > 0)
+          Positioned(
+            right: -4,
+            top: -4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(color: red, borderRadius: BorderRadius.circular(10)),
+              child: Text('$n', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
+            ),
+          ),
+      ]);
 
   void _openLeaderboard() {
     SoundService.instance.play('tap');
@@ -855,14 +948,25 @@ class _FarmScreenState extends State<FarmScreen>
   Widget _bottomBar() {
     final deliverable = farm.orders.where(farm.canDeliver).length +
         farm.daily.where((o) => o.waitUntil >= 0 && o.need.entries.every((e) => farm.countOf(e.key) >= e.value)).length;
-    Widget btn(String icon, String label, VoidCallback onTap, {int badge = 0}) => Expanded(
+    final tut = farm.tutStep;
+    Widget btn(String icon, String label, VoidCallback onTap, {int badge = 0, bool hint = false}) => Expanded(
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(14),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Stack(clipBehavior: Clip.none, children: [
+                Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [
+                  if (hint)
+                    Container(
+                      width: 42,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFE082),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE65100), width: 2),
+                      ),
+                    ),
                   Text(icon, style: const TextStyle(fontSize: 26)),
                   if (badge > 0)
                     Positioned(
@@ -886,9 +990,9 @@ class _FarmScreenState extends State<FarmScreen>
       margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       decoration: cardDeco(),
       child: Row(children: [
-        btn('🏗️', 'Xây dựng', _openShop),
+        btn('🏗️', 'Xây dựng', _openShop, hint: tut == Tut.build),
         btn('📦', 'Kho & Chợ', _openStorage),
-        btn('📋', 'Đơn hàng', _openOrders, badge: deliverable),
+        btn('📋', 'Đơn hàng', _openOrders, badge: deliverable, hint: tut == Tut.order),
         btn('🏛️', 'Nông thôn mới', _openProjects),
       ]),
     );

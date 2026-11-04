@@ -7,6 +7,9 @@ Farm demoFarm(int stage, {int house = -1}) {
   final f = Farm.fresh(seed: 11);
   if (stage <= 0) return f;
   final now = f.now();
+  f.tut = tutDone;
+  f.loginDay = Farm.dayKey(now);
+  f.loginStreak = 3;
   f.level = 6 + stage * 4;
   f.coins = 99999;
   // own more land
@@ -121,8 +124,24 @@ Farm demoFarm(int stage, {int house = -1}) {
     f.projectLv.addAll({'gieng': 3, 'tram_bom': 2, 'dinh_lang': 2});
     f.rollDaily();
   }
+  // guard dog, fed, next to the house
+  for (var i = 0; i < mapSize * mapSize && f.dog == null; i++) {
+    final x = 4 + i % 8, y = 4 + i ~/ 8;
+    if (f.canPlace('cho', x, y)) f.build('cho', x, y);
+  }
+  final dog = f.dog;
+  if (dog != null) {
+    dog.start = now;
+    dog.end = now + FarmMore.dogFedMs;
+  }
+  f.stats.addAll({'order': 30 * stage, 'harvest:lua': 120 * stage, 'help': 12, 'steal': 6, 'daily': 4, 'login': 9});
+  f.ach.addAll({'harvest': 1, 'help': 1});
+  f.title = 'harvest';
   f.inv.clear();
-  f.inv.addAll({'thoc': 24, 'rom': 6, 'trung': 5, 'gao': 4});
+  f.inv.addAll({'thoc': 24, 'rom': 6, 'trung': 5, 'gao': 4, 'ngo': 12});
+  if (stage >= 2) {
+    f.stalls.addAll([Stall(0, 'dua', 5, 400, now), Stall(1, 'trung', 10, 150, now)]);
+  }
   f.coins = 12450;
   f.xp = 40;
   f.fx.clear();

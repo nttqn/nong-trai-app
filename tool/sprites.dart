@@ -31,7 +31,7 @@ final expected = [
   'nha_0', 'nha_1', 'nha_2', 'nha_3', 'nha_4',
   'nha_kho_0', 'nha_kho_1', 'nha_kho_2',
   'gieng', 'cong_lang', 'tram_bom', 'tram_dien', 'truong', 'tram_y_te', 'cho_que', 'nha_van_hoa', 'dinh_lang',
-  'rom_dong', 'chum', 'bu_nhin', 'hoa_dao', 'tre', 'cay_da',
+  'rom_dong', 'chum', 'bu_nhin', 'cho', 'hoa_dao', 'tre', 'cay_da',
   'bui', 'da', 'goc_cay',
 ];
 

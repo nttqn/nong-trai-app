@@ -8,6 +8,7 @@ Map<String, dynamic> villageSnapshot(Farm f) => {
       'name': f.name.length > 24 ? f.name.substring(0, 24) : f.name,
       'level': f.level,
       'house': f.houseLevel,
+      if (f.title.isNotEmpty) 'title': f.title,
       'lots': f.lots.toList(),
       'projects': f.projects.toList(),
       if (f.projectLv.isNotEmpty) 'projectLv': f.projectLv,

@@ -10,12 +10,14 @@ import '../core/village.dart';
 import 'analytics.dart';
 import 'cloud.dart';
 import 'leaderboard.dart';
+import 'market.dart';
 
 /// A village on the region map.
 class VillageInfo {
   final String uid, name;
   final int level, house;
-  const VillageInfo(this.uid, this.name, this.level, this.house);
+  final String title;
+  const VillageInfo(this.uid, this.name, this.level, this.house, [this.title = '']);
 }
 
 /// Neighbours: each signed-in player's farm is published (layout only) to
@@ -84,7 +86,8 @@ class Neighbors extends ChangeNotifier {
       final m = d.data();
       final name = m['name'];
       if (name is! String || name.isEmpty) continue;
-      out.add(VillageInfo(d.id, name, (m['level'] as num?)?.toInt() ?? 1, (m['house'] as num?)?.toInt() ?? 0));
+      out.add(VillageInfo(d.id, name, (m['level'] as num?)?.toInt() ?? 1, (m['house'] as num?)?.toInt() ?? 0,
+          m['title'] is String ? m['title'] as String : ''));
     }
     out.sort((a, b) => (b.uid == myUid ? 1 : 0).compareTo(a.uid == myUid ? 1 : 0));
     return out;
@@ -130,6 +133,7 @@ class Neighbors extends ChangeNotifier {
   }
 
   String _myName = 'Hàng xóm';
+  String get myName => _myName;
   void setMyName(String n) => _myName = n.isEmpty ? 'Hàng xóm' : n;
 
   // ------------------------------------------------------------ inbox
@@ -142,6 +146,9 @@ class Neighbors extends ChangeNotifier {
     if (!available || uid == null) return;
     if (!force && DateTime.now().difference(_lastPull) < const Duration(minutes: 2)) return;
     _lastPull = DateTime.now();
+    final sold = await Market.instance.collect(f);
+    inbox.addAll(sold);
+    if (sold.isNotEmpty) notifyListeners();
     try {
       final snap = await _events(uid).limit(100).get().timeout(const Duration(seconds: 12));
       if (snap.docs.isEmpty) return;

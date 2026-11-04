@@ -261,6 +261,8 @@ const buildings = <String, BuildingDef>{
   'rom_dong': BuildingDef('rom_dong', 'Đống rơm', BKind.deco, 1, 1, 2, 40, xp: 1),
   'chum': BuildingDef('chum', 'Chum nước', BKind.deco, 1, 1, 3, 60, xp: 1),
   'bu_nhin': BuildingDef('bu_nhin', 'Bù nhìn', BKind.deco, 1, 1, 4, 80, xp: 1),
+  'cho': BuildingDef('cho', 'Chó giữ nhà', BKind.deco, 1, 1, 5, 400, xp: 5, unique: true,
+      desc: 'Cho ăn mỗi ngày để chó canh vườn: thêm 25% bắt kẻ hái trộm.'),
   'hoa_dao': BuildingDef('hoa_dao', 'Cây đào', BKind.deco, 1, 1, 6, 200, xp: 2),
   'tre': BuildingDef('tre', 'Bụi tre', BKind.deco, 1, 1, 2, 50, xp: 1),
   'cay_da': BuildingDef('cay_da', 'Cây đa', BKind.deco, 2, 2, 9, 600, xp: 5),

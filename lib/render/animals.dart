@@ -166,3 +166,30 @@ void drawEgret(Canvas c, Offset p, double t, double ph) {
   line(c, p + const Offset(3, 1), p + const Offset(8, 2), const Color(0xFFFFFFFF), 1.4);
   line(c, p + const Offset(-3, 1.5), p + const Offset(-8, 3), const Color(0xFF333333), 0.8);
 }
+
+/// The guard dog: wags and looks about when fed, curls up asleep when hungry.
+void drawDog(Canvas c, Offset f, double t, {required bool awake}) {
+  const fur = Color(0xFFC98B4B), dark = Color(0xFF8A5A2B), light = Color(0xFFF1D3A8);
+  shadow(c, f, 10, 4);
+  if (!awake) {
+    oval(c, f + const Offset(0, -4), 10, 5, fur);
+    oval(c, f + const Offset(-7, -5), 4.5, 4, fur);
+    oval(c, f + const Offset(-9, -7), 2, 2.5, dark);
+    line(c, f + const Offset(8, -3), f + const Offset(3, 0), dark, 2.5);
+    final z = (t * .8) % 1;
+    text(c, 'z', f + Offset(-10 + z * 6, -14 - z * 10), 7 + z * 3, color: Color.fromRGBO(255, 255, 255, 1 - z));
+    return;
+  }
+  final wag = math.sin(t * 14) * 4;
+  final look = math.sin(t * .7) > .6 ? 2.0 : 0.0;
+  line(c, f + const Offset(6, -9), f + Offset(11 + wag * .4, -15 - wag.abs() * .3), fur, 2.5); // tail
+  oval(c, f + const Offset(1, -7), 8, 5, fur); // body
+  line(c, f + const Offset(-4, -4), f + const Offset(-4, 0), dark, 2);
+  line(c, f + const Offset(5, -4), f + const Offset(5, 0), dark, 2);
+  oval(c, f + Offset(-7 + look, -13), 5, 4.5, fur); // head
+  oval(c, f + Offset(-10 + look, -11.5), 2.6, 2, light); // muzzle
+  circle(c, f + Offset(-12 + look, -12), 1, const Color(0xFF222222)); // nose
+  circle(c, f + Offset(-7.5 + look, -14), .9, const Color(0xFF222222)); // eye
+  fillPoly(c, [f + Offset(-5 + look, -17), f + Offset(-2 + look, -16), f + Offset(-3 + look, -11)], dark); // ear
+  oval(c, f + const Offset(0, -6), 5, 2.5, light);
+}

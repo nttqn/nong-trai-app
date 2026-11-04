@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import '../render/farm_painter.dart';
+import 'market_ui.dart';
 import 'widgets.dart';
 
 typedef Report = void Function(String? err, {String? ok});
@@ -22,7 +23,7 @@ class _ShopSheetState extends State<ShopSheet> {
     ('Trồng trọt', ['ruong', 'luong', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong']),
     ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'ao']),
     ('Chế biến', ['nha_kho', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che']),
-    ('Trang trí', ['tre', 'rom_dong', 'chum', 'bu_nhin', 'hoa_dao', 'cay_da']),
+    ('Trang trí', ['tre', 'rom_dong', 'chum', 'bu_nhin', 'cho', 'hoa_dao', 'cay_da']),
   ];
 
   @override
@@ -133,16 +134,25 @@ class _StorageSheetState extends State<StorageSheet> {
       ),
       const Padding(
         padding: EdgeInsets.fromLTRB(16, 6, 16, 0),
-        child: Text('Bán hàng ở chợ được giá gốc. Giao đơn hàng cho bà con lãi hơn nhiều!',
+        child: Text('Bán cho lái buôn được giá gốc. Giao đơn hàng cho bà con lãi hơn nhiều!',
             style: TextStyle(fontSize: 12, color: brownLight)),
       ),
       Expanded(
-        child: ids.isEmpty
-            ? const Center(child: Text('Kho đang trống', style: TextStyle(color: brownLight)))
-            : ListView(
-                padding: const EdgeInsets.all(12),
-                children: [for (final id in ids) _row(id)],
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 12),
+          children: [
+            MyStalls(f, (m, {error = false}) {
+              widget.report(error ? m : null, ok: error ? null : m);
+              if (mounted) setState(() {});
+            }),
+            if (ids.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(30),
+                child: Center(child: Text('Kho đang trống', style: TextStyle(color: brownLight))),
               ),
+            for (final id in ids) Padding(padding: const EdgeInsets.fromLTRB(12, 8, 12, 0), child: _row(id)),
+          ],
+        ),
       ),
     ]);
   }
@@ -156,7 +166,6 @@ class _StorageSheetState extends State<StorageSheet> {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: cardDeco(color: Colors.white),
       child: Row(children: [
@@ -175,6 +184,18 @@ class _StorageSheetState extends State<StorageSheet> {
         PillButton('Bán 1', dense: true, color: gold, onTap: () => sell(1)),
         const SizedBox(width: 6),
         if (n > 1) PillButton('Bán hết', dense: true, color: const Color(0xFFE08A2E), onTap: () => sell(n)),
+        if (f.level >= FarmMore.marketLevel)
+          IconButton(
+            tooltip: 'Bày lên sạp chợ phiên',
+            visualDensity: VisualDensity.compact,
+            onPressed: () async {
+              if (await showListStall(context, f, id)) {
+                widget.report(null, ok: 'Đã bày lên sạp chợ phiên');
+                if (mounted) setState(() {});
+              }
+            },
+            icon: const Text('🛒', style: TextStyle(fontSize: 20)),
+          ),
       ]),
     );
   }

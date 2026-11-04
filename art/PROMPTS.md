@@ -155,3 +155,11 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 | `vuon_ong` | A bee garden on a 2x2 tile base: three wooden beehive boxes among yellow chrysanthemum flowers, low bamboo fence. No visible bees. |
 | `xuong_dau` | A small Vietnamese tofu workshop on a 2x2 tile base: whitewashed walls, red tile roof, big grey clay pots of soy milk and wooden tofu presses by the door on the lower-left face. |
 | `xuong_che` | A tea roasting and drying shed on a 2x2 tile base: mud walls, thatched roof, a big iron tea-roasting pan on a stove, round bamboo trays of drying tea and orange persimmons on trestles. |
+
+## Đợt 5 — chó giữ nhà (không bắt buộc)
+
+> Game đã có chuồng chó vẽ bằng code; ảnh này chỉ thay phần chuồng. Con chó vẫn vẽ bằng code (ngủ khi đói, vẫy đuôi khi no) nên **không vẽ chó** trong ảnh.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `cho` | A small Vietnamese wooden dog kennel with a thatched roof and an arched dark doorway facing lower-right, a little clay food bowl in front, standing directly on the ground: no base tile, no platform. No dog. |

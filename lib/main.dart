@@ -4,10 +4,12 @@ import 'package:flutter/services.dart';
 
 import 'core/demo.dart';
 import 'core/farm.dart';
+import 'core/weather.dart';
 import 'render/sprites.dart';
 import 'services/ads.dart';
 import 'services/cloud.dart';
 import 'services/leaderboard.dart';
+import 'services/notify.dart';
 import 'services/save.dart';
 import 'services/sound.dart';
 import 'ui/farm_screen.dart';
@@ -52,9 +54,14 @@ class _BootState extends State<_Boot> {
     final q = kIsWeb ? Uri.base.queryParameters : const <String, String>{};
     final sprites = Sprites.load().timeout(const Duration(seconds: 10), onTimeout: () {});
     if (q['demo'] != null) {
+      for (final w in Weather.values) {
+        if (q['weather'] == w.name) weatherOverride = w;
+      }
       sprites.then((_) {
         if (mounted) {
-          setState(() => _farm = demoFarm(int.parse(q['demo']!), house: int.tryParse(q['house'] ?? '') ?? -1));
+          final f = demoFarm(int.parse(q['demo']!), house: int.tryParse(q['house'] ?? '') ?? -1);
+          if (q['gift'] != null) f.loginDay = 0;
+          setState(() => _farm = f);
         }
       });
       return;
@@ -71,6 +78,7 @@ class _BootState extends State<_Boot> {
       // After the farm is on screen: the consent form needs a frame.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         AdsService.instance.init();
+        NotifyService.instance.init();
         cloud.start();
       });
     });

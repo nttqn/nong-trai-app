@@ -7,9 +7,11 @@ import 'package:flutter/widgets.dart';
 
 import '../core/defs.dart';
 import '../core/farm.dart';
+import '../core/weather.dart';
 import 'animals.dart';
 import 'ground.dart';
 import 'iso.dart';
+import 'sprites.dart';
 import 'structures.dart';
 
 const worldMarginX = 320.0, worldTop = 230.0, worldBottom = 210.0;
@@ -31,6 +33,8 @@ class ViewState {
   Obj? moving;
   /// Visiting a neighbour: no "Mua đất" signs.
   bool visiting = false;
+  /// Sprites each object was drawn with last frame (object id → where).
+  final Map<int, List<SpriteHit>> drawn = {};
   final List<FloatFx> floats = [];
 }
 
@@ -60,6 +64,14 @@ bool _bodyHit(Obj o, Offset s) {
   final (bx, by, bw, bh, hgt) = switch (o.type) {
     // code-drawn: a small pump house on a wide concrete pad
     'tram_bom' => (o.x + .25, o.y + .25, 1.2, 1.1, 30.0),
+    // code-drawn houses (the art ones are tested by their pixels)
+    'nha' => switch (o.level) {
+        0 => (o.x + .3, o.y + .3, 2.2, 1.3, 40.0),
+        1 => (o.x + .3, o.y + .25, 2.3, 1.7, 42.0),
+        2 => (o.x + .25, o.y + .25, 2.4, 1.6, 38.0),
+        3 => (o.x + .5, o.y + .3, 2.0, 1.6, 68.0),
+        _ => (o.x + .2, o.y + .2, 2.6, 1.6, 68.0),
+      },
     _ => (o.x + .12, o.y + .12, o.w - .24, o.h - .24, objHeight(o)),
   };
   for (var h = 0.0; h <= hgt; h += 3) {
@@ -93,7 +105,7 @@ String? bubbleIcon(Farm farm, Obj o) {
 /// Centre of [o]'s bubble (without the bob).
 Offset bubbleAt(Iso iso, Obj o) => iso.p(o.x + o.w / 2, o.y + o.h / 2, objHeight(o) + 10);
 
-Obj? hitTest(Farm farm, Offset s) {
+Obj? hitTest(Farm farm, Offset s, [ViewState? view]) {
   // Bubbles are drawn above everything, so a tap on one wins even when a
   // building stands in front of its owner.
   Obj? bub;
@@ -111,7 +123,11 @@ Obj? hitTest(Farm farm, Offset s) {
   Obj? best;
   var bestDepth = -1;
   for (final o in farm.objs) {
-    var hit = o.contains(gx.floor(), gy.floor()) || _bodyHit(o, s);
+    // its tile, or what is drawn above it: the sprite's real pixels when
+    // it was drawn from art, else a box shaped like the code-drawn model
+    final sprites = view?.drawn[o.id];
+    var hit = o.contains(gx.floor(), gy.floor()) ||
+        (sprites != null && sprites.isNotEmpty ? sprites.any((h) => Sprites.solidAt(h, s)) : _bodyHit(o, s));
     if (hit && depthOf(o) > bestDepth) {
       best = o;
       bestDepth = depthOf(o);
@@ -155,16 +171,62 @@ class FarmPainter extends CustomPainter {
         final d = depthOf(a).compareTo(depthOf(b));
         return d != 0 ? d : a.x.compareTo(b.x);
       });
+    view.drawn.clear();
     for (final o in list) {
+      Sprites.rec = view.drawn[o.id] = [];
       drawObj(c, iso, farm, o, t);
     }
+    Sprites.rec = null;
 
     _ghost(c, iso, t);
     if (!view.visiting) _lotSigns(c, iso);
     _readyBubbles(c, iso, t, list);
     if (sel != null && view.moving == null) _progressBar(c, iso, sel);
     _egrets(c, iso, t);
+    if (!view.visiting) _tutArrow(c, iso, t);
     _floats(c, iso, t);
+    _weather(c, size, t);
+  }
+
+  /// Bouncing arrow over what the tutorial asks the player to tap.
+  void _tutArrow(Canvas c, Iso iso, double t) {
+    final o = farm.tutTarget;
+    if (o == null) return;
+    final bob = (math.sin(t * 5) + 1) * 5;
+    final tip = iso.p(o.x + o.w / 2, o.y + o.h / 2, objHeight(o) + 8 + bob);
+    final pts = [
+      tip,
+      tip + const Offset(-13, -14),
+      tip + const Offset(-5, -14),
+      tip + const Offset(-5, -30),
+      tip + const Offset(5, -30),
+      tip + const Offset(5, -14),
+      tip + const Offset(13, -14),
+    ];
+    fillPoly(c, [for (final p in pts) p + const Offset(1.5, 2)], const Color(0x55000000));
+    fillPoly(c, pts, const Color(0xFFFFD54F));
+    strokePoly(c, pts, const Color(0xFFE65100), 2);
+  }
+
+  /// Rain streaks, or a warm haze in a dry spell (the same for everyone).
+  void _weather(Canvas c, Size size, double t) {
+    switch (weatherAt(farm.now())) {
+      case Weather.rain:
+        c.drawRect(Offset.zero & size, Paint()..color = const Color(0x1A33506A));
+        final p = Paint()
+          ..color = const Color(0x66E3F2FD)
+          ..strokeWidth = 1.4
+          ..strokeCap = StrokeCap.round;
+        for (var i = 0; i < 320; i++) {
+          final x0 = (i * 97.31) % size.width;
+          final y = (i * 53.17 + t * (380 + (i % 5) * 40)) % size.height;
+          final x = (x0 - (y * .18)) % size.width;
+          c.drawLine(Offset(x, y), Offset(x - 3, y + 13), p);
+        }
+      case Weather.drought:
+        c.drawRect(Offset.zero & size, Paint()..color = Color.fromRGBO(255, 160, 40, .10 + .02 * math.sin(t * 1.5)));
+      case Weather.sunny:
+    }
   }
 
   void _ghost(Canvas c, Iso iso, double t) {

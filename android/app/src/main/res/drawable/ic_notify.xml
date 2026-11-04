@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status-bar icon for reminders: a white sprout (Android tints it). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M11,21V13.6C8.2,13.4 4,11.6 3,5c5.5,0 8,2.6 8.6,6.2C12.4,7.6 15,4 21,4c-0.6,6.4 -4.4,9.2 -8,9.6V21z"/>
+</vector>

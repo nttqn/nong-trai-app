@@ -49,7 +49,12 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
     case BKind.project:
       if (!sprite(o.type)) _project(c, iso, o.type, x, y, t);
     case BKind.deco:
-      if (!sprite(o.type)) _deco(c, iso, o.type, x, y, foot, t, o.id);
+      if (o.type == 'cho') {
+        if (!sprite('cho')) _kennel(c, foot);
+        drawDog(c, foot + const Offset(-9, 7), t, awake: o.end > farm.now());
+      } else if (!sprite(o.type)) {
+        _deco(c, iso, o.type, x, y, foot, t, o.id);
+      }
     case BKind.obstacle:
       if (!sprite(o.type)) _obstacle(c, o.type, foot, o.id);
   }
@@ -705,6 +710,24 @@ void _deco(Canvas c, Iso iso, String type, double x, double y, Offset f, double 
     case 'cay_da':
       drawBanyan(c, f, t);
   }
+}
+
+/// A small wooden kennel (chuồng chó) with a thatched roof.
+void _kennel(Canvas c, Offset f) {
+  final b = f + const Offset(5, -3);
+  shadow(c, b, 17, 8);
+  fillPoly(c, [b + const Offset(-14, -2), b + const Offset(0, 5), b + const Offset(0, -10), b + const Offset(-14, -17)], wood);
+  fillPoly(c, [b + const Offset(0, 5), b + const Offset(13, -1), b + const Offset(13, -16), b + const Offset(0, -10)], woodDark);
+  // gable over the right (door) face
+  fillPoly(c, [b + const Offset(0, -10), b + const Offset(13, -16), b + const Offset(7, -25)], woodDark);
+  // roof planes
+  fillPoly(c, [b + const Offset(-16, -16), b + const Offset(-1, -9), b + const Offset(6, -26), b + const Offset(-9, -33)],
+      const Color(0xFFD9B35B));
+  fillPoly(c, [b + const Offset(-1, -9), b + const Offset(15, -17), b + const Offset(6, -26)], const Color(0xFFC29A45));
+  line(c, b + const Offset(-9, -33), b + const Offset(6, -26), const Color(0xFF9C7A33), 1.5);
+  // door
+  fillPoly(c, [b + const Offset(4, 1), b + const Offset(10, -2), b + const Offset(10, -10), b + const Offset(7, -13), b + const Offset(4, -10)],
+      const Color(0xFF2E1E10));
 }
 
 void _obstacle(Canvas c, String type, Offset f, int seed) {

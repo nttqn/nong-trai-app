@@ -40,6 +40,7 @@ class ObjPanel extends StatelessWidget {
       BKind.house => _house(),
       BKind.storage => _warehouse(),
       BKind.obstacle => _obstacle(),
+      _ when o.type == 'cho' => _dog(),
       _ => _info(),
     };
     final movable = d.kind != BKind.obstacle;
@@ -424,6 +425,25 @@ class ObjPanel extends StatelessWidget {
                   if (err == null) a.close();
                 }
               : null),
+    ]);
+  }
+
+  Widget _dog() {
+    final awake = farm.dogAwake(o);
+    final food = FarmMore.dogFood.entries.first;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(
+          awake
+              ? '🐕 Đang canh vườn: +${(FarmMore.dogCatch * 100).round()}% bắt kẻ hái trộm. Còn no ${fmtTime(o.end - farm.now())}.'
+              : '💤 Chó đói nên ngủ khì. Cho ăn để nó canh vườn cả ngày.',
+          style: const TextStyle(color: brownLight)),
+      const SizedBox(height: 6),
+      Row(children: [
+        NeedChip(food.key, food.value, farm.countOf(food.key), size: 26),
+        const Spacer(),
+        PillButton('Cho ăn',
+            onTap: () => _do(farm.feedDog(o), ok: 'Gâu gâu! Chó sẽ canh vườn 24 giờ')),
+      ]),
     ]);
   }
 

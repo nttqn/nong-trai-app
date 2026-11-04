@@ -6,11 +6,13 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../core/achievements.dart';
 import '../core/demo.dart';
 import '../core/farm.dart';
 import '../services/cloud.dart';
 import '../services/neighbors.dart';
 import '../services/sound.dart';
+import 'market_ui.dart';
 import 'visit_screen.dart';
 import 'widgets.dart';
 
@@ -45,7 +47,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
       setState(() => _list = [
             for (final (i, n) in ['Trang trại Bác Ba', 'Vườn Cô Lan', 'Nhà Chú Tám', 'Ấp Hoa Cau', 'Đồng Xanh',
               'Làng Sen', 'Trại Ong Vàng', 'Quê Ngoại'].indexed)
-              VillageInfo('demo$i', n, 8 + i * 3, i % 5),
+              VillageInfo('demo$i', n, 8 + i * 3, i % 5, ['order', '', 'steal', 'harvest', ''][i % 5]),
           ]);
       return;
     }
@@ -87,7 +89,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => VisitScreen(me: widget.me, neighbor: f!, uid: v.uid, name: v.name, offline: _demo),
+        builder: (_) => VisitScreen(me: widget.me, neighbor: f!, uid: v.uid, name: v.name, title: v.title, offline: _demo),
       ),
     );
     if (mounted) setState(() {});
@@ -102,6 +104,14 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
         backgroundColor: cream,
         foregroundColor: brown,
         title: const Text('🗺️ Các làng lân cận', style: TextStyle(fontWeight: FontWeight.w900)),
+        actions: [
+          if (widget.me.level >= FarmMore.marketLevel && !_demo)
+            TextButton.icon(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MarketScreen(widget.me))),
+              icon: const Text('🛒', style: TextStyle(fontSize: 18)),
+              label: const Text('Chợ phiên', style: TextStyle(color: brown, fontWeight: FontWeight.w800)),
+            ),
+        ],
       ),
       body: ListenableBuilder(
         listenable: cs,
@@ -219,6 +229,11 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: mine ? Colors.white : brown)),
           ),
+          if (achById(v.title) != null)
+            Text('${achById(v.title)!.icon} ${achById(v.title)!.title}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w900, color: Color(0xFF8A2C0D))),
           Text('Cấp ${v.level}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF2E5A12))),
         ]),
       ),

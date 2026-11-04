@@ -8,20 +8,24 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../core/achievements.dart';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import '../render/farm_painter.dart';
 import '../services/neighbors.dart';
 import '../services/sound.dart';
+import 'market_ui.dart';
 import 'widgets.dart';
 
 class VisitScreen extends StatefulWidget {
   final Farm me, neighbor;
   final String uid, name;
+  /// Achievement id of the neighbour's title (danh hiệu), or empty.
+  final String title;
 
   /// No server (dev screenshots): actions only change the screen.
   final bool offline;
-  const VisitScreen({super.key, required this.me, required this.neighbor, required this.uid, required this.name, this.offline = false});
+  const VisitScreen({super.key, required this.me, required this.neighbor, required this.uid, required this.name, this.title = '', this.offline = false});
   @override
   State<VisitScreen> createState() => _VisitScreenState();
 }
@@ -86,7 +90,7 @@ class _VisitScreenState extends State<VisitScreen> with SingleTickerProviderStat
   }
 
   void _tap(Offset p) {
-    final o = hitTest(nb, p);
+    final o = hitTest(nb, p, _view);
     if (o == null || nb.readyProduct(o) == null) {
       setState(() => _sel = null);
       if (o != null && o.def.kind != BKind.obstacle) _say('${o.def.name} chưa có gì để thu hoạch');
@@ -136,7 +140,9 @@ class _VisitScreenState extends State<VisitScreen> with SingleTickerProviderStat
       if (!ok) return _say('Không gửi được, thử lại sau', error: true);
       me.payFine(widget.uid);
       setState(() => _sel = null);
-      _say('🪧 Bù nhìn bắt quả tang! Nộp phạt ${fmtNum(fine)} xu', error: true);
+      final dog = nb.dog;
+      _say('${dog != null && nb.dogAwake(dog) ? '🐕 Chó sủa ầm lên, chủ nhà' : '🪧 Bù nhìn'} bắt quả tang! Nộp phạt ${fmtNum(fine)} xu',
+          error: true);
       return;
     }
     final ok = await _send('steal', o, product);
@@ -190,10 +196,22 @@ class _VisitScreenState extends State<VisitScreen> with SingleTickerProviderStat
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 16)),
+                      if (achById(widget.title) != null)
+                        Text('${achById(widget.title)!.icon} ${achById(widget.title)!.title}',
+                            style: const TextStyle(color: Color(0xFFD84315), fontSize: 12, fontWeight: FontWeight.w900)),
                       Text('Cấp ${nb.level} · 🤝 $helps/${Farm.helpLimit} · 🧺 $steals/${Farm.stealLimit} hôm nay',
                           style: const TextStyle(color: brownLight, fontSize: 12.5, fontWeight: FontWeight.w700)),
                     ]),
                   ),
+                  if (me.level >= FarmMore.marketLevel && !widget.offline)
+                    IconButton(
+                      tooltip: 'Sạp chợ của nhà này',
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => MarketScreen(me, owner: widget.uid, ownerName: widget.name)),
+                      ),
+                      icon: const Text('🛒', style: TextStyle(fontSize: 22)),
+                    ),
                 ]),
               ),
             ),
@@ -234,7 +252,7 @@ class _VisitScreenState extends State<VisitScreen> with SingleTickerProviderStat
         padding: const EdgeInsets.all(12),
         decoration: cardDeco(),
         child: const Text(
-          'Chạm vào chỗ đã chín (có bong bóng) để thu hoạch hộ hoặc hái trộm. Cẩn thận bù nhìn!',
+          'Chạm vào chỗ đã chín (có bong bóng) để thu hoạch hộ hoặc hái trộm. Cẩn thận bù nhìn và chó giữ nhà!',
           style: TextStyle(color: brown, fontWeight: FontWeight.w600),
         ),
       );
@@ -266,7 +284,7 @@ class _VisitScreenState extends State<VisitScreen> with SingleTickerProviderStat
         if (nb.catchChance > 0)
           Padding(
             padding: const EdgeInsets.only(top: 6),
-            child: Text('🪧 Nhà này có bù nhìn: ${(nb.catchChance * 100).round()}% bị bắt, phạt ${fmtNum(me.stealFine)} xu',
+            child: Text('${nb.dog != null && nb.dogAwake(nb.dog!) ? '🐕 Có chó canh' : '🪧 Có bù nhìn'}: ${(nb.catchChance * 100).round()}% bị bắt, phạt ${fmtNum(me.stealFine)} xu',
                 style: const TextStyle(fontSize: 12, color: red, fontWeight: FontWeight.w700)),
           ),
       ]),
