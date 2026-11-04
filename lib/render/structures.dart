@@ -219,19 +219,23 @@ void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
 
 void _penAnimals(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a, double t) {
   final x = o.x.toDouble(), y = o.y.toDouble();
-  // animals wander
   final n = o.count;
-  final producing = o.end != 0;
-  for (var i = 0; i < n; i++) {
-    final speed = producing ? .35 : .15;
-    final px = x + 1 + math.cos(t * speed + i * 2.1) * .55 + (i % 3 - 1) * .18;
-    final py = y + 1.15 + math.sin(t * speed * .8 + i * 1.3) * .5 + (i ~/ 3 - .5) * .25;
-    final dir = -math.sin(t * speed + i * 2.1) >= 0 ? 1.0 : -1.0;
-    final pos = iso.p(px.clamp(x + .35, x + 1.7), py.clamp(y + .9, y + 1.8));
-    // Sprites face lower-left; a gentle bob stands in for walking.
-    final bob = Offset(0, -(math.sin(t * 6 * speed + i * 1.7).abs()) * 1.5);
-    if (!Sprites.at(c, a.id, pos + bob, _animalWidth[a.id] ?? 24, flipX: dir > 0)) {
-      drawAnimal(c, a.id, pos, dir, t, i.toDouble());
+  if (a.id == 'ong') {
+    // bees just buzz around the hives
+    for (var i = 0; i < n; i++) {
+      final px = x + 1 + math.cos(t * .35 + i * 2.1) * .55;
+      final py = y + 1.15 + math.sin(t * .28 + i * 1.3) * .5;
+      final pos = iso.p(px, py);
+      if (!Sprites.at(c, a.id, pos, _animalWidth[a.id] ?? 14)) drawAnimal(c, a.id, pos, 1, t, i.toDouble());
+    }
+  } else {
+    final hungry = o.end == 0;
+    final fedAgo = hungry ? 1e9 : (farm.now() - o.start) / 1000;
+    // draw back to front so nearer animals overlap farther ones
+    final beats = [for (var i = 0; i < n; i++) _beat(iso, o, i, t, hungry)]..sort((p, q) => p.pos.dy.compareTo(q.pos.dy));
+    for (final b in beats) {
+      _drawAnimalBeat(c, a.id, b, t, hungry && b.i == beats.first.i);
+      if (fedAgo < 4) _heart(c, b, fedAgo);
     }
   }
   // products on the ground
@@ -755,4 +759,137 @@ void _obstacle(Canvas c, String type, Offset f, int seed) {
       ovalStroke(c, f + const Offset(0, -9), 4, 1.6, const Color(0xFFA6814F), .8);
       line(c, f + const Offset(-7, -1), f + const Offset(-12, 2), const Color(0xFF7A5230), 2);
   }
+}
+
+// ---------------------------------------------------------------- animal life
+// Each animal follows its own loop worked out from the clock alone (no saved
+// state): walk to a random spot in the pen, then stay there a while eating,
+// looking about or hopping; hungry animals lie down instead. One sprite per
+// animal is enough (it is tilted / squashed), and the optional pose sprites
+// `<id>_an` (head down eating) and `<id>_nam` (lying down) replace it.
+
+enum _Act { walk, eat, idle, hop, rest }
+
+class _Beat {
+  final int i;
+  final Offset pos;
+  final bool flip;
+  final _Act act;
+  final double k; // walk: 0..1 progress; others: seconds into the stay
+  final double ph; // per-animal phase
+  const _Beat(this.i, this.pos, this.flip, this.act, this.k, this.ph);
+}
+
+double _rnd(int a, int b) {
+  final v = math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+  return v - v.floorToDouble();
+}
+
+_Beat _beat(Iso iso, Obj o, int i, double t, bool hungry) {
+  final x = o.x.toDouble(), y = o.y.toDouble();
+  final seed = o.id * 37 + i * 101;
+  final walkDur = hungry ? 3.6 : 2.4 + _rnd(seed, 1) * .8;
+  final stay = hungry ? 9.0 : 3.0 + _rnd(seed, 2) * 2;
+  final cycle = walkDur + stay;
+  final lt = t + _rnd(seed, 3) * cycle + 1000; // stagger the animals
+  final m = (lt / cycle).floor();
+  final u = lt - m * cycle;
+  Offset spot(int k) => iso.p(x + .35 + _rnd(seed, k * 2 + 11) * 1.35, y + .9 + _rnd(seed, k * 2 + 12) * .9);
+  final from = spot(m - 1), to = spot(m);
+  final dx = to.dx - from.dx;
+  final flip = dx.abs() > 1 ? dx > 0 : _rnd(seed, m) > .5;
+  if (u < walkDur) {
+    final k = u / walkDur;
+    final e = k * k * (3 - 2 * k);
+    return _Beat(i, Offset.lerp(from, to, e)!, flip, _Act.walk, k, seed.toDouble());
+  }
+  final r = _rnd(seed, m + 500);
+  final act = hungry
+      ? _Act.rest
+      : r < .5
+          ? _Act.eat
+          : r < .8
+              ? _Act.idle
+              : _Act.hop;
+  return _Beat(i, to, flip, act, u - walkDur, seed.toDouble());
+}
+
+void _drawAnimalBeat(Canvas c, String id, _Beat b, double t, bool zzz) {
+  final w = _animalWidth[id] ?? 24;
+  final small = id == 'ga' || id == 'vit';
+  // head side: sprites face lower-left, so the head is on the left unless
+  // flipped; a negative turn dips the left side
+  final headDown = b.flip ? 1.0 : -1.0;
+  var key = id;
+  var rot = 0.0, sx = 1.0, sy = 1.0, lift = 0.0;
+  switch (b.act) {
+    case _Act.walk:
+      final step = math.sin(b.k * (small ? 26 : 14) + b.ph);
+      lift = step.abs() * w * (small ? .09 : .045);
+      rot = step * (small ? .07 : .035);
+      sy = 1 - (1 - step.abs()) * .03;
+    case _Act.eat:
+      if (Sprites.has('${id}_an')) {
+        key = '${id}_an';
+        sy = 1 + math.sin(t * 3 + b.ph) * .015;
+      } else if (small) {
+        // quick pecks
+        final p = math.pow(math.max(0, math.sin(b.k * 6 + b.ph)), 6).toDouble();
+        rot = headDown * (.12 + p * .38);
+      } else {
+        // head slowly down to graze, with a little chewing nod
+        final down = math.min(1.0, b.k / .8);
+        rot = headDown * (.13 * down + math.sin(t * 4 + b.ph) * .015 * down);
+      }
+    case _Act.idle:
+      sy = 1 + math.sin(t * 2.4 + b.ph) * .025;
+      sx = 1 - math.sin(t * 2.4 + b.ph) * .012;
+      // now and then look up
+      if (math.sin(t * .9 + b.ph) > .7) rot = -headDown * .06;
+    case _Act.hop:
+      if (small && b.k < .5) {
+        lift = math.sin(math.pi * b.k / .5) * w * .45;
+        sy = 1 + math.sin(math.pi * b.k / .5) * .08;
+        sx = 2 - sy;
+      } else if (!small && b.k < .8) {
+        // big animals: shake the head instead of jumping
+        rot = math.sin(b.k * 30) * .05 * (1 - b.k / .8);
+      }
+    case _Act.rest:
+      if (Sprites.has('${id}_nam')) {
+        key = '${id}_nam';
+        sy = 1 + math.sin(t * 1.6 + b.ph) * .02;
+      } else {
+        sx = 1.1;
+        sy = .8 + math.sin(t * 1.6 + b.ph) * .015;
+      }
+  }
+  if (lift > .5) shadow(c, b.pos, w * .3, w * .09, .18);
+  if (!Sprites.has(key)) {
+    drawAnimal(c, id, b.pos - Offset(0, lift), b.flip ? 1 : -1, t, b.ph);
+  } else {
+    // tap tests use the pen itself, so leave these transformed draws out
+    final rec = Sprites.rec;
+    Sprites.rec = null;
+    c.save();
+    c.translate(b.pos.dx, b.pos.dy - lift);
+    if (rot != 0) c.rotate(rot);
+    c.scale(sx, sy);
+    Sprites.at(c, key, Offset.zero, w, flipX: b.flip);
+    c.restore();
+    Sprites.rec = rec;
+  }
+  if (zzz) {
+    final z = (t * .6 + b.ph) % 1;
+    text(c, 'z', b.pos + Offset(w * .2 + z * 5, -w * .7 - z * 9), 6 + z * 3,
+        color: Color.fromRGBO(255, 255, 255, 1 - z));
+  }
+}
+
+/// Little hearts rising for a few seconds after the animals are fed.
+void _heart(Canvas c, _Beat b, double ago) {
+  final k = ago / 4;
+  final rise = ((ago * .9 + _rnd(b.i, 9)) % 1);
+  text(c, '♥', b.pos + Offset((_rnd(b.i, 8) - .5) * 8, -18 - rise * 14), 6 + rise * 3,
+      color: Color.fromRGBO(232, 70, 90, (1 - rise) * (1 - k)));
 }

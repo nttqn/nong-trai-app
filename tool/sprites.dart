@@ -35,11 +35,16 @@ final expected = [
   'bui', 'da', 'goc_cay',
 ];
 
+/// Optional pose sprites (eating / lying down); not counted as missing.
+final optional = [
+  for (final a in ['ga', 'vit', 'lon', 'trau', 'bo', 'de']) ...['${a}_an', '${a}_nam'],
+];
+
 /// Max width by on-map size: about 3x the largest zoom on a 3x phone.
 int maxWidthFor(String key) {
   const animals = {'ga', 'vit', 'lon', 'trau', 'bo', 'de'};
   const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa'};
-  if (animals.contains(key)) return 160;
+  if (animals.contains(key) || animals.any((a) => key == '${a}_an' || key == '${a}_nam')) return 160;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',
@@ -80,7 +85,7 @@ void main(List<String> args) {
       im = img.copyResize(im, width: maxWidth, interpolation: img.Interpolation.cubic);
     }
     File('${out.path}/$key.png').writeAsBytesSync(img.encodePng(im, level: 9));
-    final note = expected.contains(key) ? '' : '   (tên lạ — kiểm tra lại tên file?)';
+    final note = expected.contains(key) || optional.contains(key) ? '' : '   (tên lạ — kiểm tra lại tên file?)';
     print('ok $key  ${im.width}x${im.height}  ${hadAlpha ? 'nền trong suốt sẵn' : 'đã xóa nền'}$note');
   }
   final have = out.listSync().map((e) => e.uri.pathSegments.last).where((n) => n.endsWith('.png')).map((n) => n.substring(0, n.length - 4)).toSet();

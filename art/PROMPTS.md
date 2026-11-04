@@ -163,3 +163,24 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 | Tên file | Lời nhắc riêng |
 |---|---|
 | `cho` | A small Vietnamese wooden dog kennel with a thatched roof and an arched dark doorway facing lower-right, a little clay food bowl in front, standing directly on the ground: no base tile, no platform. No dog. |
+
+## Đợt 6 — tư thế con vật (không bắt buộc, làm dần)
+
+> Game đã tự làm con vật đi lại, cúi ăn, nhảy, nằm nghỉ bằng cách nghiêng/nén ảnh gốc. Ảnh tư thế dưới đây làm cho đẹp hơn: con nào có ảnh thì game tự dùng, con nào chưa có vẫn chạy bình thường.
+>
+> **Cách làm:** đính kèm ảnh gốc của chính con vật đó (ví dụ `ga.png`) rồi dán lời nhắc. Câu đầu lời nhắc bắt buộc giữ nguyên để con vật giống hệt ảnh gốc: cùng màu, cùng cỡ, cùng hướng nhìn xuống trái.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `ga_an` | The exact same chicken as the attached image (same colors, size, style, facing lower-left), now bending its head down to peck at the ground, full body. |
+| `ga_nam` | The exact same chicken as the attached image (same colors, size, style, facing lower-left), now sitting down on the ground resting with eyes closed, feathers fluffed, full body. |
+| `vit_an` | The exact same duck as the attached image (same colors, size, style, facing lower-left), now bending its head down to dabble at the ground, full body. |
+| `vit_nam` | The exact same duck as the attached image (same colors, size, style, facing lower-left), now sitting on the ground resting with eyes closed, head tucked a little, full body. |
+| `lon_an` | The exact same pig as the attached image (same colors, size, style, facing lower-left), now with its snout down to the ground eating, full body. |
+| `lon_nam` | The exact same pig as the attached image (same colors, size, style, facing lower-left), now lying down on its belly asleep with eyes closed, full body. |
+| `trau_an` | The exact same water buffalo as the attached image (same colors, size, style, facing lower-left), now lowering its head to graze grass, full body. |
+| `trau_nam` | The exact same water buffalo as the attached image (same colors, size, style, facing lower-left), now lying down on the ground resting with legs folded under, eyes half closed, full body. |
+| `bo_an` | The exact same cow as the attached image (same colors, size, style, facing lower-left), now lowering its head to graze grass, full body. |
+| `bo_nam` | The exact same cow as the attached image (same colors, size, style, facing lower-left), now lying down on the ground resting with legs folded under, eyes half closed, full body. |
+| `de_an` | The exact same goat as the attached image (same colors, size, style, facing lower-left), now lowering its head to nibble grass, full body. |
+| `de_nam` | The exact same goat as the attached image (same colors, size, style, facing lower-left), now lying down on the ground resting with legs folded under, full body. |
