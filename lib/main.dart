@@ -26,7 +26,7 @@ class NongTraiApp extends StatelessWidget {
   const NongTraiApp({super.key});
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Làng Quê Yên Bình',
+        title: 'Mùa Lúa Chín',
         navigatorKey: AdsService.navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -105,7 +105,7 @@ class _BootState extends State<_Boot> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Text('🌾', style: TextStyle(fontSize: 64)),
             SizedBox(height: 12),
-            Text('Làng Quê Yên Bình',
+            Text('Mùa Lúa Chín',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white)),
             SizedBox(height: 18),
             CircularProgressIndicator(color: Colors.white),

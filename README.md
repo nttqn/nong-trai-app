@@ -1,4 +1,4 @@
-# Làng Quê Yên Bình (working title)
+# Mùa Lúa Chín – Nông Trại Làng Quê
 
 Flutter farm game set in the Vietnamese countryside: buy land, grow rice and
 cash crops, dig fish ponds, raise chickens/ducks/pigs/buffalo/cows, process
