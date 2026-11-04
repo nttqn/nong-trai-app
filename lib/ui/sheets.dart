@@ -430,7 +430,7 @@ class _ProjectsSheetState extends State<ProjectsSheet> {
                 padding: const EdgeInsets.only(right: 8),
                 child: Coin(u.coins, size: 14, color: f.coins >= u.coins ? brown : red),
               ),
-              for (final e in u.goods.entries) NeedChip(e.key, e.value, f.countOf(e.key), size: 28),
+              for (final e in u.goods.entries) NeedChip(e.key, e.value, f.countOf(e.key), size: 36),
             ]),
             Align(
               alignment: Alignment.centerRight,
@@ -493,7 +493,7 @@ class _ProjectsSheetState extends State<ProjectsSheet> {
                   padding: const EdgeInsets.only(right: 8),
                   child: Coin(d.cost, size: 14, color: f.coins >= d.cost ? brown : red),
                 ),
-                for (final e in d.goods.entries) NeedChip(e.key, e.value, f.countOf(e.key), size: 28),
+                for (final e in d.goods.entries) NeedChip(e.key, e.value, f.countOf(e.key), size: 36),
               ]),
               const SizedBox(height: 6),
               Align(

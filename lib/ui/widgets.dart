@@ -38,16 +38,23 @@ class NeedChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ok = have >= need;
-    return Padding(
-      padding: const EdgeInsets.only(right: 6),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        ItemIcon(id, size: size),
-        Text('$have/$need',
-            style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: ok ? greenDark : red)),
-      ]),
+    // Tap (or long-press) shows the item's name: small emoji can be hard to tell apart.
+    return Tooltip(
+      message: '${item(id).name}: có $have, cần $need',
+      triggerMode: TooltipTriggerMode.tap,
+      showDuration: const Duration(seconds: 2),
+      preferBelow: false,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 6),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ItemIcon(id, size: size),
+          Text('$have/$need',
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: ok ? greenDark : red)),
+        ]),
+      ),
     );
   }
 }
