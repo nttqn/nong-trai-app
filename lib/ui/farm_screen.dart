@@ -77,6 +77,7 @@ class _FarmScreenState extends State<FarmScreen>
     Neighbors.instance.addListener(_onNeighbors);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onCloud();
+      _loadErrorNotice();
       Future.delayed(const Duration(milliseconds: 1500), _maybeLoginGift);
     });
     farm.onSound = (c) => SoundService.instance.play(c);
@@ -132,6 +133,25 @@ class _FarmScreenState extends State<FarmScreen>
   bool _giftOpen = false;
 
   /// Today's login gift, once the tutorial is over and nothing else is up.
+  /// The saved farm could not be read: say so (it is parked, not lost).
+  Future<void> _loadErrorNotice() async {
+    final err = widget.save.loadError;
+    if (err == null || !mounted) return;
+    widget.save.loadError = null;
+    await showDialog<void>(
+      context: context,
+      builder: (d) => AlertDialog(
+        backgroundColor: cream,
+        title: const Text('Chưa đọc được nông trại cũ', style: TextStyle(fontWeight: FontWeight.w900, color: brown)),
+        content: SelectableText(
+            'Bản lưu cũ vẫn được cất giữ an toàn trên máy, bản cập nhật sau sẽ tự lấy lại. '
+            'Nếu đã đăng nhập Google, hãy chọn "Bản trên mây" khi được hỏi.\n\nMã lỗi (gửi cho nhà phát triển):\n$err',
+            style: const TextStyle(color: brown)),
+        actions: [TextButton(onPressed: () => Navigator.pop(d), child: const Text('Đã hiểu'))],
+      ),
+    );
+  }
+
   Future<void> _maybeLoginGift() async {
     if (!mounted || _giftOpen || _askingCloud || farm.tutActive || farm.loginClaimed) {
       if (mounted && !farm.tutActive && farm.level >= 2) NotifyService.instance.askOnce();

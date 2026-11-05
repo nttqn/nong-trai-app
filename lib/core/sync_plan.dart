@@ -20,6 +20,22 @@ SyncAction planSync({
   required int syncedAt,
   required SaveInfo? cloud,
 }) {
+  final plan = _plan(local: local, mine: mine, syncedAt: syncedAt, cloud: cloud);
+  // Never let a smaller farm silently replace a bigger one (a failed load
+  // once showed a fresh farm, which was then uploaded over a level-19 one).
+  if (cloud != null) {
+    if (plan == SyncAction.upload && cloud.level > local.level) return SyncAction.ask;
+    if (plan == SyncAction.restore && cloud.level < local.level) return SyncAction.ask;
+  }
+  return plan;
+}
+
+SyncAction _plan({
+  required SaveInfo local,
+  required bool mine,
+  required int syncedAt,
+  required SaveInfo? cloud,
+}) {
   if (cloud == null) return SyncAction.upload;
   if (!mine) {
     // First sign-in on this device. A farm barely started here is not

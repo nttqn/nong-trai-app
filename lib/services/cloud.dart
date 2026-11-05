@@ -279,6 +279,13 @@ class CloudSave extends ChangeNotifier {
     if (f == null) return;
     _dirty = false;
     try {
+      // never overwrite a bigger farm in the account without asking
+      final c = await _fetch();
+      if (c != null && c.info.level > f.level) {
+        conflict = c;
+        notifyListeners();
+        return;
+      }
       await _upload(f);
       notifyListeners();
     } catch (e) {

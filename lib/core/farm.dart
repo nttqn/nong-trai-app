@@ -205,7 +205,9 @@ class Farm {
     for (final o in objs) {
       for (var dx = 0; dx < o.w; dx++) {
         for (var dy = 0; dy < o.h; dy++) {
-          m[(o.x + dx) + (o.y + dy) * mapSize] = o.id;
+          final x = o.x + dx, y = o.y + dy;
+          if (x < 0 || y < 0 || x >= mapSize || y >= mapSize) continue;
+          m[x + y * mapSize] = o.id;
         }
       }
     }
@@ -1238,9 +1240,20 @@ class Farm {
       f.lots.add(oldSide == lotsPerSide ? lot : lotIndex(lot % oldSide, lot ~/ oldSide));
     }
     f.inv.addAll(Map<String, int>.from(j['inv']));
-    f.objs.addAll([for (final o in j['objs']) Obj.fromJson(o)]);
+    for (final o in j['objs'] as List) {
+      try {
+        final obj = Obj.fromJson(Map<String, dynamic>.from(o as Map));
+        if (buildings.containsKey(obj.type)) f.objs.add(obj);
+      } catch (_) {
+        // one bad object must not lose the whole farm
+      }
+    }
     if (oldSide < lotsPerSide) {
-      f._scatterObstacles((lot) => lot % lotsPerSide >= oldSide || lot ~/ lotsPerSide >= oldSide, 1);
+      try {
+        f._scatterObstacles((lot) => lot % lotsPerSide >= oldSide || lot ~/ lotsPerSide >= oldSide, 1);
+      } catch (_) {
+        // the outer lots just stay clear
+      }
     }
     f.projects.addAll((j['projects'] as List).cast<String>());
     f.projectLv.addAll(Map<String, int>.from(j['projectLv'] ?? const {}));
@@ -1249,8 +1262,10 @@ class Farm {
     f.daily.addAll([for (final o in (j['daily'] as List? ?? const [])) Order.fromJson(o)]);
     f.orders.addAll([for (final o in j['orders']) Order.fromJson(o)]);
     f.stats.addAll(Map<String, int>.from(j['stats']));
-    f.objs.removeWhere((o) => !buildings.containsKey(o.type));
-    f._fixRoadBuildings();
+    f._occ = null;
+    try {
+      f._fixRoadBuildings();
+    } catch (_) {}
     return f;
   }
 }

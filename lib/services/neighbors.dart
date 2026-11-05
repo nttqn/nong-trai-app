@@ -47,7 +47,10 @@ class Neighbors extends ChangeNotifier {
   Future<void> publish(Farm f) async {
     final uid = myUid;
     if (!available || uid == null) return;
-    if (Leaderboard.instance.hidden || f.name.trim().isEmpty) {
+    // no name yet: just don't publish (an unnamed fresh farm used to
+    // delete the player's village here)
+    if (f.name.trim().isEmpty) return;
+    if (Leaderboard.instance.hidden) {
       if (_sent != '') {
         _sent = '';
         try {
