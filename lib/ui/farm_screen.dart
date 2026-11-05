@@ -88,7 +88,7 @@ class _FarmScreenState extends State<FarmScreen>
       if (kIsWeb && prev < 12 && prev.floor() != _clock.value.floor()) clearTextCache();
       if (farm.fx.isNotEmpty) {
         for (final f in farm.fx) {
-          _view.floats.add(FloatFx(f, _clock.value));
+          _view.floats.add(FloatFx(f, _clock.value + (f.xp ? .25 : 0)));
         }
         farm.fx.clear();
       }

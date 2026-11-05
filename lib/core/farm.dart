@@ -75,7 +75,9 @@ class Order {
 class Fx {
   final double x, y;
   final String text;
-  Fx(this.x, this.y, this.text);
+  /// An experience badge (drawn blue, a moment after the item label).
+  final bool xp;
+  Fx(this.x, this.y, this.text, {this.xp = false});
 }
 
 class Farm {
@@ -439,7 +441,9 @@ class Farm {
   }
 
   void addXp(int n) {
-    xp += (n * (1 + xpBonus)).round();
+    final gained = (n * (1 + xpBonus)).round();
+    xp += gained;
+    _xpGained += gained;
     while (xp >= xpToNext(level)) {
       xp -= xpToNext(level);
       level++;
@@ -454,9 +458,28 @@ class Farm {
   void _changed() {
     rev++;
     _occ = null;
+    _flushXp();
   }
 
-  void _fx(Obj o, String text) => fx.add(Fx(o.x + o.w / 2, o.y + o.h / 2, text));
+  // experience gained by the current action, shown as one "+N KN" badge
+  // where the action happened (at the house when it has no place)
+  int _xpGained = 0;
+  (double, double)? _xpAt;
+
+  void _flushXp() {
+    if (_xpGained > 0) {
+      final h = house;
+      final at = _xpAt ?? (h == null ? (12.0, 9.0) : (h.x + h.w / 2, h.y + h.h / 2));
+      fx.add(Fx(at.$1 + .3, at.$2 + .3, '+$_xpGained KN', xp: true));
+    }
+    _xpGained = 0;
+    _xpAt = null;
+  }
+
+  void _fx(Obj o, String text) {
+    fx.add(Fx(o.x + o.w / 2, o.y + o.h / 2, text));
+    _xpAt ??= (o.x + o.w / 2, o.y + o.h / 2);
+  }
 
   // ---------------------------------------------------------------- building
   int buildCost(String type) {
@@ -505,7 +528,11 @@ class Farm {
     }
     if (d.w > 0) {
       final o = _add(type, x, y);
-      _fx(o, d.xp > 0 ? '+${d.xp} KN' : '✓');
+      if (d.xp > 0) {
+        _xpAt = (o.x + o.w / 2, o.y + o.h / 2);
+      } else {
+        _fx(o, '✓');
+      }
     }
     _stat('build:$type');
     _ev('build', {'type': type, 'level': level});
@@ -546,7 +573,7 @@ class Farm {
     _stat('clear');
     _snd('chop');
     addXp(d.xp);
-    fx.add(Fx(o.x + .5, o.y + .5, '+${d.xp} KN'));
+    _xpAt = (o.x + .5, o.y + .5);
     _changed();
     return null;
   }

@@ -186,6 +186,7 @@ class FarmPainter extends CustomPainter {
     _readyBubbles(c, iso, t, list);
     if (sel != null && view.moving == null) _progressBar(c, iso, sel);
     _egrets(c, iso, t);
+    _butterflies(c, iso, t, list);
     if (!view.visiting) _tutArrow(c, iso, t);
     _floats(c, iso, t);
     _weather(c, (Offset.zero & size).intersect(c.getLocalClipBounds()), t);
@@ -330,15 +331,69 @@ class FarmPainter extends CustomPainter {
     }
   }
 
+  /// Now and then a little flock of butterflies flutters around a tree or
+  /// a flowering plant on screen, then flies off (not in the rain).
+  void _butterflies(Canvas c, Iso iso, double t, List<Obj> list) {
+    if (weatherAt(farm.now()) == Weather.rain) return;
+    final trees = [
+      for (final o in list)
+        if (view.drawn.containsKey(o.id) &&
+            (o.def.kind == BKind.tree || const {'hoa_dao', 'cay_da', 'tre', 'vuon_ong'}.contains(o.type)))
+          o,
+    ];
+    if (trees.isEmpty) return;
+    const period = 34.0, stay = 15.0;
+    const colors = [Color(0xFFFFE066), Color(0xFFFFFFFF), Color(0xFFFFA94D), Color(0xFF74C0FC), Color(0xFFF783AC)];
+    for (var flock = 0; flock < 2; flock++) {
+      final lt = t + flock * period / 2;
+      final slot = (lt / period).floor();
+      final u = lt - slot * period; // seconds into this visit
+      if (u > stay) continue;
+      final o = trees[(hash2(slot, flock * 31 + 7) * trees.length).floor() % trees.length];
+      final center = iso.p(o.x + o.w / 2, o.y + o.h / 2, objHeight(o) * .55);
+      // fly in from one side, leave to the other
+      final side = hash2(slot, 3) < .5 ? -1.0 : 1.0;
+      final inK = math.min(1.0, u / 2.5), outK = math.max(0.0, (u - stay + 2.5) / 2.5);
+      final away = Offset(side * 220, -140) * math.pow(1 - inK, 2).toDouble() + Offset(-side * 240, -160) * (outK * outK);
+      final n = 3 + (hash2(slot, 5) * 3).floor();
+      for (var i = 0; i < n; i++) {
+        final ph = i * 2 * math.pi / n + hash2(slot, i) * 1.2;
+        final ang = t * (1.1 + i * .13) + ph + math.sin(t * 1.7 + i) * .6;
+        final rx = 16 + o.w * 8 + math.sin(t * .8 + i) * 6;
+        final p = center +
+            away +
+            Offset(math.cos(ang) * rx, math.sin(ang) * rx * .45 + math.sin(t * 3.1 + i * 1.7) * 5);
+        _butterfly(c, p, t * 19 + i * 2.3, colors[(i + slot) % colors.length], math.cos(ang) < 0);
+      }
+    }
+  }
+
+  void _butterfly(Canvas c, Offset p, double flapPhase, Color col, bool left) {
+    final flap = .25 + .75 * math.sin(flapPhase).abs(); // wings open/close
+    final dark = Color.lerp(col, const Color(0xFF3B2A14), .45)!;
+    for (final s in [-1.0, 1.0]) {
+      final w = 3.6 * flap;
+      oval(c, p + Offset(s * (w * .55 + .4), -1.2), w * .6 + .3, 2.3, col); // forewing
+      oval(c, p + Offset(s * (w * .45 + .3), 1.0), w * .45 + .25, 1.6, Color.lerp(col, dark, .25)!); // hindwing
+    }
+    line(c, p + const Offset(0, -2), p + const Offset(0, 2.2), dark, 1.1);
+    final head = p + Offset(left ? -.4 : .4, -2.4);
+    line(c, head, head + Offset(left ? -1.6 : 1.6, -1.8), dark, .6);
+  }
+
   void _floats(Canvas c, Iso iso, double t) {
     view.floats.removeWhere((f) => t - f.born > 1.6);
     for (final f in view.floats) {
       final k = (t - f.born) / 1.6;
-      final at = iso.p(f.fx.x, f.fx.y, 40 + k * 40);
+      if (k < 0) continue; // xp badge waits a moment
+      final xp = f.fx.xp;
+      final at = iso.p(f.fx.x, f.fx.y, 40 + k * 40) + (xp ? Offset(0, 22 - 22 * math.min(1.0, k * 4)) : Offset.zero);
       final a = (1 - k).clamp(0.0, 1.0);
-      final tp = textPainter(f.fx.text, 15, color: const Color(0xFFFFFFFF), weight: FontWeight.w900);
+      final tp = textPainter(xp ? '⭐ ${f.fx.text}' : f.fx.text, xp ? 13 : 15,
+          color: const Color(0xFFFFFFFF), weight: FontWeight.w900);
       final r = Rect.fromCenter(center: at, width: tp.width + 14, height: tp.height + 6);
-      c.drawRRect(RRect.fromRectAndRadius(r, const Radius.circular(10)), Paint()..color = Color.fromRGBO(62, 44, 23, .75 * a));
+      c.drawRRect(RRect.fromRectAndRadius(r, const Radius.circular(10)),
+          Paint()..color = xp ? Color.fromRGBO(30, 136, 229, .85 * a) : Color.fromRGBO(62, 44, 23, .75 * a));
       c.saveLayer(r.inflate(4), Paint()..color = Color.fromRGBO(255, 255, 255, a));
       tp.paint(c, at - Offset(tp.width / 2, tp.height / 2));
       c.restore();
