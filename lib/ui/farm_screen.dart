@@ -740,6 +740,7 @@ class _FarmScreenState extends State<FarmScreen>
           child: Text(
             '• Chạm ô ruộng/luống trống để gieo giống, chạm tiếp các ô khác để gieo nhanh.\n'
             '• Cây chín thì chạm để thu hoạch. Mọi thứ vẫn lớn khi bạn tắt game.\n'
+            '• Thu hoạch nhanh: đặt ngón tay lên một ô đã chín rồi vuốt qua các ô bên cạnh. Đang chọn hạt giống thì vuốt từ ô trống để gieo hàng loạt.\n'
             '• Lúa cho thóc và rơm: thóc nuôi gà vịt, xay ra gạo và cám; rơm nuôi trâu bò.\n'
             '• Trâu cho phân chuồng: bón cho cây đang lớn để rút ngắn một nửa thời gian.\n'
             '• Giao đơn hàng cho bà con để có nhiều xu và kinh nghiệm.\n'
