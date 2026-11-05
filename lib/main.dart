@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'core/defs.dart';
 import 'core/demo.dart';
 import 'core/farm.dart';
 import 'core/weather.dart';
@@ -61,6 +62,11 @@ class _BootState extends State<_Boot> {
         if (mounted) {
           final f = demoFarm(int.parse(q['demo']!), house: int.tryParse(q['house'] ?? '') ?? -1);
           if (q['gift'] != null) f.loginDay = 0;
+          if (q['hungry'] != null) {
+            for (final o in f.objs) {
+              if (o.def.kind == BKind.pen || o.type == 'cho') o.start = o.end = 0;
+            }
+          }
           setState(() => _farm = f);
         }
       });

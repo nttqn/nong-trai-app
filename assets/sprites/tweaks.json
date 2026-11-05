@@ -31,5 +31,26 @@
   },
   "cay_vai_qua": {
     "scale": 1.3
+  },
+  "bu_nhin": {
+    "scale": 0.55
+  },
+  "chum": {
+    "scale": 0.5
+  },
+  "nha_kho_2": {
+    "scale": 0.88
+  },
+  "cay_nhan": {
+    "scale": 1.3
+  },
+  "cay_nhan_qua": {
+    "scale": 1.3
+  },
+  "cay_hong": {
+    "scale": 1.3
+  },
+  "cay_hong_qua": {
+    "scale": 1.3
   }
 }
