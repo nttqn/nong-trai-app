@@ -269,3 +269,82 @@ extension FarmMore on Farm {
     return null;
   }
 }
+
+// ---------------------------------------------------------------- recovery
+/// Rebuilds a lost farm from its public leaderboard row (2026-11-05: an
+/// update failed to read a level-19 save and the cloud copy was replaced).
+/// The layout is gone, so the farm gets its level, house, village projects
+/// and land back, plus coins to rebuild what was on it.
+extension FarmRecover on Farm {
+  static const recoverMinGap = 3;
+
+  bool get recovered => (stats['recovered'] ?? 0) > 0;
+
+  /// Coins to rebuild fields, pens, workshops and trees of a farm at [lvl].
+  static int recoverCoins(int lvl) => 400000 + lvl * lvl * 12000;
+
+  void recoverFrom({required int lvl, required int houseLv, required int projectCount, required int orders, required String farmName}) {
+    level = math.max(level, lvl);
+    xp = 0;
+    final h = house;
+    if (h != null) h.level = houseLv.clamp(h.level, houseLevels.length - 1);
+    stats['house'] = houseLevel;
+    // land: as many lots as the level allows, growing out from the yard
+    final maxLots = [for (var n = 0; n < lotsPerSide * lotsPerSide; n++) lotLevel(n)].where((l) => l <= level).length;
+    while (lots.length < maxLots) {
+      int? pick;
+      var best = 1 << 30;
+      for (var lot = 0; lot < lotsPerSide * lotsPerSide; lot++) {
+        if (lots.contains(lot) || !lotAdjacent(lot)) continue;
+        final lx = lot % lotsPerSide, ly = lot ~/ lotsPerSide;
+        final d = (lx - 1.5).abs() + (ly - 1.5).abs() + (lx >= 4 || ly >= 4 ? 10 : 0);
+        if (d * 100 + lot < best) {
+          best = (d * 100 + lot).round();
+          pick = lot;
+        }
+      }
+      if (pick == null) break;
+      lots.add(pick);
+    }
+    // village projects, placed on free owned land
+    for (final id in projectOrder.take(projectCount)) {
+      if (has(id)) continue;
+      final d = bdef(id);
+      if (d.w > 0) {
+        var placed = false;
+        for (var y = 2; y < mapSize && !placed; y++) {
+          for (var x = 0; x < mapSize && !placed; x++) {
+            final px = Farm.snapX(id, x);
+            if (canPlace(id, px, y)) {
+              _add(id, px, y);
+              placed = true;
+            }
+          }
+        }
+      }
+      projects.add(id);
+      stats['project:$id'] = 1;
+    }
+    stats['order'] = math.max(stats['order'] ?? 0, orders);
+    stats['lot'] = lots.length;
+    stats['recovered'] = lvl;
+    // skip the guided quests the farm had long finished
+    var q = 0;
+    while (q < questChain.length) {
+      final d = questChain[q];
+      if (d.key == 'level' && d.target > level) break;
+      q++;
+    }
+    quest = math.max(quest, q);
+    final n = currentQuest;
+    questBase = n == null ? 0 : (stats[n.key] ?? 0);
+    tut = tutDone;
+    if (name.isEmpty) name = farmName;
+    coins += recoverCoins(lvl);
+    for (final e in const {'thoc': 40, 'rom': 20, 'cam': 20, 'gao': 10}.entries) {
+      inv[e.key] = (inv[e.key] ?? 0) + e.value;
+    }
+    _ev('recover', {'level': lvl});
+    _changed();
+  }
+}

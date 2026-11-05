@@ -17,6 +17,7 @@ import '../render/iso.dart' show clearTextCache;
 import '../services/ads.dart';
 import '../services/analytics.dart';
 import '../services/cloud.dart';
+import '../services/leaderboard.dart';
 import '../services/notify.dart';
 import '../services/save.dart';
 import '../services/sound.dart';
@@ -297,6 +298,48 @@ class _FarmScreenState extends State<FarmScreen>
       _say(cs.message!, error: true);
     }
     if (cs.conflict != null && !_askingCloud) _askCloud();
+    if (!cs.busy && cs.user != null && cs.lastSync != null && cs.conflict == null && !_recoverChecked) {
+      _recoverChecked = true;
+      unawaited(_maybeRecover());
+    }
+  }
+
+  bool _recoverChecked = false;
+
+  /// The farm on screen is far below this account's leaderboard row: the
+  /// saved farm was lost (2026-11-05 update). Offer to rebuild it once.
+  Future<void> _maybeRecover() async {
+    if (farm.recovered) return;
+    final row = await Leaderboard.instance.mine();
+    if (row == null || !mounted || row.level < farm.level + FarmRecover.recoverMinGap) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (d) => AlertDialog(
+        backgroundColor: cream,
+        title: const Text('Khôi phục nông trại', style: TextStyle(fontWeight: FontWeight.w900, color: brown)),
+        content: Text(
+            'Bảng xếp hạng ghi nông trại "${row.name}" của bạn đã đạt cấp ${row.level}, nhưng bản lưu bị mất trong lần cập nhật trước. '
+            'Xin lỗi bạn!\n\nKhôi phục: cấp ${row.level}, ${houseLevels[row.house.clamp(0, houseLevels.length - 1)].name}, '
+            '${row.projects()} công trình làng, đất theo cấp, cùng ${fmtNum(FarmRecover.recoverCoins(row.level))} xu để xây lại ruộng vườn, chuồng trại.',
+            style: const TextStyle(color: brown)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('Để sau')),
+          FilledButton(onPressed: () => Navigator.pop(d, true), child: const Text('Khôi phục')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) {
+      _recoverChecked = false; // ask again next time the cloud settles
+      return;
+    }
+    setState(() {
+      farm.recoverFrom(
+          lvl: row.level, houseLv: row.house, projectCount: row.projects(), orders: row.orders, farmName: row.name);
+    });
+    await widget.save.saveNow(farm);
+    await CloudSave.instance.flush();
+    _say('Đã khôi phục nông trại cấp ${row.level}!');
   }
 
   Future<void> _askCloud() async {

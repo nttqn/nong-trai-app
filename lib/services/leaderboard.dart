@@ -83,6 +83,19 @@ class Leaderboard extends ChangeNotifier {
     } catch (_) {}
   }
 
+  /// This player's own row, if any.
+  Future<LbEntry?> mine() async {
+    final uid = myUid;
+    if (!_cloud.available || uid == null) return null;
+    try {
+      final d = await _col.doc(uid).get().timeout(const Duration(seconds: 10));
+      final m = d.data();
+      return m == null ? null : LbEntry.fromDoc(uid, m);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Writes this farm's row when something on it changed (or [force]).
   Future<void> submit(Farm f, {bool force = false}) async {
     final uid = myUid;
