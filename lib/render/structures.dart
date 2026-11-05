@@ -51,7 +51,7 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
     case BKind.deco:
       if (o.type == 'cho') {
         if (!sprite('cho')) _kennel(c, foot);
-        drawDog(c, foot + const Offset(-9, 7), t, awake: o.end > farm.now());
+        _dog(c, foot + const Offset(-9, 7), t, o.end > farm.now(), o.id);
       } else if (!sprite(o.type)) {
         _deco(c, iso, o.type, x, y, foot, t, o.id);
       }
@@ -892,4 +892,25 @@ void _heart(Canvas c, _Beat b, double ago) {
   final rise = ((ago * .9 + _rnd(b.i, 9)) % 1);
   text(c, '♥', b.pos + Offset((_rnd(b.i, 8) - .5) * 8, -18 - rise * 14), 6 + rise * 3,
       color: Color.fromRGBO(232, 70, 90, (1 - rise) * (1 - k)));
+}
+
+
+/// The guard dog: art (cho_thuc awake / cho_ngu asleep) when there is some,
+/// else the code-drawn one. Awake it trots in place and now and then turns
+/// round; asleep it breathes under rising z's.
+void _dog(Canvas c, Offset at, double t, bool awake, int id) {
+  final key = awake ? 'cho_thuc' : 'cho_ngu';
+  if (!Sprites.has(key)) {
+    drawDog(c, at, t, awake: awake);
+    return;
+  }
+  if (awake) {
+    final turn = math.sin(t * .45 + id) > 0; // looks the other way for a while
+    final bob = math.sin(t * 9 + id).abs() * (math.sin(t * .9 + id) > .3 ? 1.6 : 0);
+    Sprites.at(c, key, at - Offset(0, bob), 21, flipX: turn);
+  } else {
+    Sprites.at(c, key, at, 23);
+    final z = (t * .8) % 1;
+    text(c, 'z', at + Offset(-6 + z * 6, -16 - z * 10), 7 + z * 3, color: Color.fromRGBO(255, 255, 255, 1 - z));
+  }
 }

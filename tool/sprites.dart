@@ -38,6 +38,7 @@ final expected = [
 /// Optional pose sprites (eating / lying down); not counted as missing.
 final optional = [
   for (final a in ['ga', 'vit', 'lon', 'trau', 'bo', 'de']) ...['${a}_an', '${a}_nam'],
+  'cho_thuc', 'cho_ngu',
 ];
 
 /// Max width by on-map size: about 3x the largest zoom on a 3x phone.
@@ -45,7 +46,7 @@ int maxWidthFor(String key) {
   const animals = {'ga', 'vit', 'lon', 'trau', 'bo', 'de'};
   const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa'};
   if (animals.contains(key) || animals.any((a) => key == '${a}_an' || key == '${a}_nam')) return 160;
-  if (key.startsWith('item_')) return 128;
+  if (key.startsWith('item_') || key == 'cho_thuc' || key == 'cho_ngu') return 128;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',

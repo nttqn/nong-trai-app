@@ -160,11 +160,13 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 
 ## Đợt 5 — chó giữ nhà (không bắt buộc)
 
-> Game đã có chuồng chó vẽ bằng code; ảnh này chỉ thay phần chuồng. Con chó vẫn vẽ bằng code (ngủ khi đói, vẫy đuôi khi no) nên **không vẽ chó** trong ảnh.
+> `cho` là cái chuồng (**không vẽ chó** trong đó). Con chó là hai ảnh riêng: `cho_thuc` (đã cho ăn, đứng canh) và `cho_ngu` (đói, nằm ngủ). Tạo `cho_thuc` trước, rồi **đính kèm `cho_thuc`** khi tạo `cho_ngu` để cùng một con chó. Thiếu ảnh nào thì game tạm vẽ bằng code.
 
 | Tên file | Lời nhắc riêng |
 |---|---|
 | `cho` | A small Vietnamese wooden dog kennel with a thatched roof and an arched dark doorway facing lower-right, a little clay food bowl in front, standing directly on the ground: no base tile, no platform. No dog. |
+| `cho_thuc` | One cute Vietnamese village dog (chó ta): short tan-yellow coat, pointed upright ears, curled tail raised, alert happy face, standing on all four legs, facing lower-left, full body. |
+| `cho_ngu` | The exact same dog as the attached image (same colors, size, style), now curled up lying on the ground asleep, eyes closed, tail wrapped around its body, facing lower-left, full body. |
 
 ## Đợt 6 — tư thế con vật (không bắt buộc, làm dần)
 
