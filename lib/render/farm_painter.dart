@@ -84,6 +84,15 @@ bool _bodyHit(Obj o, Offset s) {
 int depthOf(Obj o) => (o.x + o.w) + (o.y + o.h);
 
 /// Frontmost object under a screen point (footprint or its tall body).
+/// The item shown in the "ready" bubble over [o], or null.
+String? bubbleItem(Farm farm, Obj o) => switch (o.def.kind) {
+      BKind.pen when farm.isReady(o) => animalForPen(o.type)!.product,
+      BKind.pond when o.crop != null && farm.isReady(o) => fishes[o.crop]!.product,
+      BKind.tree when farm.isReady(o) => trees[o.type]!.product,
+      BKind.factory when farm.readyJobs(o) > 0 => recipes[o.jobs.first.recipe]!.product,
+      _ => null,
+    };
+
 /// The icon of the "ready" bubble floating over [o], or null.
 String? bubbleIcon(Farm farm, Obj o) {
   switch (o.def.kind) {
@@ -295,7 +304,8 @@ class FarmPainter extends CustomPainter {
             ..style = PaintingStyle.stroke
             ..strokeWidth = 2);
       fillPoly(c, [at + const Offset(-4, 11), at + const Offset(4, 11), at + const Offset(0, 17)], const Color(0xFFFFFDF5));
-      text(c, icon, at, 14);
+      final it = bubbleItem(farm, o);
+      if (it == null || !Sprites.at(c, 'item_$it', at + const Offset(0, 9.5), 19)) text(c, icon, at, 14);
     }
   }
 

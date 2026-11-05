@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/defs.dart';
 import '../core/farm.dart';
+import '../render/sprites.dart';
 
 const cream = Color(0xFFFFF8E7), creamDark = Color(0xFFF3E6C4);
 const brown = Color(0xFF5A3D1E), brownLight = Color(0xFF8A6A40);
@@ -26,7 +27,10 @@ class ItemIcon extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 1.5),
       ),
-      child: Text(d.icon, style: TextStyle(fontSize: size * .55)),
+      // drawn icon (art/PROMPTS.md batch 7) when there is one, else emoji
+      child: Sprites.image('item_$id') != null
+          ? RawImage(image: Sprites.image('item_$id'), width: size * .78, height: size * .78, fit: BoxFit.contain, filterQuality: FilterQuality.medium)
+          : Text(d.icon, style: TextStyle(fontSize: size * .55)),
     );
   }
 }

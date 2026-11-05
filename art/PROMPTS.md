@@ -186,3 +186,54 @@ Cute colorful casual mobile farm game asset, isometric 2:1 view (camera 30° fro
 | `bo_nam` | The exact same cow as the attached image (same colors, size, style, facing lower-left), now lying down on the ground resting with legs folded under, eyes half closed, full body. |
 | `de_an` | The exact same goat as the attached image (same colors, size, style, facing lower-left), now lowering its head to nibble grass, full body. |
 | `de_nam` | The exact same goat as the attached image (same colors, size, style, facing lower-left), now lying down on the ground resting with legs folded under, full body. |
+
+## Đợt 7 — biểu tượng nông sản (thay emoji chưa giống)
+
+> Biểu tượng hiện trong Kho, đơn hàng, bong bóng "đã chín" trên bản đồ... Món nào có ảnh thì game tự dùng ảnh, chưa có thì vẫn dùng emoji.
+>
+> **Khác các đợt trước:** biểu tượng **không** dùng câu PHONG CÁCH ở trên (không cần góc isometric). Tạo `item_gao` hoặc `item_trung` trước làm **ảnh mẫu biểu tượng**, ưng rồi thì mỗi ảnh sau dán ảnh mẫu đó vào và gõ:
+> `Same icon style, size and lighting as the attached image. ` + **PHONG CÁCH BIỂU TƯỢNG** + lời nhắc riêng.
+
+### PHONG CÁCH BIỂU TƯỢNG
+
+```
+Cute colorful casual mobile farm game item icon, slight 3/4 front view from a little above, soft cel shading with gentle gradients, clean dark-brown outlines, warm light from the top-left, chunky readable shape that still reads at 32 pixels, single item centered and filling most of the square image, isolated on a plain white background (transparent if possible), no text, no border, no background circle, no cast shadow.
+```
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `item_rom` | A tied bundle of golden dry rice straw, bound in the middle with a straw cord. |
+| `item_nep` | A small woven bamboo basket of sticky-rice paddy: plump golden-white unhusked grains, with a few rice stalks lying across it. |
+| `item_thoctam` | A small woven bamboo basket of fragrant jasmine paddy: slender long pale-gold unhusked grains, a sprig of fragrant rice stalk on top. |
+| `item_rau` | A bunch of Vietnamese water spinach (rau muống): long hollow green stems with arrow-shaped leaves, tied with a strip of banana leaf. |
+| `item_dau` | A small burlap sack open at the top, full of tiny round green mung beans, a few spilled in front. |
+| `item_mia` | Two cut purple sugarcane stalks with visible joints, crossed, a few green leaves at the top. |
+| `item_che` | A small handful of fresh green tea shoots: the bud plus two young leaves, bright light green. |
+| `item_trungvit` | Two duck eggs, larger than chicken eggs, pale blue-green shell. |
+| `item_suadaunanh` | A clear glass bottle of creamy pale-beige soy milk with a few soybeans beside it. |
+| `item_suade` | A small metal milk can of fresh goat milk with a white goat-milk splash at the top. |
+| `item_phan` | A woven bamboo basket filled with dark brown farmyard manure, a little straw sticking out. |
+| `item_caro` | One tilapia fish (cá rô phi): grey-green body with faint dark vertical stripes, spiny dorsal fin. |
+| `item_catram` | One grass carp (cá trắm): long torpedo-shaped body, olive-grey back, silver-yellow belly, big scales. |
+| `item_cachep` | One common carp (cá chép): golden-bronze body, big scales, small barbels by the mouth. |
+| `item_buoi` | A Vietnamese green pomelo: large round green-yellow fruit, slightly pear-shaped, with one leaf on the stem. |
+| `item_vai` | A small cluster of lychees on a twig: bumpy bright red-pink skins, one peeled showing white flesh. |
+| `item_nhan` | A cluster of longans on a twig: small round smooth tan-brown fruits, one peeled showing translucent white flesh. |
+| `item_hong` | Two ripe orange persimmons with green four-petal calyx on top. |
+| `item_cam` | A small burlap sack of light brown rice bran (cám) open at the top, fine powdery texture. |
+| `item_banhda` | A round crispy Vietnamese rice cracker (bánh đa) sprinkled with black sesame seeds, slightly tilted. |
+| `item_xoi` | A portion of sticky rice with peanuts (xôi lạc) on a piece of banana leaf. |
+| `item_banhchung` | A square Vietnamese bánh chưng: wrapped in green dong leaves, tied with thin bamboo strings in a cross pattern. |
+| `item_banhngo` | A few golden pan-fried corn cakes stacked on a little plate. |
+| `item_duong` | A small clay bowl of light brown cane sugar crystals, a couple of sugar lumps beside it. |
+| `item_keolac` | A few rectangular peanut brittle candy bars (kẹo lạc): golden caramel with whole peanuts. |
+| `item_nuocmam` | A traditional glass bottle of amber Vietnamese fish sauce (nước mắm) with a small red cap. |
+| `item_tuongot` | A small glass jar of bright red Vietnamese chili sauce with two red chilies beside it. |
+| `item_chaca` | A few pieces of golden fried fish cake (chả cá) with fresh dill on top, on a small plate. |
+| `item_dauphu` | Three white soft tofu blocks (đậu phụ) on a small round bamboo tray. |
+| `item_chemat` | A clay teacup of golden tea with a little honey dipper resting on the saucer. |
+| `item_hongsay` | A few flattened dried persimmons (hồng sấy), deep orange-brown, with a light sugar bloom. |
+| `item_gaotam` | A small bowl of raw jasmine rice: long slender translucent white grains. |
+| `item_com` | Green young rice flakes (cốm làng Vòng) wrapped in a lotus leaf, opened to show the bright green flakes. |
+| `item_banhdauxanh` | A few small yellow square mung bean cakes (bánh đậu xanh) in a little paper box. |
+| `item_banhcom` | A square green bánh cốm cake wrapped half-open in paper, showing the green outside and yellow mung-bean filling. |

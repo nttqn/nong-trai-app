@@ -55,6 +55,7 @@ class Sprites {
   static final _paint = Paint()..filterQuality = FilterQuality.medium;
 
   static bool has(String key) => _img.containsKey(key);
+  static ui.Image? image(String key) => _img[key];
   static int get count => _img.length;
 
   /// Loads every sprite in the asset bundle. Never throws.
