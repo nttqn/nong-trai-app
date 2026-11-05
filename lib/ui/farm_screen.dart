@@ -415,6 +415,91 @@ class _FarmScreenState extends State<FarmScreen>
     return (gx.floor(), gy.floor());
   }
 
+  // ---------------------------------------------------------------- swipe
+  // Drag starting on a ripe field harvests every ripe field the finger
+  // passes over; in planting mode, a drag from an empty field sows them.
+  // The map does not pan during such a drag.
+  int _pointers = 0;
+  bool _swiping = false;
+  bool _swipePlant = false;
+  Obj? _swipeStart;
+  Offset? _swipeDownAt, _swipeLast;
+  Matrix4? _swipeCam;
+  final Set<int> _swiped = {};
+  String? _swipeErr;
+
+  bool _swipeable(Obj? o, {required bool plant}) {
+    if (o == null || (o.def.kind != BKind.paddy && o.def.kind != BKind.bed)) return false;
+    if (plant) {
+      final c = _plantCrop == null ? null : crops[_plantCrop];
+      return c != null && o.crop == null && farm.cropFits(o, c);
+    }
+    return o.crop != null && farm.isReady(o);
+  }
+
+  void _swipeDown(PointerDownEvent e) {
+    _pointers++;
+    if (_pointers > 1 || _placeType != null || _moving != null) {
+      _swipeStart = null; // pinch zoom
+      return;
+    }
+    final o = hitTest(farm, e.localPosition, _view);
+    _swipePlant = _plantCrop != null && _swipeable(o, plant: true);
+    _swipeStart = _swipePlant || _swipeable(o, plant: false) ? o : null;
+    _swipeDownAt = e.position;
+    _swipeLast = e.localPosition;
+    _swipeCam = _tc.value.clone();
+  }
+
+  void _swipeMove(PointerMoveEvent e) {
+    if (_pointers > 1) return;
+    if (!_swiping) {
+      final start = _swipeStart;
+      if (start == null || (e.position - _swipeDownAt!).distance < 10) return;
+      // it is a swipe: keep the map still and start with the first field
+      _swiped.clear();
+      _swipeErr = null;
+      _tc.value = _swipeCam!;
+      setState(() => _swiping = true);
+      _swipeAct(start);
+    } else if (_swipeCam != null) {
+      _tc.value = _swipeCam!;
+    }
+    // walk the finger's path in small steps so no field is skipped
+    final from = _swipeLast!, to = e.localPosition;
+    final steps = math.max(1, ((to - from).distance / 6).ceil());
+    for (var i = 1; i <= steps; i++) {
+      final p = Offset.lerp(from, to, i / steps)!;
+      final o = hitTest(farm, p, _view);
+      if (o != null && !_swiped.contains(o.id) && _swipeable(o, plant: _swipePlant)) _swipeAct(o);
+    }
+    _swipeLast = to;
+  }
+
+  void _swipeAct(Obj o) {
+    if (_swipeErr != null) return;
+    _swiped.add(o.id);
+    final err = _swipePlant ? farm.plant(o, _plantCrop!) : farm.harvest(o);
+    if (err != null) {
+      _swipeErr = err;
+      _report(err);
+    } else {
+      HapticFeedback.selectionClick();
+    }
+  }
+
+  void _swipeEnd(PointerEvent e) {
+    _pointers = math.max(0, _pointers - 1);
+    if (_pointers > 0) return;
+    _swipeStart = null;
+    if (_swiping) {
+      setState(() => _swiping = false);
+      if (_swiped.length > 1 && _swipeErr == null) {
+        _say(_swipePlant ? 'Đã gieo ${_swiped.length} ô' : 'Đã thu hoạch ${_swiped.length} ô');
+      }
+    }
+  }
+
   // ---------------------------------------------------------------- taps
   void _tap(Offset p) {
     final (gxf, gyf) = worldIso.toGrid(p);
@@ -740,11 +825,18 @@ class _FarmScreenState extends State<FarmScreen>
                 minScale: .4,
                 maxScale: 2.6,
                 boundaryMargin: const EdgeInsets.all(60),
-                child: GestureDetector(
-                  onTapUp: (d) => _tap(d.localPosition),
-                  child: CustomPaint(
-                    size: const Size(worldW, worldH),
-                    painter: FarmPainter(farm, _view, _clock, _cache),
+                panEnabled: !_swiping,
+                child: Listener(
+                  onPointerDown: _swipeDown,
+                  onPointerMove: _swipeMove,
+                  onPointerUp: _swipeEnd,
+                  onPointerCancel: _swipeEnd,
+                  child: GestureDetector(
+                    onTapUp: (d) => _tap(d.localPosition),
+                    child: CustomPaint(
+                      size: const Size(worldW, worldH),
+                      painter: FarmPainter(farm, _view, _clock, _cache),
+                    ),
                   ),
                 ),
               ),
