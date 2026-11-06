@@ -154,7 +154,15 @@ void drawGround(Canvas c, Iso iso, Farm farm) {
   // the lotus lake, over the lot lines
   for (var x = 0; x < mapSize; x++) {
     for (var y = 0; y < mapSize; y++) {
-      if (Farm.isLake(x, y)) _lakeTile(c, iso, x, y, diamond(iso, x.toDouble(), y.toDouble(), 1, 1));
+      if (!Farm.isLake(x, y)) continue;
+      final d = diamond(iso, x.toDouble(), y.toDouble(), 1, 1);
+      // under a painted lake the square tiles are grass; the picture covers them
+      if (Sprites.has('ho_sen')) {
+        final tex = groundTexture(Zone.plain, x, y);
+        if (tex == null || !Sprites.tile(c, tex, d)) fillPoly(c, d, hash2(x, y) < .5 ? grassA : grassB);
+      } else {
+        _lakeTile(c, iso, x, y, d);
+      }
     }
   }
   // A painted lake (ho_sen) lies over the water tiles as one picture: its
@@ -203,12 +211,26 @@ void _hedge(Canvas c, Offset foot, double s, int seed) {
 
 /// The whole lotus lake as one picture (ho_sen); false when there is none.
 bool _paintedLake(Canvas c, Iso iso) {
-  if (!Sprites.has('ho_sen')) return false;
-  // Ellipse centre (29.5, 29.5), radii 3.3 x 2.6 tiles (Farm.isLake).
-  const rx = 3.3, ry = 2.6;
-  final reach = math.sqrt(rx * rx + ry * ry);
-  final front = iso.p(29.5 + rx * rx / reach, 29.5 + ry * ry / reach);
-  return Sprites.at(c, 'ho_sen', front + const Offset(0, 3), 2 * reach * Iso.hw);
+  final img = Sprites.image('ho_sen');
+  if (img == null) return false;
+  // Fit the picture over every water tile of the lake (Farm.isLake): its
+  // oval spans the tiles' bounding box on screen, a little larger so the
+  // square tile corners stay under the bank.
+  var box = Rect.zero;
+  var first = true;
+  for (var x = 0; x < mapSize; x++) {
+    for (var y = 0; y < mapSize; y++) {
+      if (!Farm.isLake(x, y)) continue;
+      for (final p in diamond(iso, x.toDouble(), y.toDouble(), 1, 1)) {
+        box = first ? Rect.fromCenter(center: p, width: 0, height: 0) : box.expandToInclude(Rect.fromCenter(center: p, width: 0, height: 0));
+        first = false;
+      }
+    }
+  }
+  if (first) return false;
+  final w = math.max(box.width * 1.12, box.height * 1.12 * img.width / img.height);
+  final h = w * img.height / img.width;
+  return Sprites.at(c, 'ho_sen', box.center + Offset(0, h / 2), w);
 }
 
 /// Ground looks of the outer ring (purely visual; all of it is farmland).

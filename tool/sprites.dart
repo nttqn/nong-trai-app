@@ -35,6 +35,9 @@ final expected = [
   'bui', 'da', 'goc_cay',
 ];
 
+/// Ground art (batch 8), all optional.
+const ground = {'co_hoa', 'ho_sen', 'sen_1', 'sen_2', 'lau', 'cau_go', 'cau_be_tong', 'cay_xa_1', 'cay_xa_2', 'cay_xa_3'};
+
 /// Optional pose sprites (eating / lying down); not counted as missing.
 final optional = [
   for (final a in ['ga', 'vit', 'lon', 'trau', 'bo', 'de']) ...['${a}_an', '${a}_nam'],
@@ -47,6 +50,8 @@ int maxWidthFor(String key) {
   const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa'};
   if (animals.contains(key) || animals.any((a) => key == '${a}_an' || key == '${a}_nam')) return 160;
   if (key.startsWith('item_') || key == 'cho_thuc' || key == 'cho_ngu') return 128;
+  if (key == 'ho_sen') return 768; // one picture for the whole lake
+  if (key.startsWith('cau_')) return 400;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',
@@ -87,7 +92,7 @@ void main(List<String> args) {
       im = img.copyResize(im, width: maxWidth, interpolation: img.Interpolation.cubic);
     }
     File('${out.path}/$key.png').writeAsBytesSync(img.encodePng(im, level: 9));
-    final note = expected.contains(key) || optional.contains(key) || key.startsWith('item_') || key.startsWith('dat_') ? '' : '   (tên lạ — kiểm tra lại tên file?)';
+    final note = expected.contains(key) || optional.contains(key) || key.startsWith('item_') || key.startsWith('dat_') || ground.contains(key) ? '' : '   (tên lạ — kiểm tra lại tên file?)';
     print('ok $key  ${im.width}x${im.height}  ${hadAlpha ? 'nền trong suốt sẵn' : 'đã xóa nền'}$note');
   }
   final have = out.listSync().map((e) => e.uri.pathSegments.last).where((n) => n.endsWith('.png')).map((n) => n.substring(0, n.length - 4)).toSet();
