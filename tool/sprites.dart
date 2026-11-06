@@ -87,7 +87,7 @@ void main(List<String> args) {
       im = img.copyResize(im, width: maxWidth, interpolation: img.Interpolation.cubic);
     }
     File('${out.path}/$key.png').writeAsBytesSync(img.encodePng(im, level: 9));
-    final note = expected.contains(key) || optional.contains(key) || key.startsWith('item_') ? '' : '   (tên lạ — kiểm tra lại tên file?)';
+    final note = expected.contains(key) || optional.contains(key) || key.startsWith('item_') || key.startsWith('dat_') ? '' : '   (tên lạ — kiểm tra lại tên file?)';
     print('ok $key  ${im.width}x${im.height}  ${hadAlpha ? 'nền trong suốt sẵn' : 'đã xóa nền'}$note');
   }
   final have = out.listSync().map((e) => e.uri.pathSegments.last).where((n) => n.endsWith('.png')).map((n) => n.substring(0, n.length - 4)).toSet();
