@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'core/defs.dart';
 import 'core/demo.dart';
 import 'core/farm.dart';
+import 'core/calendar.dart';
 import 'core/weather.dart';
 import 'render/sprites.dart';
 import 'services/ads.dart';
@@ -58,10 +59,15 @@ class _BootState extends State<_Boot> {
       for (final w in Weather.values) {
         if (q['weather'] == w.name) weatherOverride = w;
       }
+      if (q['day'] != null) calendarOverride = DateTime.tryParse(q['day']!);
       sprites.then((_) {
         if (mounted) {
           final f = demoFarm(int.parse(q['demo']!), house: int.tryParse(q['house'] ?? '') ?? -1);
           if (q['gift'] != null) f.loginDay = 0;
+          if (q['yard'] == 'cover') f.yardCover = true;
+          if (q['yard'] == 'dry') f.yardDry = FarmSeason.yardNeedMs;
+          if (q['yard'] == 'empty') f.yard.clear();
+          if (q['fest'] != null) demoFestivalDecos(f);
           if (q['hungry'] != null) {
             for (final o in f.objs) {
               if (o.def.kind == BKind.pen || o.type == 'cho') o.start = o.end = 0;

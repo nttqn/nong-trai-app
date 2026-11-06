@@ -4,11 +4,13 @@
 import 'dart:math' as math;
 
 import 'achievements.dart';
+import 'calendar.dart';
 import 'defs.dart';
 import 'quests.dart';
 import 'weather.dart';
 
 part 'farm_more.dart';
+part 'farm_season.dart';
 
 typedef NowFn = int Function();
 int wallClock() => DateTime.now().millisecondsSinceEpoch;
@@ -102,6 +104,17 @@ class Farm {
   String title = '';
   /// Goods on this player's market stall.
   final List<Stall> stalls = [];
+  /// Lễ hội: the festival whose orders are in [fest], and festival
+  /// decorations won but not placed yet.
+  String festKey = '';
+  final List<Order> fest = [];
+  final Map<String, int> giftDeco = {};
+  /// Sân phơi: grain spread out to dry, how long it has dried (ms), when
+  /// that was last worked out, the rain block that last soaked it, grain
+  /// lost to rain since it was spread, and whether the tarp is on.
+  final Map<String, int> yard = {};
+  int yardDry = 0, yardT = 0, yardWet = -1, yardLost = 0;
+  bool yardCover = false;
   /// Tutorial step (new farms start at 0; [tutDone] when finished).
   int tut = tutDone;
   int rev = 0; // bumps on every change (render caches, autosave)
@@ -347,7 +360,7 @@ class Farm {
   /// weather (rain helps; a dry spell hurts fields without irrigation).
   int cropMs(CropDef c) {
     final ms = _dur(c.seconds, c.plot == Plot.paddy ? _paddySpeed : _bedSpeed);
-    return (ms * weatherCropMult(c)).round();
+    return (ms * weatherCropMult(c) * (cropInSeason(c) ? 1 - seasonSpeed : 1)).round();
   }
 
   Weather get weather => weatherAt(now());
@@ -497,6 +510,9 @@ class Farm {
 
   String? canBuy(String type) {
     final d = bdef(type);
+    if (festivalDecos.contains(type)) {
+      return giftCount(type) > 0 ? null : 'Quà lễ hội: giao đủ đơn lễ hội để nhận';
+    }
     if (level < d.level) return 'Cần đạt cấp ${d.level}';
     if (d.unique && (projects.contains(type) || objs.any((o) => o.type == type))) {
       return 'Đã xây rồi';
@@ -521,6 +537,7 @@ class Farm {
     if (d.w > 0 && !canPlace(type, x, y)) return 'Không đặt được ở đây';
     coins -= buildCost(type);
     _spend(d.goods);
+    if (festivalDecos.contains(type)) giftDeco[type] = giftCount(type) - 1;
     if (d.kind == BKind.project) {
       projects.add(type);
       _stat('project:$type');
@@ -555,11 +572,14 @@ class Farm {
   bool canRemove(Obj o) {
     final k = o.def.kind;
     if (k == BKind.storage) return stored <= storageCap - warehouseLevels[o.level].storage;
+    if (o.type == 'san_phoi' && yard.isNotEmpty) return false; // grain on it
     return k == BKind.paddy || k == BKind.bed || k == BKind.tree || k == BKind.deco;
   }
 
   void remove(Obj o) {
     objs.remove(o);
+    // a festival gift goes back to the bag, to put somewhere else
+    if (festivalDecos.contains(o.type)) giftDeco[o.type] = giftCount(o.type) + 1;
     _snd('remove');
     _changed();
   }
@@ -657,6 +677,7 @@ class Farm {
     _snd('harvest');
     addXp(c.xp);
     _fx(f, '+$n ${item(c.product).icon}');
+    if (c.plot == Plot.paddy) _spreadGrain(c.product, n);
     f.crop = null;
     f.start = f.end = 0;
     f.stolen = 0;
@@ -1104,8 +1125,8 @@ class Farm {
   }
 
   /// A special order: bigger, from the dearer goods, paid about double.
-  Order _makeDaily(math.Random rng, int tier) {
-    final pool = producible()..sort((a, b) => item(a).price.compareTo(item(b).price));
+  Order _makeDaily(math.Random rng, int tier, {List<String>? goods, double pay = 1}) {
+    final pool = [...(goods ?? producible())]..sort((a, b) => item(a).price.compareTo(item(b).price));
     if (pool.isEmpty) pool.add('thoc');
     final from = (pool.length * const [0.0, .35, .6][tier]).floor().clamp(0, pool.length - 1);
     final top = pool.sublist(from);
@@ -1123,7 +1144,7 @@ class Farm {
       need[id] = q;
       value += p * q;
     }
-    final coins = (value * (2.1 + tier * .3) * (1 + orderBonus)).round();
+    final coins = (value * (2.1 + tier * .3) * (1 + orderBonus) * pay).round();
     final xpGain = math.max(5, (value / 4).round());
     return Order(nextId++, villagers[rng.nextInt(villagers.length)], need, coins, xpGain);
   }
@@ -1149,6 +1170,8 @@ class Farm {
   /// Turn waiting slots into fresh orders once their timer is up.
   void tickOrders() {
     rollDaily();
+    rollFestival();
+    settleYard();
     final t = now();
     final rng = math.Random(seed * 31 + nextId + t ~/ 1000);
     var changed = false;
@@ -1238,6 +1261,10 @@ class Farm {
         if (title.isNotEmpty) 'title': title,
         if (stalls.isNotEmpty) 'stalls': [for (final s in stalls) s.toJson()],
         if (tut != tutDone) 'tut': tut,
+        if (festKey.isNotEmpty) 'fest': {'k': festKey, 'o': [for (final o in fest) o.toJson()]},
+        if (giftDeco.isNotEmpty) 'gift': giftDeco,
+        if (yard.isNotEmpty)
+          'yard': {'g': yard, 'd': yardDry, 't': yardT, 'w': yardWet, 'l': yardLost, 'c': yardCover},
       };
 
   static Farm fromJson(Map<String, dynamic> j, {NowFn? now}) {
@@ -1289,6 +1316,25 @@ class Farm {
     f.daily.addAll([for (final o in (j['daily'] as List? ?? const [])) Order.fromJson(o)]);
     f.orders.addAll([for (final o in j['orders']) Order.fromJson(o)]);
     f.stats.addAll(Map<String, int>.from(j['stats']));
+    try {
+      final fe = j['fest'] as Map?;
+      if (fe != null) {
+        f.festKey = fe['k'] ?? '';
+        f.fest.addAll([for (final o in (fe['o'] as List? ?? const [])) Order.fromJson(Map<String, dynamic>.from(o))]);
+      }
+      f.giftDeco.addAll(Map<String, int>.from(j['gift'] ?? const {}));
+      final y = j['yard'] as Map?;
+      if (y != null) {
+        f.yard.addAll(Map<String, int>.from(y['g'] ?? const {}));
+        f.yardDry = y['d'] ?? 0;
+        f.yardT = y['t'] ?? 0;
+        f.yardWet = y['w'] ?? -1;
+        f.yardLost = y['l'] ?? 0;
+        f.yardCover = y['c'] ?? false;
+      }
+    } catch (_) {
+      // festival and drying yard state is never worth losing a farm over
+    }
     f._occ = null;
     try {
       f._fixRoadBuildings();

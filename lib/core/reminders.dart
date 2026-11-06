@@ -4,6 +4,7 @@
 
 import 'dart:math' as math;
 
+import 'calendar.dart';
 import 'defs.dart';
 import 'farm.dart';
 
@@ -54,6 +55,26 @@ List<Reminder> planReminders(Farm f) {
       if (o.def.kind == BKind.tree && o.end != 0) o.end,
   ]);
   if (fruit != null) add(4, fruit, '🍌 Cây ăn quả đã chín', 'Vườn nhà đang trĩu quả.');
+
+  // grain on the drying yard: dry, or rain on the way
+  if (f.yardWetOut) {
+    final ready = f.yardReadyAt, rain = f.nextRainAt;
+    if (ready != null) {
+      add(6, ready, '☀️ Thóc đã phơi khô', 'Ra sân phơi đóng bao, được thêm thóc mẩy hạt.');
+    } else if (rain != null) {
+      add(6, math.max(now + _minLead, rain - 15 * 60 * 1000), '🌧️ Trời sắp mưa!', 'Thóc đang phơi ngoài sân, cất ngay kẻo ướt!');
+    }
+  }
+
+  // the next festival, on its first morning
+  if (f.level >= FarmSeason.festLevel) {
+    final next = upcomingFestivals(calendarDay(now), count: 1);
+    if (next.isNotEmpty) {
+      final s = next.first.start;
+      add(7, DateTime(s.year, s.month, s.day, 8).millisecondsSinceEpoch, '${next.first.def.icon} ${next.first.def.name} đến rồi!',
+          'Bà con đặt hàng lễ hội, giao đủ để nhận ${bdef(next.first.def.deco).name.toLowerCase()}.');
+    }
+  }
 
   // tomorrow morning's gift (or this evening's, if today's is still waiting)
   final d = DateTime.fromMillisecondsSinceEpoch(now);

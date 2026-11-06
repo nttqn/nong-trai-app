@@ -263,3 +263,23 @@ Thiếu ảnh nào thì game vẫn vẽ phần đó bằng code. Hàng tre quanh
 | `cay_xa_1` | A big old Vietnamese banyan tree (cây đa) with a wide dense canopy and aerial roots, standing directly on the ground: no base tile, no platform. |
 | `cay_xa_2` | A tall Vietnamese kapok tree (cây gạo) with bright red flowers on mostly bare branches, standing directly on the ground: no base tile, no platform. |
 | `cay_xa_3` | A small group of 3 slender areca palm trees (cây cau) of different heights, standing directly on the ground: no base tile, no platform. |
+
+## Đợt 9 — sân phơi thóc và quà lễ hội
+
+Thiếu ảnh nào thì game vẫn vẽ tạm bằng code, nhưng bản vẽ code khá thô. Nên làm **`san_phoi` trước**, rồi đến 3 trạng thái của nó, vì người chơi thấy sân phơi hằng ngày. Đồ lễ hội làm dần, kịp trước **Tết cơm mới (16/11)** và **Tết Nguyên đán (30/1)** là đẹp.
+
+> **Sân phơi**: cả 4 ảnh `san_phoi*` phải **cùng khung hình, cùng góc, cùng kích cỡ sân**, chỉ khác thứ nằm trên sân. Làm `san_phoi` trước rồi đính kèm nó làm mẫu cho 3 ảnh kia.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `san_phoi` | An empty square drying yard (sân phơi thóc) paved with old red clay bricks in a neat grid, with a very low brick rim, a wooden grain rake (cào) lying on one corner, 2x2 tile flat base, nothing tall on it. Flat ground-level object. |
+| `san_phoi_thoc` | Same yard as `san_phoi` (attach it as reference, same framing and size): golden rice grain (thóc) spread evenly over most of the yard in neat raked rows, the rake lying at the edge. |
+| `san_phoi_bat` | Same yard as `san_phoi` (attach it): the spread rice grain fully covered by a blue plastic tarp, the tarp corners held down by a few old bricks. |
+| `san_phoi_kho` | Same yard as `san_phoi` (attach it): dry golden rice grain with three full jute rice sacks tied at the top standing at the front edge of the yard. |
+| `cay_neu` | A Vietnamese Tết cây nêu: a very tall thin bamboo pole with its green leafy top, red paper charms, a small round bamboo hoop and little bells hanging from the top, standing directly on the ground: no base tile, no platform. Tall and narrow. |
+| `den_long` | A small wooden frame with three round red silk lanterns with golden tassels hanging from its top bar, standing directly on the ground: no base tile, no platform. |
+| `cay_du` | A traditional village festival bamboo swing (cây đu): two tall A-shaped bamboo frames joined by a top bar, a long rope swing with a wooden seat, red ribbons tied at the top, standing directly on the ground, about two tiles wide and one tile deep: no base tile, no platform. |
+| `gio_qua` | A round woven bamboo basket (thúng) full of tropical fruit: lychees, mangoes, plums, rambutans, standing directly on the ground: no base tile, no platform. |
+| `chau_sen` | A big blue-and-white glazed ceramic pot with lotus leaves and two pink lotus flowers growing out of it, standing directly on the ground: no base tile, no platform. |
+| `den_ong_sao` | A Vietnamese Mid-Autumn star lantern (đèn ông sao): a big red five-pointed star lantern made of cellophane on a bamboo frame with yellow tassels, mounted on a bamboo pole stuck in the ground: no base tile, no platform. |
+| `coi_gia` | A traditional stone rice mortar (cối giã gạo) with a long wooden pestle leaning in it, a little white rice in the mortar, a small woven tray (nia) beside it, standing directly on the ground: no base tile, no platform. |

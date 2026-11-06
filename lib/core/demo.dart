@@ -1,5 +1,6 @@
 // Dev-only farms for screenshots (web builds, ?demo=N).
 
+import 'calendar.dart';
 import 'defs.dart';
 import 'farm.dart';
 
@@ -142,6 +143,16 @@ Farm demoFarm(int stage, {int house = -1}) {
     dog.start = now;
     dog.end = now + FarmMore.dogFedMs;
   }
+  // the drying yard, half-dried grain on it
+  for (var i = 0; i < mapSize * mapSize && f.dryingYard == null; i++) {
+    final x = 8 + i % 10, y = 3 + i ~/ 10;
+    if (f.canPlace('san_phoi', x, y)) f.build('san_phoi', x, y);
+  }
+  if (f.dryingYard != null) {
+    f.yard['thoc'] = 24;
+    f.yardDry = FarmSeason.yardNeedMs ~/ 2;
+    f.yardT = f.now();
+  }
   f.stats.addAll({'order': 30 * stage, 'harvest:lua': 120 * stage, 'help': 12, 'steal': 6, 'daily': 4, 'login': 9});
   f.ach.addAll({'harvest': 1, 'help': 1});
   f.title = 'harvest';
@@ -154,4 +165,16 @@ Farm demoFarm(int stage, {int house = -1}) {
   f.xp = 40;
   f.fx.clear();
   return f;
+}
+
+/// Every festival gift placed near the house (?fest on web demos).
+void demoFestivalDecos(Farm f) {
+  for (final d in festivalDecos) {
+    f.giftDeco[d] = 1;
+    for (var i = 0; i < mapSize * mapSize; i++) {
+      final x = 1 + i % 14, y = 12 + i ~/ 14;
+      if (f.canPlace(d, x, y) && f.build(d, x, y) == null) break;
+    }
+  }
+  f.fx.clear();
 }

@@ -42,6 +42,9 @@ const ground = {'co_hoa', 'ho_sen', 'sen_1', 'sen_2', 'lau', 'cau_go', 'cau_be_t
 final optional = [
   for (final a in ['ga', 'vit', 'lon', 'trau', 'bo', 'de']) ...['${a}_an', '${a}_nam'],
   'cho_thuc', 'cho_ngu',
+  // batch 9: drying yard states and festival gifts
+  'san_phoi', 'san_phoi_thoc', 'san_phoi_bat', 'san_phoi_kho',
+  'cay_neu', 'den_long', 'cay_du', 'gio_qua', 'chau_sen', 'den_ong_sao', 'coi_gia',
 ];
 
 /// Max width by on-map size: about 3x the largest zoom on a 3x phone.
@@ -51,7 +54,7 @@ int maxWidthFor(String key) {
   if (animals.contains(key) || animals.any((a) => key == '${a}_an' || key == '${a}_nam')) return 160;
   if (key.startsWith('item_') || key == 'cho_thuc' || key == 'cho_ngu') return 128;
   if (key == 'ho_sen') return 768; // one picture for the whole lake
-  if (key.startsWith('cau_')) return 400;
+  if (key.startsWith('cau_') || key.startsWith('san_phoi') || key == 'cay_du') return 400;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',

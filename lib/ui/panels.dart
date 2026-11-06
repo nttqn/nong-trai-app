@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../core/calendar.dart';
 import '../core/defs.dart';
+import '../core/weather.dart';
 import '../core/farm.dart';
 import '../services/ads.dart';
 import 'sheets.dart' show Report;
@@ -41,6 +43,7 @@ class ObjPanel extends StatelessWidget {
       BKind.storage => _warehouse(),
       BKind.obstacle => _obstacle(),
       _ when o.type == 'cho' => _dog(),
+      _ when o.type == 'san_phoi' => _yard(),
       _ => _info(),
     };
     final movable = d.kind != BKind.obstacle;
@@ -190,7 +193,20 @@ class ObjPanel extends StatelessWidget {
         padding: const EdgeInsets.all(5),
         decoration: cardDeco(color: locked ? const Color(0xFFE9E1CF) : Colors.white),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Opacity(opacity: locked ? .4 : 1, child: ItemIcon(c.product, size: 34)),
+          Stack(clipBehavior: Clip.none, children: [
+            Opacity(opacity: locked ? .4 : 1, child: ItemIcon(c.product, size: 34)),
+            // in season: grows faster
+            if (farm.cropInSeason(c))
+              Positioned(
+                right: -14,
+                top: -4,
+                child: Tooltip(
+                  message: 'Hợp mùa: lớn nhanh hơn ${(seasonSpeed * 100).round()}%',
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Text(seasons[farm.season]!.icon, style: const TextStyle(fontSize: 14)),
+                ),
+              ),
+          ]),
           Text(c.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -469,6 +485,62 @@ class ObjPanel extends StatelessWidget {
         const Spacer(),
         PillButton('Cho ăn',
             onTap: () => _do(farm.feedDog(o), ok: 'Gâu gâu! Chó sẽ canh vườn 24 giờ')),
+      ]),
+    ]);
+  }
+
+  Widget _yard() {
+    farm.settleYard();
+    final n = farm.yardTotal;
+    final now = farm.now();
+    String clock(int ms) {
+      final d = DateTime.fromMillisecondsSinceEpoch(ms);
+      return '${d.hour}:${d.minute.toString().padLeft(2, '0')}';
+    }
+
+    if (n == 0) {
+      return Text(
+          'Sân trống. Gặt lúa xong thóc tự đem ra phơi (tối đa ${FarmSeason.yardCap}); phơi khô được thêm ${(FarmSeason.yardBonus * 100).round()}%. Trời mưa nhớ cất thóc!',
+          style: const TextStyle(color: brownLight));
+    }
+    final grains = Wrap(children: [
+      for (final e in farm.yard.entries)
+        Padding(
+          padding: const EdgeInsets.only(right: 6),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            ItemIcon(e.key, size: 26),
+            Text('${e.value}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: brown)),
+          ]),
+        ),
+    ]);
+    if (farm.yardDone) {
+      return Row(children: [
+        grains,
+        Expanded(
+          child: Text('☀️ Thóc khô giòn! Đóng bao được thêm ${farm.yardBonusCount}.',
+              style: const TextStyle(color: brown, fontWeight: FontWeight.w700)),
+        ),
+        PillButton('Đóng bao', onTap: () => _do(farm.collectYard())),
+      ]);
+    }
+    final rain = farm.nextRainAt, ready = farm.yardReadyAt;
+    final raining = farm.weather == Weather.rain;
+    final status = farm.yardCover
+        ? (raining ? '🌧️ Đang mưa, thóc nằm dưới bạt.' : '⛺ Thóc đang che bạt, chưa khô thêm.')
+        : ready != null
+            ? '☀️ Đang phơi ${(farm.yardProgress * 100).round()}%, khô lúc ${clock(ready)}.'
+            : '⚠️ Đang phơi ${(farm.yardProgress * 100).round()}%, nhưng ${rain != null && rain > now ? 'mưa lúc ${clock(rain)}' : 'sắp mưa'}: nhớ cất thóc!';
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(status, style: TextStyle(color: farm.yardRainSoon ? red : brownLight, fontWeight: FontWeight.w700)),
+      if (farm.yardLost > 0)
+        Text('Mưa đã làm hỏng ${farm.yardLost} thóc.', style: const TextStyle(color: brownLight, fontSize: 12)),
+      const SizedBox(height: 4),
+      Row(children: [
+        Expanded(child: grains),
+        if (farm.yardCover)
+          PillButton('Phơi tiếp', onTap: raining ? null : () => _do(farm.coverYard(false)))
+        else
+          PillButton('Cất thóc', color: const Color(0xFF1E88E5), onTap: () => _do(farm.coverYard(true), ok: 'Đã che bạt')),
       ]),
     ]);
   }

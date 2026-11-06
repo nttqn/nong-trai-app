@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 
+import '../core/calendar.dart' show festivalDecos;
 import '../core/defs.dart';
 import '../core/farm.dart';
 import 'animals.dart';
@@ -53,6 +54,19 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         if (!sprite('cho')) _kennel(c, foot);
         // in front of the kennel (its front corner is foot + (0, 16)), on the ground
         _dog(c, foot + const Offset(-6, 15.5), t, o.end > farm.now(), o.id);
+      } else if (o.type == 'san_phoi') {
+        // art per state when there is some (art/PROMPTS.md batch 9)
+        final key = farm.yard.isEmpty
+            ? 'san_phoi'
+            : farm.yardDone
+                ? 'san_phoi_kho'
+                : farm.yardCover
+                    ? 'san_phoi_bat'
+                    : 'san_phoi_thoc';
+        if (!sprite(key)) {
+          if (!sprite('san_phoi')) _yardBase(c, iso, x, y);
+          _yardGrain(c, iso, farm, x, y, t);
+        }
       } else if (!sprite(o.type)) {
         _deco(c, iso, o.type, x, y, foot, t, o.id);
       }
@@ -677,8 +691,184 @@ void _star(Canvas c, Offset p, double r, Color col) {
   pathFill(c, path..close(), col);
 }
 
+// ------------------------------------------------------------------ sân phơi
+/// Code-drawn drying yard: a square of red bricks with a low rim.
+void _yardBase(Canvas c, Iso iso, double x, double y) {
+  const tile = Color(0xFFC77B5C);
+  fillPoly(c, diamond(iso, x + .04, y + .04, 1.92, 1.92), shade(tile, -.25));
+  fillPoly(c, diamond(iso, x + .1, y + .1, 1.8, 1.8, 1.5), tile);
+  for (var i = 1; i < 6; i++) {
+    final k = .1 + 1.8 * i / 6;
+    line(c, iso.p(x + k, y + .1, 1.5), iso.p(x + k, y + 1.9, 1.5), shade(tile, -.12), .8);
+    line(c, iso.p(x + .1, y + k, 1.5), iso.p(x + 1.9, y + k, 1.5), shade(tile, -.12), .8);
+  }
+}
+
+/// The grain spread on the yard: raked rows, darker while wet; a blue
+/// tarp held down by bricks when covered; sacks when dry.
+void _yardGrain(Canvas c, Iso iso, Farm farm, double x, double y, double t) {
+  final n = farm.yardTotal;
+  if (n == 0) {
+    // the rake left leaning on the yard
+    line(c, iso.p(x + 1.6, y + 1.5, 2), iso.p(x + 1.05, y + .55, 16), woodDark, 1.6);
+    line(c, iso.p(x + 1.75, y + 1.35, 2), iso.p(x + 1.45, y + 1.65, 2), woodDark, 2.2);
+    return;
+  }
+  final k = .5 + .45 * math.min(1.0, n / FarmSeason.yardCap);
+  final s = 1.8 * k, o = (1.8 - s) / 2 + .1;
+  final dry = farm.yardProgress;
+  final grain = Color.lerp(const Color(0xFFB8913F), const Color(0xFFF0CB55), dry)!;
+  fillPoly(c, diamond(iso, x + o, y + o, s, s, 2.2), grain);
+  for (var i = 1; i < 7; i++) {
+    final v = o + s * i / 7;
+    line(c, iso.p(x + o + .05, y + v, 2.4), iso.p(x + o + s - .05, y + v, 2.4), shade(grain, -.18), 1.1);
+  }
+  // single grains catching the light
+  for (var i = 0; i < 70; i++) {
+    final p = iso.p(x + o + s * hash2(i, 11), y + o + s * hash2(i, 12), 2.6);
+    oval(c, p, .8, .5, shade(grain, hash2(i, 13) < .5 ? .12 : -.14));
+  }
+  if (farm.yardCover && !farm.yardDone) {
+    fillPoly(c, diamond(iso, x + o - .06, y + o - .06, s + .12, s + .12, 4.5), const Color(0xFF2F6FB5));
+    for (var i = 1; i < 4; i++) {
+      final v = o + s * i / 4;
+      line(c, iso.p(x + v, y + o - .06, 4.6), iso.p(x + v, y + o + s + .06, 4.6), const Color(0xFF5B92D1), 1.2);
+    }
+    for (final (u, w) in [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0)]) {
+      final p = iso.p(x + o - .06 + (s + .12) * u, y + o - .06 + (s + .12) * w, 5.5);
+      oval(c, p, 3.4, 2.2, const Color(0xFFA0522D));
+    }
+  }
+  if (farm.yardDone) {
+    // filled sacks waiting by the edge
+    final bags = math.min(4, 1 + n ~/ 10);
+    for (var i = 0; i < bags; i++) {
+      final p = iso.p(x + .45 + i * .32, y + 1.55, 0);
+      shadow(c, p, 6, 2.5);
+      oval(c, p + const Offset(0, -6), 5.5, 7, const Color(0xFFE6D7B0));
+      oval(c, p + const Offset(-1.5, -7), 1.6, 4, const Color(0x33FFFFFF));
+      line(c, p + const Offset(-2.5, -12.5), p + const Offset(2.5, -12.5), const Color(0xFF8D6E4C), 1.4);
+      oval(c, p + const Offset(0, -14.5), 2.6, 2, const Color(0xFFD9C79A));
+    }
+  }
+}
+
+// ------------------------------------------------------------------ festival gifts
+void _festDeco(Canvas c, Iso iso, String type, double x, double y, Offset f, double t, int seed) {
+  const red = Color(0xFFD32F2F), gold = Color(0xFFFFC107), bamboo = Color(0xFFB9A35A);
+  final sway = math.sin(t * 1.6 + seed) * 1.5;
+  void lantern(Offset p, double r) {
+    circle(c, p, r * 1.9, const Color(0x33FFB300));
+    oval(c, p, r, r * 1.15, red);
+    oval(c, p + Offset(-r * .35, -r * .2), r * .3, r * .6, const Color(0x40FFFFFF));
+    line(c, p + Offset(-r * .6, -r * 1.1), p + Offset(r * .6, -r * 1.1), gold, 1.6);
+    line(c, p + Offset(-r * .6, r * 1.1), p + Offset(r * .6, r * 1.1), gold, 1.6);
+    line(c, p + Offset(0, r * 1.15), p + Offset(0, r * 1.9), gold, 1.2);
+  }
+
+  switch (type) {
+    case 'cay_neu':
+      shadow(c, f, 8, 3);
+      final top = f + Offset(sway, -82);
+      line(c, f, top, bamboo, 3);
+      for (var i = 0; i < 4; i++) {
+        line(c, f + Offset(0, -12.0 - i * 16), f + Offset(2.5, -12.0 - i * 16), shade(bamboo, -.3), 1.5);
+      }
+      for (var i = 0; i < 6; i++) {
+        final a = -math.pi / 2 + (i - 2.5) * .45;
+        oval(c, top + Offset(math.cos(a) * 9, math.sin(a) * 6 + 3), 6, 2.4, const Color(0xFF6BAA45));
+      }
+      // hanging charms: a red cloth and a little gold disc
+      final h = top + const Offset(4, 6);
+      line(c, h, h + Offset(2 + sway, 18), const Color(0xFF795548), .8);
+      fillPoly(c, [h + Offset(sway, 18), h + Offset(6 + sway, 18), h + Offset(3 + sway, 28)], red);
+      line(c, top + const Offset(-4, 6), top + Offset(-5 + sway, 22), const Color(0xFF795548), .8);
+      circle(c, top + Offset(-5 + sway, 24), 3, gold);
+    case 'den_long':
+      shadow(c, f, 14, 4);
+      final l = f + const Offset(-13, 0), r = f + const Offset(13, 0);
+      line(c, l, l + const Offset(0, -46), woodDark, 2.6);
+      line(c, r, r + const Offset(0, -46), woodDark, 2.6);
+      line(c, l + const Offset(-3, -45), r + const Offset(3, -45), wood, 3);
+      for (var i = 0; i < 3; i++) {
+        final p = f + Offset(-9.0 + i * 9 + sway * .6, -32 + (i == 1 ? 3 : 0));
+        line(c, Offset(p.dx, f.dy - 45), p + const Offset(0, -6), const Color(0xFF5D4037), .8);
+        lantern(p, 4.6);
+      }
+    case 'cay_du':
+      final a = iso.p(x + .25, y + .5), b = iso.p(x + 1.75, y + .5);
+      shadow(c, (a + b) / 2, 26, 6);
+      for (final p in [a, b]) {
+        line(c, p + const Offset(-5, 0), p + const Offset(0, -68), bamboo, 2.6);
+        line(c, p + const Offset(5, 0), p + const Offset(0, -68), bamboo, 2.6);
+      }
+      line(c, a + const Offset(0, -68), b + const Offset(0, -68), shade(bamboo, -.15), 3);
+      final swing = math.sin(t * 1.8 + seed) * 7;
+      final ta = Offset.lerp(a, b, .38)! + const Offset(0, -68), tb = Offset.lerp(a, b, .62)! + const Offset(0, -68);
+      final seat = (ta + tb) / 2 + Offset(swing, 50);
+      line(c, ta, seat + const Offset(-6, 0), const Color(0xFF8D6E4C), 1);
+      line(c, tb, seat + const Offset(6, 0), const Color(0xFF8D6E4C), 1);
+      line(c, seat + const Offset(-8, 0), seat + const Offset(8, 0), woodDark, 3);
+      // red ribbons on the top bar
+      for (final p in [ta, tb]) {
+        fillPoly(c, [p, p + const Offset(4, 0), p + Offset(2 + sway, 12)], red);
+      }
+    case 'gio_qua':
+      shadow(c, f, 12, 4);
+      final b = f + const Offset(0, -7);
+      oval(c, b, 12, 7, const Color(0xFF9C6B3C));
+      for (var i = 0; i < 4; i++) {
+        line(c, b + Offset(-10 + i * 6.5, -4), b + Offset(-9 + i * 6.5, 5), const Color(0xFF7A4F28), .9);
+      }
+      const fruit = [Color(0xFFE53935), Color(0xFFFFB300), Color(0xFF7CB342), Color(0xFFD81B60), Color(0xFFFF7043)];
+      for (var i = 0; i < 7; i++) {
+        final p = b + Offset(-8 + (i % 4) * 5.3, -5.0 - (i ~/ 4) * 4.5 - (i % 2) * 1.2);
+        circle(c, p, 3.4, fruit[i % fruit.length]);
+        circle(c, p + const Offset(-1, -1), 1, const Color(0x55FFFFFF));
+      }
+    case 'chau_sen':
+      shadow(c, f, 12, 4);
+      final pot = f + const Offset(0, -7);
+      oval(c, pot, 11, 8, const Color(0xFF3F6E9E));
+      line(c, pot + const Offset(-9, -2), pot + const Offset(9, -2), const Color(0xFFE3EEF7), 1.2);
+      oval(c, pot + const Offset(0, -7), 10, 3, const Color(0xFF4E7FB0));
+      for (final (dx, dy) in [(-8.0, -11.0), (7.0, -12.0), (0.0, -9.0)]) {
+        oval(c, pot + Offset(dx, dy), 6, 2.6, const Color(0xFF5E9E3E));
+      }
+      final fl = pot + Offset(sway * .5, -24);
+      line(c, pot + const Offset(0, -8), fl, const Color(0xFF4E8B32), 1.4);
+      for (var i = 0; i < 5; i++) {
+        final a = -math.pi / 2 + (i - 2) * .5;
+        oval(c, fl + Offset(math.cos(a) * 3.5, math.sin(a) * 3.5 + 1), 2.4, 4.4, const Color(0xFFF48FB1));
+      }
+      circle(c, fl + const Offset(0, 1), 1.8, gold);
+    case 'den_ong_sao':
+      shadow(c, f, 6, 2.5);
+      final top = f + Offset(sway, -58);
+      line(c, f, top + const Offset(0, 12), bamboo, 2.2);
+      circle(c, top, 17, const Color(0x30FFB300));
+      _star(c, top, 13, red);
+      _star(c, top, 7, gold);
+      for (var i = 0; i < 2; i++) {
+        line(c, top + Offset(-4.0 + i * 8, 10), top + Offset(-5.0 + i * 10 + sway, 22), const Color(0xFFFF7043), 1.4);
+      }
+    case 'coi_gia':
+      shadow(c, f, 11, 4);
+      final m = f + const Offset(0, -2);
+      fillPoly(c, [m + const Offset(-10, 0), m + const Offset(10, 0), m + const Offset(12, -16), m + const Offset(-12, -16)],
+          const Color(0xFF9E9E9E));
+      oval(c, m + const Offset(0, -16), 12, 4, const Color(0xFF757575));
+      oval(c, m + const Offset(0, -16), 8, 2.6, const Color(0xFFFFFDF5));
+      oval(c, m + const Offset(-3, -8), 3, 6, const Color(0x22FFFFFF));
+      // the pestle, leaning
+      line(c, m + const Offset(2, -17), m + const Offset(16, -44), woodDark, 3.6);
+      oval(c, m + const Offset(2, -18), 3, 2, wood);
+  }
+}
+
 // ------------------------------------------------------------------ deco & obstacles
 void _deco(Canvas c, Iso iso, String type, double x, double y, Offset f, double t, int seed) {
+  if (festivalDecos.contains(type)) return _festDeco(c, iso, type, x, y, f, t, seed);
   switch (type) {
     case 'rom_dong':
       shadow(c, f, 14, 6);

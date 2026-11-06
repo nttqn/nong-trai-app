@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nong_trai/core/calendar.dart';
 import 'package:nong_trai/core/defs.dart';
 import 'package:nong_trai/core/farm.dart';
 
 void main() {
+  // a day with none of the tested crops in season (summer: ngô, dưa, mía, ớt)
+  setUp(() => calendarOverride = DateTime(2026, 7, 1));
+  tearDown(() => calendarOverride = null);
   late int t;
   late Farm f;
   setUp(() {

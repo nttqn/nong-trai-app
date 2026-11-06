@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../core/calendar.dart' show festivalDecos;
 import '../core/defs.dart';
 import '../core/farm.dart';
 import '../render/farm_painter.dart';
 import 'market_ui.dart';
+import 'calendar_sheet.dart' show FestOrderCard;
 import 'widgets.dart';
 
 typedef Report = void Function(String? err, {String? ok});
@@ -20,7 +22,7 @@ class ShopSheet extends StatefulWidget {
 
 class _ShopSheetState extends State<ShopSheet> {
   static const tabs = [
-    ('Trồng trọt', ['ruong', 'luong', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong']),
+    ('Trồng trọt', ['ruong', 'luong', 'san_phoi', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong']),
     ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'ao']),
     ('Nhà cửa', ['nha_phu', 'nha_kho']),
     ('Chế biến', [ 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che']),
@@ -52,7 +54,13 @@ class _ShopSheetState extends State<ShopSheet> {
                 childAspectRatio: .68,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                children: [for (final id in t.$2) _card(id)],
+                children: [
+                  for (final id in t.$2) _card(id),
+                  // festival gifts waiting to be placed
+                  if (t.$1 == 'Trang trí')
+                    for (final id in festivalDecos)
+                      if (f.giftCount(id) > 0) _card(id),
+                ],
               ),
           ]),
         ),
@@ -86,7 +94,10 @@ class _ShopSheetState extends State<ShopSheet> {
               maxLines: 2,
               style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: brown)),
           const SizedBox(height: 2),
-          if (locked)
+          if (festivalDecos.contains(id))
+            Text('🎁 Quà lễ hội ×${f.giftCount(id)}',
+                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFFC62828)))
+          else if (locked)
             Text('🔒 Cấp ${id == 'nha_phu' ? extraHouseLevels[f.extraHouseCount.clamp(0, extraHouseLevels.length - 1)] : d.level}',
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: red))
           else
@@ -223,6 +234,12 @@ class _OrdersSheetState extends State<OrdersSheet> {
         child: ListView(
           padding: const EdgeInsets.all(12),
           children: [
+            if (f.activeFestival != null) ...[
+              Text('${f.activeFestival!.def.icon} Đơn ${f.activeFestival!.def.name}',
+                  style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFC62828), fontSize: 15.5)),
+              const SizedBox(height: 6),
+              for (final o in f.fest) FestOrderCard(f, o, widget.report, () => setState(() {})),
+            ],
             ..._dailyBlock(),
             for (final o in f.orders) _order(o),
           ],

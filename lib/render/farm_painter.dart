@@ -52,7 +52,12 @@ double objHeight(Obj o) => switch (o.def.kind) {
       BKind.storage => 60,
       BKind.project => 64,
       BKind.tree => 52,
-      BKind.deco => o.type == 'cay_da' ? 80 : 40,
+      BKind.deco => switch (o.type) {
+          'cay_da' || 'cay_neu' => 80,
+          'cay_du' => 70,
+          'san_phoi' => 10,
+          _ => 40,
+        },
       BKind.obstacle => 16,
       BKind.pen => 28,
       _ => 12,
@@ -93,6 +98,7 @@ String? bubbleItem(Farm farm, Obj o) => switch (o.def.kind) {
       BKind.pond when o.crop != null && farm.isReady(o) => fishes[o.crop]!.product,
       BKind.tree when farm.isReady(o) => trees[o.type]!.product,
       BKind.factory when farm.readyJobs(o) > 0 => recipes[o.jobs.first.recipe]!.product,
+      BKind.deco when o.type == 'san_phoi' && farm.yardDone => farm.yard.keys.first,
       _ => null,
     };
 
@@ -109,6 +115,10 @@ String? bubbleIcon(Farm farm, Obj o) {
     case BKind.factory:
       final n = farm.readyJobs(o);
       if (n > 0) return item(recipes[o.jobs.first.recipe]!.product).icon;
+    case BKind.deco when o.type == 'san_phoi':
+      if (farm.yardDone) return item(farm.yard.keys.first).icon;
+      if (farm.yardRainSoon) return '☔';
+      if (farm.yardCover && farm.yard.isNotEmpty && farm.weather != Weather.rain) return '☀️';
     default:
   }
   return null;
@@ -202,6 +212,7 @@ class FarmPainter extends CustomPainter {
     if (sel != null && view.moving == null) _progressBar(c, iso, sel);
     _egrets(c, iso, t);
     _butterflies(c, iso, t, list);
+    _petals(c, (Offset.zero & size).intersect(c.getLocalClipBounds()), t);
     if (!view.visiting) _tutArrow(c, iso, t);
     _floats(c, iso, t);
     _weather(c, (Offset.zero & size).intersect(c.getLocalClipBounds()), t);
@@ -381,6 +392,30 @@ class FarmPainter extends CustomPainter {
             Offset(math.cos(ang) * rx, math.sin(ang) * rx * .45 + math.sin(t * 3.1 + i * 1.7) * 5);
         _butterfly(c, p, t * 19 + i * 2.3, colors[(i + slot) % colors.length], math.cos(ang) < 0);
       }
+    }
+  }
+
+  /// Peach blossom petals drifting over the village in the spring
+  /// festivals (Tết, Rằm tháng Giêng, hội làng).
+  void _petals(Canvas c, Rect area, double t) {
+    final f = farm.festival;
+    if (f == null || !const {'tet', 'nguyen_tieu', 'hoi_lang'}.contains(f.def.id)) return;
+    if (weatherAt(farm.now()) == Weather.rain) return;
+    const cols = [Color(0xFFF8BBD0), Color(0xFFF48FB1), Color(0xFFFFFFFF)];
+    // the same size on screen whatever the zoom
+    final k = 1 / c.getTransform()[0].clamp(.3, 3.0);
+    for (var i = 0; i < 26; i++) {
+      final sp = 18 + hash2(i, 1) * 22;
+      final fall = (t * sp + hash2(i, 2) * area.height) % (area.height + 40) - 20;
+      final drift = (t * (10 + hash2(i, 4) * 12) + hash2(i, 3) * area.width) % (area.width + 40) - 20;
+      final p = Offset(area.left + drift + math.sin(t * 1.3 + i) * 14, area.top + fall);
+      final a = t * (1.5 + hash2(i, 5)) + i;
+      c.save();
+      c.translate(p.dx, p.dy);
+      c.rotate(a);
+      c.scale(k);
+      oval(c, Offset.zero, 4.5, 2.6 + math.sin(a * 2).abs() * 1.1, cols[i % cols.length]);
+      c.restore();
     }
   }
 

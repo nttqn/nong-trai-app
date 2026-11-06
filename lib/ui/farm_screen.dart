@@ -21,6 +21,7 @@ import '../services/leaderboard.dart';
 import '../services/notify.dart';
 import '../services/save.dart';
 import '../services/sound.dart';
+import 'calendar_sheet.dart';
 import 'cloud_tile.dart';
 import 'extras.dart';
 import 'leaderboard_sheet.dart';
@@ -102,6 +103,7 @@ class _FarmScreenState extends State<FarmScreen>
     })..start();
     _hud = Timer.periodic(const Duration(seconds: 1), (_) {
       farm.tickOrders();
+      _festivalNotice();
       if (mounted) setState(() {});
     });
   }
@@ -577,6 +579,15 @@ class _FarmScreenState extends State<FarmScreen>
         }
       case BKind.factory:
         if (farm.readyJobs(o) > 0) _report(farm.collectJobs(o));
+      case BKind.deco when o.type == 'san_phoi':
+        farm.settleYard();
+        if (farm.yardDone) {
+          _report(farm.collectYard());
+        } else if (farm.yardRainSoon) {
+          _report(farm.coverYard(true), ok: 'Đã che bạt, mưa không sợ ướt thóc');
+        } else if (farm.yardCover && farm.weather != Weather.rain && farm.yard.isNotEmpty) {
+          _report(farm.coverYard(false), ok: 'Phơi thóc tiếp');
+        }
       default:
     }
     if (o != _sel) {
@@ -741,6 +752,8 @@ class _FarmScreenState extends State<FarmScreen>
             '• Chạm ô ruộng/luống trống để gieo giống, chạm tiếp các ô khác để gieo nhanh.\n'
             '• Cây chín thì chạm để thu hoạch. Mọi thứ vẫn lớn khi bạn tắt game.\n'
             '• Thu hoạch nhanh: đặt ngón tay lên một ô đã chín rồi vuốt qua các ô bên cạnh. Đang chọn hạt giống thì vuốt từ ô trống để gieo hàng loạt.\n'
+            '• 📅 Lịch làng chạy theo âm lịch thật: cây hợp mùa lớn nhanh hơn 15%, lễ hội (Tết, Trung thu, Tết cơm mới...) có đơn hàng riêng và quà trang trí.\n'
+            '• Sân phơi thóc (cấp 3): gặt lúa xong thóc tự ra sân, phơi khô được thêm 50%. Thấy ☔ là sắp mưa, chạm để che bạt kẻo ướt thóc.\n'
             '• Lúa cho thóc và rơm: thóc nuôi gà vịt, xay ra gạo và cám; rơm nuôi trâu bò.\n'
             '• Trâu cho phân chuồng: bón cho cây đang lớn để rút ngắn một nửa thời gian.\n'
             '• Giao đơn hàng cho bà con để có nhiều xu và kinh nghiệm.\n'
@@ -981,6 +994,14 @@ class _FarmScreenState extends State<FarmScreen>
           ),
           const SizedBox(width: 6),
           GestureDetector(
+            onTap: _openCalendar,
+            child: _badged(
+                _chip(Text('${farm.festival?.def.icon ?? '📅'} ${lunarToday(farm).short}',
+                    style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900, color: brown))),
+                farm.festReadyCount),
+          ),
+          const SizedBox(width: 6),
+          GestureDetector(
             onTap: () => showWeather(context, farm),
             child: _chip(Text(weatherIcon(farm.weather), style: const TextStyle(fontSize: 19))),
           ),
@@ -997,6 +1018,23 @@ class _FarmScreenState extends State<FarmScreen>
         ]),
       ]),
     );
+  }
+
+  // once per festival per session: tell the player it has begun
+  String _festSaid = '';
+  void _festivalNotice() {
+    final f = farm.activeFestival;
+    if (f == null || f.key == _festSaid || farm.tutStep != null) return;
+    _festSaid = f.key;
+    _say('${f.def.icon} ${f.def.name} đã đến! Mở lịch 📅 để xem đơn hàng lễ hội');
+  }
+
+  void _openCalendar() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => CalendarSheet(farm, _report), height: .86).then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   void _openAchievements() {
@@ -1102,7 +1140,7 @@ class _FarmScreenState extends State<FarmScreen>
       );
 
   Widget _bottomBar() {
-    final deliverable = farm.orders.where(farm.canDeliver).length +
+    final deliverable = farm.orders.where(farm.canDeliver).length + farm.festReadyCount +
         farm.daily.where((o) => o.waitUntil >= 0 && o.need.entries.every((e) => farm.countOf(e.key) >= e.value)).length;
     final tut = farm.tutStep;
     Widget btn(String icon, String label, VoidCallback onTap, {int badge = 0, bool hint = false}) => Expanded(
