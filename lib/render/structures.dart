@@ -51,7 +51,8 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
     case BKind.deco:
       if (o.type == 'cho') {
         if (!sprite('cho')) _kennel(c, foot);
-        _dog(c, foot + const Offset(-9, 7), t, o.end > farm.now(), o.id);
+        // in front of the kennel (its front corner is foot + (0, 16)), on the ground
+        _dog(c, foot + const Offset(-6, 15.5), t, o.end > farm.now(), o.id);
       } else if (!sprite(o.type)) {
         _deco(c, iso, o.type, x, y, foot, t, o.id);
       }
@@ -232,7 +233,7 @@ void _penAnimals(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a, double t) {
     final hungry = o.end == 0;
     final fedAgo = hungry ? 1e9 : (farm.now() - o.start) / 1000;
     // draw back to front so nearer animals overlap farther ones
-    final beats = [for (var i = 0; i < n; i++) _beat(iso, o, i, t, hungry)]..sort((p, q) => p.pos.dy.compareTo(q.pos.dy));
+    final beats = [for (var i = 0; i < n; i++) _beat(iso, o, i, n, t, hungry)]..sort((p, q) => p.pos.dy.compareTo(q.pos.dy));
     for (final b in beats) {
       _drawAnimalBeat(c, a.id, b, t, hungry && b.i == beats.first.i);
       if (fedAgo < 4) _heart(c, b, fedAgo);
@@ -785,7 +786,7 @@ double _rnd(int a, int b) {
   return v - v.floorToDouble();
 }
 
-_Beat _beat(Iso iso, Obj o, int i, double t, bool hungry) {
+_Beat _beat(Iso iso, Obj o, int i, int n, double t, bool hungry) {
   final x = o.x.toDouble(), y = o.y.toDouble();
   final seed = o.id * 37 + i * 101;
   final walkDur = hungry ? 3.6 : 2.4 + _rnd(seed, 1) * .8;
@@ -794,7 +795,21 @@ _Beat _beat(Iso iso, Obj o, int i, double t, bool hungry) {
   final lt = t + _rnd(seed, 3) * cycle + 1000; // stagger the animals
   final m = (lt / cycle).floor();
   final u = lt - m * cycle;
-  Offset spot(int k) => iso.p(x + .35 + _rnd(seed, k * 2 + 11) * 1.35, y + .9 + _rnd(seed, k * 2 + 12) * .9);
+  // Each animal keeps to its own patch of the open middle of the pen
+  // (shed and trough stand at the back): patches sit side by side across
+  // the screen, in one row (two for big flocks), so they don't pile up.
+  // Worked in a = u - v (screen across) and b = u + v (screen depth).
+  final rows = n <= 3 ? 1 : 2;
+  final cols = (n / rows).ceil();
+  final col = i % cols, row = i ~/ cols;
+  const lo = .3, hi = 1.78; // inside the fence
+  const b0 = 1.65, b1 = 2.75; // middle band: clear of the shed behind and of a pen right in front
+  Offset spot(int k) {
+    final bb = b0 + (row + .15 + _rnd(seed, k * 2 + 12) * .7) * (b1 - b0) / rows;
+    final aMin = math.max(2 * lo - bb, bb - 2 * hi), aMax = math.min(2 * hi - bb, bb - 2 * lo);
+    final aa = aMin + (col + .15 + _rnd(seed, k * 2 + 11) * .7) * (aMax - aMin) / cols;
+    return iso.p(x + (bb + aa) / 2, y + (bb - aa) / 2);
+  }
   final from = spot(m - 1), to = spot(m);
   final dx = to.dx - from.dx;
   final flip = dx.abs() > 1 ? dx > 0 : _rnd(seed, m) > .5;
