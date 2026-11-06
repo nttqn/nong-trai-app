@@ -68,6 +68,11 @@ class _BootState extends State<_Boot> {
           if (q['yard'] == 'dry') f.yardDry = FarmSeason.yardNeedMs;
           if (q['yard'] == 'empty') f.yard.clear();
           if (q['fest'] != null) demoFestivalDecos(f);
+          if (q['memcard'] != null) {
+            f.tickOrders();
+            f.mem[q['memcard']!] = 1;
+            f.memFresh.add(q['memcard']!);
+          }
           if (q['hungry'] != null) {
             for (final o in f.objs) {
               if (o.def.kind == BKind.pen || o.type == 'cho') o.start = o.end = 0;

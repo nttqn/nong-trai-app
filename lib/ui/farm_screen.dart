@@ -21,6 +21,8 @@ import '../services/leaderboard.dart';
 import '../services/notify.dart';
 import '../services/save.dart';
 import '../services/sound.dart';
+import '../core/memories.dart';
+import 'album_sheet.dart';
 import 'calendar_sheet.dart';
 import 'cloud_tile.dart';
 import 'extras.dart';
@@ -104,6 +106,7 @@ class _FarmScreenState extends State<FarmScreen>
     _hud = Timer.periodic(const Duration(seconds: 1), (_) {
       farm.tickOrders();
       _festivalNotice();
+      _memoryCard();
       if (mounted) setState(() {});
     });
   }
@@ -978,6 +981,11 @@ class _FarmScreenState extends State<FarmScreen>
           Expanded(child: Align(alignment: Alignment.centerLeft, child: q == null ? const SizedBox.shrink() : _questChip(q))),
           const SizedBox(width: 6),
           GestureDetector(
+            onTap: _openAlbum,
+            child: _badged(_chip(const Text('📖', style: TextStyle(fontSize: 19))), farm.memNewCount),
+          ),
+          const SizedBox(width: 6),
+          GestureDetector(
             onTap: _openLeaderboard,
             child: _chip(const Text('🏆', style: TextStyle(fontSize: 19))),
           ),
@@ -1027,6 +1035,29 @@ class _FarmScreenState extends State<FarmScreen>
     if (f == null || f.key == _festSaid || farm.tutStep != null) return;
     _festSaid = f.key;
     _say('${f.def.icon} ${f.def.name} đã đến! Mở lịch 📅 để xem đơn hàng lễ hội');
+  }
+
+  // a memory opened while playing: show its card once nothing else is up
+  bool _memShowing = false;
+  void _memoryCard() {
+    if (_memShowing || farm.memFresh.isEmpty || _levelUps.isNotEmpty || farm.tutStep != null) return;
+    if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
+    final m = memoryById(farm.memFresh.removeAt(0));
+    if (m == null) return;
+    _memShowing = true;
+    SoundService.instance.play('quest');
+    showMemory(context, farm, m, _report, fresh: true).whenComplete(() {
+      _memShowing = false;
+      if (mounted) setState(() {});
+    });
+  }
+
+  void _openAlbum() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => AlbumSheet(farm, _report), height: .86).then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   void _openCalendar() {

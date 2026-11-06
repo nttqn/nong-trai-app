@@ -86,6 +86,16 @@ void main(List<String> args) {
       print('!! $name: cannot decode');
       continue;
     }
+    // memory paintings (batch 10): whole pictures, kept with their
+    // background, as jpg in assets/memories/<id>.jpg
+    if (key.startsWith('ky_uc_')) {
+      var pic = decoded.convert(numChannels: 3, format: img.Format.uint8);
+      if (pic.width > 900) pic = img.copyResize(pic, width: 900, interpolation: img.Interpolation.cubic);
+      final dir = Directory('assets/memories')..createSync(recursive: true);
+      File('${dir.path}/${key.substring(6)}.jpg').writeAsBytesSync(img.encodeJpg(pic, quality: 84));
+      print('ok $key  ${pic.width}x${pic.height}  tranh ký ức');
+      continue;
+    }
     var im = decoded.convert(numChannels: 4, format: img.Format.uint8);
     final hadAlpha = _transparentShare(im) > .03;
     if (!hadAlpha) _removeBackground(im);

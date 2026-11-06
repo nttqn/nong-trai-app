@@ -224,4 +224,34 @@ extension FarmSeason on Farm {
     final r = nextRainAt;
     return r != null && yardReadyAt == null && r - now() <= 30 * 60 * 1000;
   }
+
+  // ------------------------------------------------------------ ký ức làng quê
+  int get memNewCount => mem.values.where((v) => v == 1).length;
+
+  /// Open the memories whose milestone is reached. Those already reached
+  /// when the game starts open quietly (no card for each one at once).
+  void checkMemories() {
+    var changed = false;
+    for (final m in memories) {
+      if (mem.containsKey(m.id) || !m.done(this)) continue;
+      mem[m.id] = 1;
+      changed = true;
+      if (_memInit) memFresh.add(m.id);
+    }
+    _memInit = true;
+    if (changed) _changed();
+  }
+
+  /// Read a memory for the first time: its gift.
+  String? readMemory(String id) {
+    final m = memoryById(id);
+    if (m == null || mem[id] != 1) return null;
+    mem[id] = 2;
+    coins += m.coins;
+    _stat('memory');
+    _snd('coin');
+    _ev('memory_read', {'id': id, 'level': level});
+    _changed();
+    return null;
+  }
 }

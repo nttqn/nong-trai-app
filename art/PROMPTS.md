@@ -283,3 +283,41 @@ Thiếu ảnh nào thì game vẫn vẽ tạm bằng code, nhưng bản vẽ cod
 | `chau_sen` | A big blue-and-white glazed ceramic pot with lotus leaves and two pink lotus flowers growing out of it, standing directly on the ground: no base tile, no platform. |
 | `den_ong_sao` | A Vietnamese Mid-Autumn star lantern (đèn ông sao): a big red five-pointed star lantern made of cellophane on a bamboo frame with yellow tassels, mounted on a bamboo pole stuck in the ground: no base tile, no platform. |
 | `coi_gia` | A traditional stone rice mortar (cối giã gạo) with a long wooden pestle leaning in it, a little white rice in the mortar, a small woven tray (nia) beside it, standing directly on the ground: no base tile, no platform. |
+
+## Đợt 10 — tranh "Ký ức làng quê" (album 📖)
+
+Mỗi ký ức là **một bức tranh cảnh đầy đủ**: có nền, có trời, **khung ngang tỉ lệ 4:3**. Khác các đợt trước, ở đây **không cần nền trong suốt** và công cụ của mình sẽ giữ nguyên nền. Tên file có tiền tố `ky_uc_`. Hai lá thư `thu_con` và `thu_chau` không cần tranh.
+
+Chưa có tranh thì album hiện ô màu nâu ấm với biểu tượng, vẫn đọc được bình thường.
+
+### PHONG CÁCH TRANH KÝ ỨC (dán vào mọi lời nhắc của đợt này)
+
+```
+A warm nostalgic illustration in the same cute colorful cel-shaded style as the attached farm game art, but as a full scene with background and sky, landscape 4:3 framing, soft golden afternoon light, gentle painterly textures, rural northern Vietnam village in the 1990s, simple friendly characters with no detailed faces, cozy and heartfelt mood, no text, no letters, no watermark, no border.
+```
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `ky_uc_mua_dau` | A farmer in a conical hat holding up the first bundle of golden rice at harvest, sparrows over the paddy bank, rice field stretching to a bamboo hedge. |
+| `ky_uc_don_dau` | An old grandmother chewing betel at a village gate smiling and handing coins to a young farmer who gives her a basket of fresh vegetables. |
+| `ky_uc_ga_gay` | Dawn in the village: a red rooster crowing on top of a straw stack, morning cooking smoke rising from tiled roofs, pink sky. |
+| `ky_uc_com_gao_moi` | A family meal on a bamboo mat: a steaming pot of white new rice, bowls, chopsticks, a mother scooping rice for a child, warm kitchen light. |
+| `ky_uc_nha_ngoi` | Neighbours helping lay red clay roof tiles on a small village house, a father sitting on the porch smoking a bamboo water pipe, admiring the new roof. |
+| `ky_uc_ao_ca` | Children sitting on a wooden plank jetty over a small pond behind a house, fishing with bamboo rods, bamboo shadows on the green water, summer noon. |
+| `ky_uc_gieng_lang` | Women at a round brick village well in the early morning, drawing water with buckets and carrying it on shoulder poles, chatting. |
+| `ky_uc_con_trau` | A little boy sitting on a water buffalo's back playing a bamboo flute in a green field at sunset, kites in the sky. |
+| `ky_uc_phoi_thoc` | A family raking golden rice grain on a red brick drying yard in bright sun, dark rain clouds appearing at the edge of the sky, someone running with a blue tarp. |
+| `ky_uc_cho_vang` | A yellow village dog wagging its tail running to greet someone arriving on an old bicycle at the end of a dirt lane. |
+| `ky_uc_cong_lang` | An old moss-covered village gate with a curved tiled roof at dusk, elderly people sitting under a big tree beside it waiting, a dirt road leading in. |
+| `ky_uc_hang_xom` | Neighbours harvesting rice together in a field for a sick family, sickles and rice bundles, everyone helping, warm community feeling. |
+| `ky_uc_cho_phien` | A busy early-morning rural market: baskets of vegetables, bunches of bananas, trays of rice cakes, women in conical hats, a child holding a sweet. |
+| `ky_uc_banh_chung` | Night before Tết: a family gathered around a big pot of bánh chưng boiling over a wood fire in the yard, children sleeping against their parents, glowing embers. |
+| `ky_uc_tet_sum_vay` | The first morning of Tết: a family in new clothes in front of the ancestral altar with peach blossoms and a five-fruit tray, children holding red lucky envelopes. |
+| `ky_uc_trung_thu` | Mid-Autumn night: children parading through a village lane with red star lanterns and a little drum, a full moon, a table with pomelo and mooncakes. |
+| `ky_uc_com_moi` | A mother offering a bowl of new-harvest rice and green young rice flakes (cốm) on the family altar, autumn light through the window. |
+| `ky_uc_truong_lang` | A small yellow village kindergarten with children reciting in class, grandmothers watching proudly through the gate. |
+| `ky_uc_con_chau_ve` | A young couple with a small child arriving at the old parents' house with bags, grandparents welcoming them at the gate, a new house being built beside. |
+| `ky_uc_hoi_dinh` | A spring festival at the village communal house (đình): young people on a tall bamboo swing, tug of war, elders on mats watching, red flags and drums. |
+| `ky_uc_biet_thu` | A beautiful village garden house at sunset, with an old rice drying yard and an areca palm by the gate still kept the same as before. |
+| `ky_uc_lao_nong` | Close view of an old farmer's weathered hands holding ripe rice ears, behind him the golden field and a calm sky, peaceful and proud. |
+| `ky_uc_nong_thon_moi` | A modern Vietnamese countryside village at dusk: concrete lanes with street lights, a new school and clinic, but still bamboo hedges, rice fields and children flying kites. |

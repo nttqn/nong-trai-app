@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'achievements.dart';
 import 'calendar.dart';
 import 'defs.dart';
+import 'memories.dart';
 import 'quests.dart';
 import 'weather.dart';
 
@@ -115,6 +116,11 @@ class Farm {
   final Map<String, int> yard = {};
   int yardDry = 0, yardT = 0, yardWet = -1, yardLost = 0;
   bool yardCover = false;
+  /// Ký ức làng quê: 1 = opened, not read yet; 2 = read (gift taken).
+  final Map<String, int> mem = {};
+  /// Memories opened while playing, for the "ký ức mới" card (not saved).
+  final List<String> memFresh = [];
+  bool _memInit = false;
   /// Tutorial step (new farms start at 0; [tutDone] when finished).
   int tut = tutDone;
   int rev = 0; // bumps on every change (render caches, autosave)
@@ -1172,6 +1178,7 @@ class Farm {
     rollDaily();
     rollFestival();
     settleYard();
+    checkMemories();
     final t = now();
     final rng = math.Random(seed * 31 + nextId + t ~/ 1000);
     var changed = false;
@@ -1263,6 +1270,7 @@ class Farm {
         if (tut != tutDone) 'tut': tut,
         if (festKey.isNotEmpty) 'fest': {'k': festKey, 'o': [for (final o in fest) o.toJson()]},
         if (giftDeco.isNotEmpty) 'gift': giftDeco,
+        if (mem.isNotEmpty) 'mem': mem,
         if (yard.isNotEmpty)
           'yard': {'g': yard, 'd': yardDry, 't': yardT, 'w': yardWet, 'l': yardLost, 'c': yardCover},
       };
@@ -1323,6 +1331,7 @@ class Farm {
         f.fest.addAll([for (final o in (fe['o'] as List? ?? const [])) Order.fromJson(Map<String, dynamic>.from(o))]);
       }
       f.giftDeco.addAll(Map<String, int>.from(j['gift'] ?? const {}));
+      f.mem.addAll(Map<String, int>.from(j['mem'] ?? const {}));
       final y = j['yard'] as Map?;
       if (y != null) {
         f.yard.addAll(Map<String, int>.from(y['g'] ?? const {}));
