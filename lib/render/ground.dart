@@ -8,6 +8,7 @@ import '../core/defs.dart';
 import '../core/farm.dart';
 import 'iso.dart';
 import 'plants.dart';
+import 'sprites.dart';
 
 double hash2(int x, int y, [int s = 0]) {
   var h = x * 374761393 + y * 668265263 + s * 2147483647;
@@ -61,6 +62,15 @@ void drawGround(Canvas c, Iso iso, Farm farm) {
         }
       } else {
         final zone = groundZone(x, y);
+        // Painted ground tiles (art batch 8) when there are some.
+        final tex = groundTexture(zone, x, y);
+        if (tex != null && Sprites.tile(c, tex, d)) {
+          if (Sprites.has('co_hoa') && hash2(x, y, 3) < .07) {
+            Sprites.at(c, 'co_hoa', iso.p(x + .3 + hash2(x, y, 4) * .4, y + .3 + hash2(x, y, 5) * .4), 26,
+                flipX: hash2(x, y, 6) < .5);
+          }
+          continue;
+        }
         fillPoly(c, d, switch (zone) {
           Zone.flats => hash2(x, y) < .5 ? const Color(0xFFB9C86C) : const Color(0xFFB0C264),
           Zone.tea => hash2(x, y) < .5 ? const Color(0xFF6FAE45) : const Color(0xFF68A740),
@@ -147,23 +157,73 @@ void drawGround(Canvas c, Iso iso, Farm farm) {
       if (Farm.isLake(x, y)) _lakeTile(c, iso, x, y, diamond(iso, x.toDouble(), y.toDouble(), 1, 1));
     }
   }
-  for (var x = 0; x < mapSize; x++) {
-    for (var y = 0; y < mapSize; y++) {
-      if (Farm.isLake(x, y)) _lakeDeco(c, iso, x, y);
+  // A painted lake (ho_sen) lies over the water tiles as one picture: its
+  // bottom on the ellipse's front-most point, as wide as the ellipse on
+  // screen. Otherwise lotus and reeds tile by tile.
+  if (!_paintedLake(c, iso)) {
+    for (var x = 0; x < mapSize; x++) {
+      for (var y = 0; y < mapSize; y++) {
+        if (Farm.isLake(x, y)) _lakeDeco(c, iso, x, y);
+      }
     }
   }
   // bamboo hedge (lũy tre) beyond the river and along the far-left edge
   for (var x = -5; x < mapSize + 5; x += 1) {
     if (x == 11 || x == 10 || x == 12) continue;
-    if (hash2(x, 99) < .75) drawBamboo(c, iso.p(x + .5, -2.5), 0.8 + hash2(x, 98) * .5, seed: x);
+    if (hash2(x, 99) < .75) _hedge(c, iso.p(x + .5, -2.5), 0.8 + hash2(x, 98) * .5, x);
   }
   for (var y = 3; y < mapSize + 5; y += 1) {
-    if (hash2(-3, y) < .6) drawBamboo(c, iso.p(-1.6, y + .5), 0.7 + hash2(y, 97) * .5, seed: y + 50);
+    if (hash2(-3, y) < .6) _hedge(c, iso.p(-1.6, y + .5), 0.7 + hash2(y, 97) * .5, y + 50);
   }
+  // Village trees in the distance (cay_xa_1..3), once there is art for them:
+  // behind the hedge on the left and across the far fields at the front.
+  final far = [for (final k in const ['cay_xa_1', 'cay_xa_2', 'cay_xa_3']) if (Sprites.has(k)) k];
+  if (far.isNotEmpty) {
+    for (var y = 2; y < mapSize + 5; y += 2) {
+      if (hash2(-5, y) < .55) {
+        Sprites.at(c, far[(hash2(y, 71) * far.length).floor() % far.length], iso.p(-4.2 + hash2(y, 72), y + .5),
+            70 + hash2(y, 73) * 30, flipX: hash2(y, 74) < .5);
+      }
+    }
+    for (var x = -4; x < mapSize + 4; x += 2) {
+      if (x >= 10 && x <= 12) continue;
+      if (hash2(x, 75) < .45) {
+        Sprites.at(c, far[(hash2(x, 76) * far.length).floor() % far.length], iso.p(x + .5, mapSize + 4.2 + hash2(x, 77)),
+            70 + hash2(x, 78) * 30, flipX: hash2(x, 79) < .5);
+      }
+    }
+  }
+}
+
+/// One clump of the bamboo hedge: the `tre` art when there is some.
+void _hedge(Canvas c, Offset foot, double s, int seed) {
+  if (Sprites.at(c, 'tre', foot, 46 * s, flipX: seed.isOdd)) return;
+  drawBamboo(c, foot, s, seed: seed);
+}
+
+/// The whole lotus lake as one picture (ho_sen); false when there is none.
+bool _paintedLake(Canvas c, Iso iso) {
+  if (!Sprites.has('ho_sen')) return false;
+  // Ellipse centre (29.5, 29.5), radii 3.3 x 2.6 tiles (Farm.isLake).
+  const rx = 3.3, ry = 2.6;
+  final reach = math.sqrt(rx * rx + ry * ry);
+  final front = iso.p(29.5 + rx * rx / reach, 29.5 + ry * ry / reach);
+  return Sprites.at(c, 'ho_sen', front + const Offset(0, 3), 2 * reach * Iso.hw);
 }
 
 /// Ground looks of the outer ring (purely visual; all of it is farmland).
 enum Zone { plain, flats, tea }
+
+/// The painted tile for a grass square: one of dat_co_1..3 (varied by
+/// position), dat_bai_boi on the river flats, dat_che on the tea hill; null
+/// when no grass art has been added yet.
+String? groundTexture(Zone zone, int x, int y) {
+  if (zone == Zone.flats && Sprites.has('dat_bai_boi')) return 'dat_bai_boi';
+  if (zone == Zone.tea && Sprites.has('dat_che')) return 'dat_che';
+  final grass = [for (final k in const ['dat_co_1', 'dat_co_2', 'dat_co_3']) if (Sprites.has(k)) k];
+  if (grass.isEmpty) return null;
+  return grass[(hash2(x, y, 11) * grass.length).floor().clamp(0, grass.length - 1)];
+}
 
 Zone groundZone(int x, int y) {
   if (x >= legacyMapSize && y < 12) return Zone.flats; // bãi bồi by the river
@@ -193,6 +253,7 @@ void _lakeDeco(Canvas c, Iso iso, int x, int y) {
   if (shore && hash2(x, y, 25) < .7) {
     // reeds at the edge
     final at = iso.p(x + .5, y + .5);
+    if (Sprites.at(c, 'lau', at + const Offset(0, 3), 30, flipX: hash2(x, y, 26) < .5)) return;
     for (var k = 0; k < 5; k++) {
       final dx = (k - 2) * 2.4 + hash2(x, y, 30 + k) * 1.5;
       line(c, at + Offset(dx, 2), at + Offset(dx * 1.3, -9 - hash2(x, y, 40 + k) * 6), const Color(0xFF5E8F2F), 1.4);
@@ -202,6 +263,9 @@ void _lakeDeco(Canvas c, Iso iso, int x, int y) {
   for (var k = 0; k < 2; k++) {
     if (hash2(x, y, 21 + k * 7) > .6) continue;
     final at = iso.p(x + .2 + hash2(x, y, 22 + k * 7) * .6, y + .2 + hash2(x, y, 23 + k * 7) * .6);
+    // Lotus art: sen_1 has a flower, sen_2 only leaves.
+    final lotus = hash2(x, y, 24 + k * 7) < .45 ? 'sen_1' : 'sen_2';
+    if (Sprites.at(c, lotus, at + const Offset(0, 4), 26, flipX: hash2(x, y, 28 + k) < .5)) continue;
     oval(c, at + const Offset(0, 1), 9, 4.6, const Color(0x33103040));
     oval(c, at, 9, 4.6, const Color(0xFF4E9A3A));
     oval(c, at - const Offset(.8, .8), 7.4, 3.4, const Color(0xFF6DB84E));
@@ -218,6 +282,9 @@ void _lakeDeco(Canvas c, Iso iso, int x, int y) {
 }
 
 void _bridge(Canvas c, Iso iso, bool concreteRoad) {
+  // Bridge art spans the river along the road: x 11, y -1 to 2.
+  if (concreteRoad && Sprites.foot(c, iso, 'cau_be_tong', 11, -1, 1, 3)) return;
+  if (Sprites.foot(c, iso, 'cau_go', 11, -1, 1, 3)) return;
   final deck = concreteRoad ? const Color(0xFFB4B8B5) : const Color(0xFF9B6B3D);
   final side = concreteRoad ? const Color(0xFF8E9390) : const Color(0xFF7A522C);
   box(c, iso, 11, -1, 1, 3, 4, 8, deck, side, shade(side, -.1));

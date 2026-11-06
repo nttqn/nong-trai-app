@@ -131,6 +131,32 @@ class Sprites {
     return true;
   }
 
+  /// Fills the ground diamond [d] (four corners: back, right, front, left)
+  /// with the tile image [key], clipped to the diamond and drawn a hair
+  /// larger so neighbouring tiles leave no seams. False when missing.
+  static bool tile(Canvas c, String key, List<Offset> d) {
+    final img = _img[key];
+    if (img == null) return false;
+    final xs = [for (final p in d) p.dx], ys = [for (final p in d) p.dy];
+    xs.sort();
+    ys.sort();
+    final r = Rect.fromLTRB(xs.first, ys.first, xs.last, ys.last).inflate(.6);
+    c.save();
+    c.clipPath(_grown(d), doAntiAlias: false);
+    c.drawImageRect(img, Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()), r, _paint);
+    c.restore();
+    return true;
+  }
+
+  /// [d] pushed out by half a pixel so clipped tiles meet without gaps.
+  static Path _grown(List<Offset> d) {
+    final cx = (d[1].dx + d[3].dx) / 2, cy = (d[0].dy + d[2].dy) / 2;
+    return Path()
+      ..addPolygon([
+        for (final p in d) Offset(p.dx + (p.dx - cx).sign * .6, p.dy + (p.dy - cy).sign * .6),
+      ], true);
+  }
+
   /// Draws [key] with its bottom-centre at [bottom], [width] wide.
   static bool at(Canvas c, String key, Offset bottom, double width, {bool flipX = false}) {
     final img = _img[key];

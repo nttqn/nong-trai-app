@@ -41,6 +41,9 @@ class ViewState {
 class GroundCache {
   ui.Picture? pic;
   int rev = -1;
+
+  /// Sprites loaded when it was recorded.
+  int sprites = -1;
 }
 
 double objHeight(Obj o) => switch (o.def.kind) {
@@ -157,12 +160,15 @@ class FarmPainter extends CustomPainter {
     final t = clock.value;
     final iso = worldIso;
     c.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF9FCB63));
-    if (cache.rev != farm.rev || cache.pic == null) {
+    // Recorded again when the farm changes, or when sprites finish loading
+    // after the first frame (the ground uses some).
+    if (cache.rev != farm.rev || cache.pic == null || cache.sprites != Sprites.count) {
       final rec = ui.PictureRecorder();
       drawGround(Canvas(rec), iso, farm);
       cache.pic?.dispose();
       cache.pic = rec.endRecording();
       cache.rev = farm.rev;
+      cache.sprites = Sprites.count;
     }
     c.drawPicture(cache.pic!);
     drawWaterAnim(c, iso, t);

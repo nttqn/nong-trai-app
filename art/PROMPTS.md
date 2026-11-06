@@ -239,3 +239,27 @@ Cute colorful casual mobile farm game item icon, slight 3/4 front view from a li
 | `item_com` | Green young rice flakes (cốm làng Vòng) wrapped in a lotus leaf, opened to show the bright green flakes. |
 | `item_banhdauxanh` | A few small yellow square mung bean cakes (bánh đậu xanh) in a little paper box. |
 | `item_banhcom` | A square green bánh cốm cake wrapped half-open in paper, showing the green outside and yellow mung-bean filling. |
+
+## Đợt 8 — mặt đất, hồ sen, cầu, cây làng xa (không bắt buộc, làm dần)
+
+Thiếu ảnh nào thì game vẫn vẽ phần đó bằng code. Hàng tre quanh bản đồ đã tự dùng ảnh `tre` có sẵn.
+
+> **Ô đất (`dat_*`)**: mỗi ảnh là **một ô hình thoi**, bề mặt phẳng, phủ kín cả hình thoi. Ô sẽ được lát cạnh nhau hàng nghìn lần, nên **không viền, không bóng, không vật nổi**, màu đều từ mép này sang mép kia. Nên làm `dat_co_1` trước, gửi mình thử lát trên bản đồ; ưng rồi mới làm các ô khác.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `dat_co_1` | One flat isometric 2:1 diamond ground tile completely filled with short lush green grass texture, even color right up to all four edges so it tiles seamlessly with copies of itself, a few tiny grass blades only. No outline, no border, no shadow, no objects, no soil edge or side faces: just the flat top surface, transparent outside the diamond. |
+| `dat_co_2` | Same as `dat_co_1` (attach it as reference), same green and brightness, with a few tiny clover leaves scattered on the grass. Must tile seamlessly next to `dat_co_1`. |
+| `dat_co_3` | Same as `dat_co_1` (attach it as reference), same green and brightness, with a very small patch of slightly lighter grass. Must tile seamlessly next to `dat_co_1`. |
+| `dat_bai_boi` | Same flat diamond tile format as `dat_co_1` (attach it): pale yellow-green river-silt meadow, short sparse grass on light sandy soil, faint ripples. Seamless edges. |
+| `dat_che` | Same flat diamond tile format as `dat_co_1` (attach it): a tea hillside seen from above, two neat rows of rounded dark-green tea bushes running across the diamond, soil between rows. Seamless edges. |
+| `co_hoa` | A tiny clump of wild grass with two or three small white and yellow wildflowers, standing directly on the ground: no base tile, no platform. Very small, simple. |
+| `ho_sen` | A large oval lotus pond seen in isometric 2:1 view from above (the oval is about 1.3 times wider than tall on screen), calm blue-green water, a narrow natural muddy-grass bank all around, many round lotus leaves and pink lotus flowers floating in clusters, a few reeds at the edges, maybe one small wooden plank jetty on the lower-left side. Flat ground-level object, transparent outside the pond bank. |
+| `sen_1` | A small floating cluster of 3 round green lotus leaves with one pink lotus flower standing up from the water, seen from isometric view, no water around it (transparent). |
+| `sen_2` | A small floating cluster of 2-3 round green lotus leaves only, no flower, seen from isometric view, no water around it (transparent). |
+| `lau` | A clump of tall reeds and cattails growing at a pond's edge, standing directly on the ground: no base tile, no water around it. |
+| `cau_go` | A rustic wooden plank bridge over a river, seen in isometric view, running from the upper-right down to the lower-left (3 tiles long, 1 tile wide), wooden railings on both sides, sturdy posts going down into the water. Bridge only: no river, no banks, transparent around it. |
+| `cau_be_tong` | Same shape and direction as `cau_go` (attach it as reference) but a modern grey concrete village bridge with low concrete railings painted white and blue. Bridge only, transparent around it. |
+| `cay_xa_1` | A big old Vietnamese banyan tree (cây đa) with a wide dense canopy and aerial roots, standing directly on the ground: no base tile, no platform. |
+| `cay_xa_2` | A tall Vietnamese kapok tree (cây gạo) with bright red flowers on mostly bare branches, standing directly on the ground: no base tile, no platform. |
+| `cay_xa_3` | A small group of 3 slender areca palm trees (cây cau) of different heights, standing directly on the ground: no base tile, no platform. |
