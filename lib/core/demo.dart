@@ -145,7 +145,7 @@ Farm demoFarm(int stage, {int house = -1}) {
   }
   // the drying yard, half-dried grain on it
   for (var i = 0; i < mapSize * mapSize && f.dryingYard == null; i++) {
-    final x = 8 + i % 10, y = 3 + i ~/ 10;
+    final x = 13 + i % 8, y = 10 + i ~/ 8;
     if (f.canPlace('san_phoi', x, y)) f.build('san_phoi', x, y);
   }
   if (f.dryingYard != null) {

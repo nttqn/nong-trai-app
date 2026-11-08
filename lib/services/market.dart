@@ -28,6 +28,18 @@ class Market {
 
   String _docId(String uid, int slot) => '${uid}_$slot';
 
+  /// Account deletion: take down every stall of [uid] (goods are not
+  /// returned; the farm on the phone keeps what it has).
+  Future<void> removeAll(String uid) async {
+    for (var slot = 0; slot < 10; slot++) {
+      try {
+        await _col.doc(_docId(uid, slot)).delete().timeout(_t);
+      } catch (_) {
+        // no stall in that slot
+      }
+    }
+  }
+
   /// Puts [qty] [id] on a free stall for [price] xu. Null when done.
   Future<String?> list(Farm f, String id, int qty, int price, String myName) async {
     final uid = _nb.myUid;

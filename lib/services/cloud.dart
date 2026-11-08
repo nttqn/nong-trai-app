@@ -13,6 +13,7 @@ import '../core/farm.dart';
 import '../core/sync_plan.dart';
 import 'analytics.dart';
 import 'leaderboard.dart';
+import 'market.dart';
 import 'neighbors.dart';
 
 /// The account's copy of the farm, as read from Firestore.
@@ -328,6 +329,7 @@ class CloudSave extends ChangeNotifier {
     try {
       await Leaderboard.instance.withdraw();
       await Neighbors.instance.withdraw();
+      await Market.instance.removeAll(u.uid);
       await _doc.delete();
       try {
         await u.delete();

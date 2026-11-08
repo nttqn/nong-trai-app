@@ -77,6 +77,13 @@ class Neighbors extends ChangeNotifier {
     try {
       await _villages.doc(uid).delete();
     } catch (_) {}
+    // visits other players left on this farm (help, steal, caught)
+    try {
+      final ev = await FirebaseFirestore.instance.collection('visits').doc(uid).collection('events').get();
+      for (final d in ev.docs) {
+        await d.reference.delete();
+      }
+    } catch (_) {}
   }
 
   // ------------------------------------------------------------ browse

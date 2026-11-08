@@ -68,6 +68,26 @@ class _FarmScreenState extends State<FarmScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // store screenshots on web: ?sheet=calendar|album|orders|shop|storage|map
+    final demoSheet = kIsWeb ? Uri.base.queryParameters['sheet'] : null;
+    if (demoSheet != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        farm.tickOrders(); // memories, festival orders
+        switch (demoSheet) {
+          case 'calendar':
+            _openCalendar();
+          case 'album':
+            _openAlbum();
+          case 'orders':
+            _openOrders();
+          case 'storage':
+            _openStorage();
+          case 'map':
+            _openMap();
+        }
+      });
+    }
     farm.onLevelUp = (l) {
       _levelUps.add(l);
       Analytics.instance.levelUp(l);
@@ -1033,6 +1053,7 @@ class _FarmScreenState extends State<FarmScreen>
   void _festivalNotice() {
     final f = farm.activeFestival;
     if (f == null || f.key == _festSaid || farm.tutStep != null) return;
+    if (kIsWeb && Uri.base.queryParameters['shot'] != null) return; // clean store screenshots
     _festSaid = f.key;
     _say('${f.def.icon} ${f.def.name} đã đến! Mở lịch 📅 để xem đơn hàng lễ hội');
   }
