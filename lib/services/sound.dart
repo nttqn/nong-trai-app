@@ -16,7 +16,7 @@ class SoundService {
   static const sfxFiles = [
     'tap', 'error', 'plant', 'harvest', 'pick', 'feed', 'sparkle', 'splash',
     'build', 'chop', 'remove', 'place', 'work', 'collect', 'coin', 'cash',
-    'quest', 'levelup', 'ga', 'vit', 'lon', 'bo', 'trau',
+    'quest', 'levelup', 'ga', 'vit', 'lon', 'bo', 'trau', 'de', 'ong',
   ];
   static const tracks = ['dong_que', 'chieu_que'];
 

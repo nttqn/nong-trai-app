@@ -368,3 +368,28 @@ const ad = (a, d) => (k) => Math.min(1, k / a) * Math.min(1, (1 - k) / d);
     [[(k) => 260 + 300 * Math.min(1, k * 2.5), 1], [750, 0.35]], { q: 2.5, breath: 0.15 });
   write('trau', lowpass(x, 1800), 0.75);
 }
+
+// Goat: a shaky "be-e-e", nasal, with a fast bleating tremolo.
+{
+  const x = buf(0.95);
+  const shake = (k) => 0.55 + 0.45 * Math.abs(Math.sin(k * 0.9 * Math.PI * 14));
+  voice(x, 0, 0.85, (k) => 330 + 50 * Math.sin(Math.PI * Math.min(1, k * 1.6)) - 60 * k + 18 * Math.sin(k * 90),
+    (k) => ad(0.06, 0.35)(k) * shake(k),
+    [[(k) => 700 + 250 * Math.min(1, k * 4), 1], [1900, 0.55], [2900, 0.25]], { q: 5, breath: 0.12 });
+  write('de', lowpass(x, 4200), 0.6);
+}
+
+// Bees: a soft buzzing swarm passing by.
+{
+  const dur = 1.3, x = buf(dur);
+  for (const [f, a, ph] of [[220, 1, 0], [233, 0.8, 1.3], [208, 0.7, 2.1], [440, 0.25, 0.5]]) {
+    let p = 0;
+    for (let i = 0; i < x.length; i++) {
+      const k = i / x.length;
+      p += (2 * Math.PI * (f + 6 * Math.sin(k * 23 + ph))) / RATE;
+      const env = Math.sin(Math.PI * k) * (0.7 + 0.3 * Math.sin(k * 41 + ph));
+      x[i] += saw(p) * a * env;
+    }
+  }
+  write('ong', bandpass(x, 900, 1.2), 0.45);
+}
