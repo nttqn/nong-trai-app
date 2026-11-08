@@ -60,6 +60,9 @@ Hỗ trợ: trungsmail@gmail.com
 ## Có gì mới (bản 1.0.0, ≤ 500 ký tự)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
 
+## What's new (1.0.0, en-US)
+First release: rice paddies, vegetable beds, pens, fish ponds, village crafts, New Countryside projects, neighbours and the village market. A real lunar calendar with crop seasons and 7 festivals, a rice-drying yard, and the Village Memories album.
+
 ## Thể loại
 Trò chơi → Mô phỏng (Simulation)
 
