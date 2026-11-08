@@ -190,3 +190,70 @@ class _TickingState extends State<Ticking> {
   @override
   Widget build(BuildContext context) => widget.builder(context);
 }
+
+/// Wraps a button: a tap does [onFire] once (the child's own onTap should
+/// call [HoldRepeatState.tap]), holding it repeats [onFire], faster and
+/// faster, until the finger lifts or [onFire] returns false.
+class HoldRepeat extends StatefulWidget {
+  final bool Function() onFire;
+  final Widget Function(VoidCallback tap) builder;
+  const HoldRepeat({super.key, required this.onFire, required this.builder});
+  @override
+  State<HoldRepeat> createState() => _HoldRepeatState();
+}
+
+class _HoldRepeatState extends State<HoldRepeat> {
+  Timer? _timer;
+  bool _repeated = false;
+  int _n = 0;
+  Offset _at = Offset.zero;
+
+  void _down(PointerDownEvent e) {
+    _at = e.position;
+    _repeated = false;
+    _n = 0;
+    _timer?.cancel();
+    _timer = Timer(const Duration(milliseconds: 380), _step);
+  }
+
+  void _step() {
+    if (!mounted) return;
+    _repeated = true;
+    if (!widget.onFire()) return _stop();
+    _n++;
+    // 220 ms at first, down to 45 ms after a dozen
+    final ms = (220 - _n * 15).clamp(45, 220);
+    _timer = Timer(Duration(milliseconds: ms), _step);
+  }
+
+  void _stop([Object? _]) {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void _tap() {
+    if (_repeated) return; // the hold already sold
+    widget.onFire();
+  }
+
+  @override
+  void dispose() {
+    _stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Listener(
+        onPointerDown: _down,
+        onPointerUp: _stop,
+        // the finger slid away (scrolling the list): stop selling
+        onPointerMove: (e) {
+          if ((e.position - _at).distance > 14) {
+            _stop();
+            _repeated = true; // and no tap on release either
+          }
+        },
+        onPointerCancel: _stop,
+        child: widget.builder(_tap),
+      );
+}

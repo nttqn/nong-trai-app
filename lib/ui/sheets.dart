@@ -147,7 +147,7 @@ class _StorageSheetState extends State<StorageSheet> {
       ),
       const Padding(
         padding: EdgeInsets.fromLTRB(16, 6, 16, 0),
-        child: Text('Bán cho lái buôn được giá gốc. Giao đơn hàng cho bà con lãi hơn nhiều!',
+        child: Text('Bán cho lái buôn được giá gốc. Giữ nút "Bán 1" để bán liên tục. Giao đơn hàng cho bà con lãi hơn nhiều!',
             style: TextStyle(fontSize: 12, color: brownLight)),
       ),
       Expanded(
@@ -194,7 +194,15 @@ class _StorageSheetState extends State<StorageSheet> {
             ]),
           ]),
         ),
-        PillButton('Bán 1', dense: true, color: gold, onTap: () => sell(1)),
+        // tap: sell one; hold: keep selling one at a time
+        HoldRepeat(
+          onFire: () {
+            if (f.countOf(id) < 1) return false;
+            sell(1);
+            return f.countOf(id) > 0;
+          },
+          builder: (tap) => PillButton('Bán 1', dense: true, color: gold, onTap: tap),
+        ),
         const SizedBox(width: 6),
         if (n > 1) PillButton('Bán hết', dense: true, color: const Color(0xFFE08A2E), onTap: () => sell(n)),
         if (f.level >= FarmMore.marketLevel)
