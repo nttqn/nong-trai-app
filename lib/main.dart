@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter/services.dart';
 
 import 'core/defs.dart';
@@ -68,6 +69,24 @@ class _BootState extends State<_Boot> {
           if (q['yard'] == 'dry') f.yardDry = FarmSeason.yardNeedMs;
           if (q['yard'] == 'empty') f.yard.clear();
           if (q['fest'] != null) demoFestivalDecos(f);
+          // promo video capture: everything runs ?slow= times slower (the
+          // recorder speeds the frames back up), so every frame is caught
+          final slow = double.tryParse(q['slow'] ?? '');
+          if (slow != null && slow > 1) {
+            timeDilation = slow;
+            final base = f.now();
+            final wall0 = DateTime.now().millisecondsSinceEpoch;
+            f.now = () => base + ((DateTime.now().millisecondsSinceEpoch - wall0) / slow).round();
+          }
+          // promo video: every field ripe, ready to swipe-harvest
+          if (q['ripe'] != null) {
+            for (final o in f.objs) {
+              if (o.crop != null && (o.def.kind == BKind.paddy || o.def.kind == BKind.bed)) {
+                o.end = f.now() - 1000;
+                o.start = o.end - 60000;
+              }
+            }
+          }
           if (q['memcard'] != null) {
             f.tickOrders();
             f.mem[q['memcard']!] = 1;

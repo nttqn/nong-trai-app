@@ -53,3 +53,11 @@ app.*.map.json
 *.keystore
 key.properties
 keystore-base64.txt
+
+# promo video work files (tool/promo)
+tool/promo/frames/
+tool/promo/clips/
+tool/promo/seg/
+tool/promo/out/
+tool/promo/voice/*.mp3
+store/video/*.mp4

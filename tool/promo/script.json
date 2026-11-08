@@ -1,0 +1,11 @@
+[
+  {"id": "s1", "scene": "clip:a_village", "say": "Về quê thôi! Mùa Lúa Chín, nông trại làng quê Việt Nam.", "sub": "Mùa Lúa Chín\nNông trại làng quê Việt"},
+  {"id": "s2", "scene": "clip:b_harvest", "at": 0.7, "say": "Lúa chín vàng đồng, vuốt nhẹ một đường là gặt cả cánh đồng.", "sub": "Vuốt một đường\nGặt cả cánh đồng"},
+  {"id": "s3", "scene": "clip:c_pens", "say": "Nuôi gà vịt, lợn, trâu bò, thả cá dưới ao.", "sub": "Gà vịt, lợn, trâu bò\nAo cá, vườn cây trái"},
+  {"id": "s4", "scene": "clips:d_yard,e_rain", "say": "Nắng lên đem thóc ra phơi, trời đổ mưa thì nhanh tay che bạt.", "sub": "Nắng lên phơi thóc\nMưa đến nhớ che bạt"},
+  {"id": "s5", "scene": "clip:f_tet", "say": "Lễ hội theo âm lịch thật: Tết Nguyên đán, Trung thu, Tết cơm mới.", "sub": "Lễ hội theo âm lịch\nTết · Trung thu · Tết cơm mới"},
+  {"id": "s6", "scene": "clip:g_calendar", "say": "Hai mươi tư tiết khí, cây hợp mùa lớn nhanh hơn.", "sub": "24 tiết khí\nCây hợp mùa lớn nhanh hơn"},
+  {"id": "s7", "scene": "clips:h_memory,i_album", "say": "Mỗi chặng đường lại để dành một ký ức làng quê.", "sub": "Album\nKý ức làng quê"},
+  {"id": "s8", "scene": "clip:j_map", "say": "Ghé thăm hàng xóm, cùng nhau xây làng nông thôn mới.", "sub": "Thăm hàng xóm\nXây làng nông thôn mới"},
+  {"id": "s9", "scene": "end", "say": "Tải Mùa Lúa Chín miễn phí trên Google Play nhé!", "sub": "Tải miễn phí trên Google Play"}
+]
