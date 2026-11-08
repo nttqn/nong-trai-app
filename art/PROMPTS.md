@@ -321,3 +321,31 @@ A warm nostalgic illustration in the same cute colorful cel-shaded style as the 
 | `ky_uc_biet_thu` | A beautiful village garden house at sunset, with an old rice drying yard and an areca palm by the gate still kept the same as before. |
 | `ky_uc_lao_nong` | Close view of an old farmer's weathered hands holding ripe rice ears, behind him the golden field and a calm sky, peaceful and proud. |
 | `ky_uc_nong_thon_moi` | A modern Vietnamese countryside village at dusk: concrete lanes with street lights, a new school and clinic, but still bamboo hedges, rice fields and children flying kites. |
+
+## Đợt 11 — các biểu tượng còn lại (cho đồng bộ với đợt 7)
+
+Làm y như đợt 7: dán một biểu tượng đã có (ví dụ `item_gaotam`) làm ảnh mẫu, rồi gõ `Same icon style, size and lighting as the attached image. ` + **PHONG CÁCH BIỂU TƯỢNG** + lời nhắc riêng. Nhớ làm cả **`item_cam`** của đợt 7 (còn thiếu).
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `item_thoc` | A small woven bamboo basket full of golden unhusked rice grains (paddy), a few rice stalks lying across it. |
+| `item_gao` | A small ceramic bowl heaped with clean white uncooked rice grains, a few grains spilled in front. |
+| `item_ngo` | Two ears of yellow corn, one with the green husk pulled back showing plump kernels. |
+| `item_khoai` | Two purple-skinned Vietnamese sweet potatoes, one cut showing yellow flesh. |
+| `item_lac` | A small pile of peanuts in their tan wrinkled shells, one cracked open showing red-skinned nuts. |
+| `item_ot` | A small bunch of bright red Vietnamese chili peppers with green stems. |
+| `item_dua` | A round dark-green striped watermelon with a triangular slice cut out showing red flesh and black seeds. |
+| `item_cuc` | A bunch of bright yellow chrysanthemum flowers (hoa cúc) with a few green leaves, tied with a red string. |
+| `item_dautuong` | A small burlap sack open at the top, full of round pale-yellow soybeans, a few spilled in front. |
+| `item_trung` | Three brown chicken eggs in a little nest of straw. |
+| `item_thit` | A piece of fresh pork belly with pink meat and white fat layers, on a banana leaf. |
+| `item_sua` | A glass bottle of fresh white cow milk with a blue cap, a little milk splash at the top. |
+| `item_matong` | A small clay pot of golden honey with a wooden honey dipper dripping honey. |
+| `item_tom` | Two big freshwater prawns (tôm càng) with long blue-grey claws, slightly curled. |
+| `item_chuoi` | A hand of ripe yellow bananas with a few brown speckles. |
+| `item_xoai` | A ripe golden-yellow Vietnamese mango with a green leaf on the stem. |
+| `item_dua_xiem` | A green young coconut with the top cut open and a bamboo straw sticking out. |
+| `item_nuocmia` | A tall glass of pale green sugarcane juice with ice and a slice of kumquat on the rim. |
+| `item_sinhto` | A tall glass of thick orange mango smoothie with a straw and a mango slice on the rim. |
+| `item_phomai` | A small round wheel of white goat cheese with one wedge cut out. |
+| `item_chekho` | A small paper packet of dark-green dried rolled tea leaves, a few leaves spilled in front. |
