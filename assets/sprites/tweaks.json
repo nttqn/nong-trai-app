@@ -52,5 +52,26 @@
   },
   "cay_hong_qua": {
     "scale": 1.3
+  },
+  "chau_sen": {
+    "scale": 0.5
+  },
+  "gio_qua": {
+    "scale": 0.55
+  },
+  "coi_gia": {
+    "scale": 0.5
+  },
+  "den_long": {
+    "scale": 0.7
+  },
+  "den_ong_sao": {
+    "scale": 0.55
+  },
+  "cay_neu": {
+    "scale": 0.5
+  },
+  "cay_du": {
+    "scale": 0.85
   }
 }
