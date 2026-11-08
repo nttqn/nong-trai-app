@@ -152,11 +152,12 @@ class ObjPanel extends StatelessWidget {
         _timer('${c.name} đang lớn'),
         const SizedBox(height: 8),
         Row(children: [
-          Text('Thu hoạch: ${c.yield} ${item(c.product).icon}',
-              style: const TextStyle(color: brownLight, fontSize: 12.5)),
+          Text('Thu hoạch: ${c.yield} ', style: const TextStyle(color: brownLight, fontSize: 12.5)),
+          ItemGlyph(c.product, size: 18),
           const Spacer(),
-          PillButton('Bón phân (${farm.countOf('phan')} 💩)',
+          PillButton('Bón phân (${farm.countOf('phan')})',
               dense: true,
+              leading: const ItemGlyph('phan', size: 18),
               color: const Color(0xFF8D6E4C),
               onTap: farm.countOf('phan') > 0 ? () => _do(farm.fertilize(o)) : null),
         ]),
@@ -243,8 +244,8 @@ class ObjPanel extends StatelessWidget {
             leading: Coin(an.price, size: 11.5, color: Colors.white),
             onTap: o.count < an.maxCount ? () => _do(farm.buyAnimal(o)) : null),
         if (!producing)
-          PillButton('Cho ăn (${farm.countOf(an.feed)} ${item(an.feed).icon})',
-              dense: true, onTap: o.count > 0 ? () => _do(farm.feed(o)) : null),
+          PillButton('Cho ăn (${farm.countOf(an.feed)})',
+              dense: true, leading: ItemGlyph(an.feed, size: 18), onTap: o.count > 0 ? () => _do(farm.feed(o)) : null),
       ]),
     ]);
   }

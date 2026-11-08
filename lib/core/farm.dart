@@ -80,7 +80,10 @@ class Fx {
   final String text;
   /// An experience badge (drawn blue, a moment after the item label).
   final bool xp;
-  Fx(this.x, this.y, this.text, {this.xp = false});
+  /// The item gained ("+2 🌾"): its drawn icon replaces the emoji when
+  /// there is one (render/farm_painter.dart).
+  final String? item;
+  Fx(this.x, this.y, this.text, {this.xp = false, this.item});
 }
 
 class Farm {
@@ -495,8 +498,8 @@ class Farm {
     _xpAt = null;
   }
 
-  void _fx(Obj o, String text) {
-    fx.add(Fx(o.x + o.w / 2, o.y + o.h / 2, text));
+  void _fx(Obj o, String text, {String? item}) {
+    fx.add(Fx(o.x + o.w / 2, o.y + o.h / 2, text, item: item));
     _xpAt ??= (o.x + o.w / 2, o.y + o.h / 2);
   }
 
@@ -682,7 +685,7 @@ class Farm {
     _stat('harvest:${c.id}');
     _snd('harvest');
     addXp(c.xp);
-    _fx(f, '+$n ${item(c.product).icon}');
+    _fx(f, '+$n ${item(c.product).icon}', item: c.product);
     if (c.plot == Plot.paddy) _spreadGrain(c.product, n);
     f.crop = null;
     f.start = f.end = 0;
@@ -713,7 +716,7 @@ class Farm {
     _gain(t.product, n);
     _snd('pick');
     addXp(t.xp);
-    _fx(o, '+$n ${item(t.product).icon}');
+    _fx(o, '+$n ${item(t.product).icon}', item: t.product);
     o.stolen = 0;
     o.start = now();
     o.end = o.start + _dur(t.seconds, _treeSpeed);
@@ -759,7 +762,7 @@ class Farm {
     _gain(a.product, n);
     _snd(a.id);
     addXp(a.xp * pen.count);
-    _fx(pen, '+$n ${item(a.product).icon}');
+    _fx(pen, '+$n ${item(a.product).icon}', item: a.product);
     pen.start = pen.end = 0;
     pen.stolen = 0;
     _changed();
@@ -790,7 +793,7 @@ class Farm {
     _gain(f.product, n);
     _snd('splash');
     addXp(f.xp);
-    _fx(pond, '+$n ${item(f.product).icon}');
+    _fx(pond, '+$n ${item(f.product).icon}', item: f.product);
     pond.crop = null;
     pond.start = pond.end = 0;
     pond.stolen = 0;
@@ -829,7 +832,7 @@ class Farm {
       fac.jobs.removeAt(0);
       _gain(r.product, r.out);
       addXp(r.xp);
-      _fx(fac, '+${r.out} ${item(r.product).icon}');
+      _fx(fac, '+${r.out} ${item(r.product).icon}', item: r.product);
       got++;
     }
     if (got > 0) {

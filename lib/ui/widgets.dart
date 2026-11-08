@@ -257,3 +257,17 @@ class _HoldRepeatState extends State<HoldRepeat> {
         child: widget.builder(_tap),
       );
 }
+
+/// An item's drawn icon inline with text (no badge), or its emoji.
+class ItemGlyph extends StatelessWidget {
+  final String id;
+  final double size;
+  const ItemGlyph(this.id, {super.key, this.size = 16});
+  @override
+  Widget build(BuildContext context) {
+    final img = Sprites.image('item_$id');
+    return img != null
+        ? RawImage(image: img, width: size, height: size, fit: BoxFit.contain, filterQuality: FilterQuality.medium)
+        : Text(item(id).icon, style: TextStyle(fontSize: size * .8));
+  }
+}

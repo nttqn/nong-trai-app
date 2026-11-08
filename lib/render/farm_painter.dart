@@ -440,13 +440,25 @@ class FarmPainter extends CustomPainter {
       final xp = f.fx.xp;
       final at = iso.p(f.fx.x, f.fx.y, 40 + k * 40) + (xp ? Offset(0, 22 - 22 * math.min(1.0, k * 4)) : Offset.zero);
       final a = (1 - k).clamp(0.0, 1.0);
-      final tp = textPainter(xp ? '⭐ ${f.fx.text}' : f.fx.text, xp ? 13 : 15,
+      // "+2" and the item's drawn icon, when it has one; else the emoji text
+      final id = f.fx.item;
+      final icon = id != null && Sprites.has('item_$id');
+      final label = icon ? f.fx.text.replaceAll(item(id).icon, '').trim() : f.fx.text;
+      final tp = textPainter(xp ? '⭐ $label' : label, xp ? 13 : 15,
           color: const Color(0xFFFFFFFF), weight: FontWeight.w900);
-      final r = Rect.fromCenter(center: at, width: tp.width + 14, height: tp.height + 6);
+      const iconW = 20.0;
+      final w = tp.width + 14 + (icon ? iconW + 2 : 0);
+      final r = Rect.fromCenter(center: at, width: w, height: math.max(tp.height, icon ? iconW : 0) + 6);
       c.drawRRect(RRect.fromRectAndRadius(r, const Radius.circular(10)),
           Paint()..color = xp ? Color.fromRGBO(30, 136, 229, .85 * a) : Color.fromRGBO(62, 44, 23, .75 * a));
       c.saveLayer(r.inflate(4), Paint()..color = Color.fromRGBO(255, 255, 255, a));
-      tp.paint(c, at - Offset(tp.width / 2, tp.height / 2));
+      tp.paint(c, Offset(r.left + 7, at.dy - tp.height / 2));
+      if (icon) {
+        final rec = Sprites.rec;
+        Sprites.rec = null;
+        Sprites.at(c, 'item_$id', Offset(r.right - 7 - iconW / 2, at.dy + iconW / 2), iconW);
+        Sprites.rec = rec;
+      }
       c.restore();
     }
   }

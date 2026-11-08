@@ -165,7 +165,7 @@ extension FarmSeason on Farm {
     if (!roomFor(n)) return 'Kho đầy! Bán bớt hoặc nâng cấp nhà';
     bonus.forEach(_gain);
     final o = dryingYard;
-    if (o != null) _fx(o, '+$n ${item(bonus.keys.first).icon}');
+    if (o != null) _fx(o, '+$n ${item(bonus.keys.first).icon}', item: bonus.keys.first);
     addXp(math.max(1, n ~/ 4));
     _stat('dry', n);
     yard.clear();
