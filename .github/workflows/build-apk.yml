@@ -53,10 +53,10 @@ jobs:
           set -o pipefail
           # the Gradle download (GitHub releases) sometimes answers 504: retry
           ok=0
-          for i in 1 2 3; do
+          for i in 1 2 3 4 5; do
             if flutter build apk --release 2>&1 | tee build.log; then ok=1; break; fi
-            grep -q "response code: 5" build.log || break
-            echo "Gradle download failed, retrying in 60 s ($i/3)"; sleep 60
+            grep -qE "code:? 50[0-9]|Gateway|downloading artifacts" build.log || break
+            echo "Download failed, retrying in 90 s ($i/5)"; sleep 90
           done
           if [ $ok = 0 ]; then
             grep -iE "error|exception|failed|what went wrong|caused by" build.log | grep -v "^\s*at " | head -25 | while IFS= read -r l; do echo "::error::$l"; done
