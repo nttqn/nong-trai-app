@@ -306,6 +306,7 @@ class CloudSave extends ChangeNotifier {
     if (!available || user == null) return;
     await Leaderboard.instance.withdraw();
     await Neighbors.instance.withdraw();
+    await Market.instance.removeAll(user!.uid);
     try {
       await _doc.delete().timeout(const Duration(seconds: 10));
     } catch (e) {
