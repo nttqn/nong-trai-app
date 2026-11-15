@@ -11,6 +11,7 @@ import '../core/weather.dart';
 import 'animals.dart';
 import 'ground.dart';
 import 'iso.dart';
+import 'night.dart';
 import 'sprites.dart';
 import 'structures.dart';
 
@@ -182,6 +183,9 @@ class FarmPainter extends CustomPainter {
     }
     c.drawPicture(cache.pic!);
     drawWaterAnim(c, iso, t);
+    final night = nightOf(farm);
+    final rain = weatherAt(farm.now()) == Weather.rain;
+    drawStreetLamps(c, iso, farm, night);
 
     // selection footprint under the object
     final sel = view.selected;
@@ -205,13 +209,26 @@ class FarmPainter extends CustomPainter {
       drawObj(c, iso, farm, o, t);
     }
     Sprites.rec = null;
+    if (night < .5 && !rain) _sparrows(c, iso, t, list);
+    if (night < .5) _egrets(c, iso, t);
+    if (night < .4) _butterflies(c, iso, t, list);
+
+    // night falls over the farm; bubbles, signs and the UI stay bright
+    if (night > .01) {
+      // a margin past the clip: on web the reported bounds can fall short
+      final area = c.getLocalClipBounds().inflate(300);
+      final lit = moonLitOf(farm);
+      final onScreen = list.where((o) => view.drawn.containsKey(o.id));
+      drawNightTint(c, area, night, lit);
+      if (!rain) drawWaterSky(c, iso, t, night, lit);
+      drawNightLights(c, iso, farm, onScreen, t, night);
+      if (!rain) drawFireflies(c, iso, onScreen, t, night);
+    }
 
     _ghost(c, iso, t);
     if (!view.visiting) _lotSigns(c, iso);
     _readyBubbles(c, iso, t, list);
     if (sel != null && view.moving == null) _progressBar(c, iso, sel);
-    _egrets(c, iso, t);
-    _butterflies(c, iso, t, list);
     _petals(c, (Offset.zero & size).intersect(c.getLocalClipBounds()), t);
     if (!view.visiting) _tutArrow(c, iso, t);
     _floats(c, iso, t);
@@ -256,7 +273,7 @@ class FarmPainter extends CustomPainter {
           c.drawLine(area.topLeft + Offset(x, y), area.topLeft + Offset(x - 3, y + 13), p);
         }
       case Weather.drought:
-        c.drawRect(area, Paint()..color = Color.fromRGBO(255, 160, 40, .10 + .02 * math.sin(t * 1.5)));
+        c.drawRect(area, Paint()..color = Color.fromRGBO(255, 160, 40, (.10 + .02 * math.sin(t * 1.5)) * (1 - nightOf(farm))));
       case Weather.sunny:
     }
   }
@@ -355,6 +372,62 @@ class FarmPainter extends CustomPainter {
       final k = cyc / .55;
       final p = Offset(-60 + k * (worldW + 120), worldTop + 120 + i * 18 + math.sin(k * 6 + i) * 10);
       drawEgret(c, p + Offset(i * 26.0, 0), t, i.toDouble());
+    }
+  }
+
+  /// Now and then a few sparrows come for a growing field. A scarecrow
+  /// within 3 tiles of it scares them off before they land; otherwise they
+  /// hop about pecking for a while (just for show: they take nothing).
+  void _sparrows(Canvas c, Iso iso, double t, List<Obj> list) {
+    final fields = [
+      for (final o in list)
+        if (view.drawn.containsKey(o.id) && (o.def.kind == BKind.paddy || o.def.kind == BKind.bed) && o.crop != null) o,
+    ];
+    if (fields.isEmpty) return;
+    const period = 24.0;
+    final slot = (t / period).floor();
+    final u = t - slot * period;
+    if (u > 15) return;
+    final o = fields[(hash2(slot, 91) * fields.length).floor() % fields.length];
+    final guarded = farm.objs.any((s) => s.type == 'bu_nhin' && (s.x - o.x).abs() <= 3 && (s.y - o.y).abs() <= 3);
+    final side = hash2(slot, 92) < .5 ? -1.0 : 1.0;
+    final n = 3 + (hash2(slot, 93) * 3).floor();
+    double ease(double k) => 1 - (1 - k) * (1 - k);
+    for (var i = 0; i < n; i++) {
+      final s = slot * 7 + i;
+      final spot = iso.p(o.x + .2 + hash2(s, 94) * .6, o.y + .2 + hash2(s, 95) * .6);
+      final from = spot + Offset(side * 240 + i * 12, -190 + i * 8);
+      final lag = i * .12;
+      final ui = u - lag;
+      if (ui < 0) continue;
+      if (guarded) {
+        // swoop in, spot the scarecrow, scatter back up
+        final turn = spot - Offset(side * 30, 46);
+        if (ui < 2.0) {
+          drawSparrow(c, Offset.lerp(from, turn, ease(ui / 2.0))!, t + i, flying: true, left: side > 0);
+        } else if (ui < 4.6) {
+          final k = (ui - 2.0) / 2.6;
+          final p = Offset.lerp(turn, from + Offset(-side * 40 * hash2(s, 96), -40), k * k)!;
+          drawSparrow(c, p, t * 1.6 + i, flying: true, left: side < 0);
+          if (i == 0 && ui < 3.0) {
+            text(c, '!', p - const Offset(0, 12), 11, color: const Color(0xFFFFFFFF), weight: FontWeight.w900);
+          }
+        }
+      } else {
+        final away = spot + Offset(-side * 260, -210 - i * 10);
+        if (ui < 2.4) {
+          drawSparrow(c, Offset.lerp(from, spot, ease(ui / 2.4))!, t + i, flying: true, left: side > 0);
+        } else if (ui < 12.5) {
+          // hop about and peck
+          final ph = ui * (1.3 + hash2(s, 97) * .6) + i;
+          final hop = math.max(0.0, math.sin(ph * 2.2)) * 2.5;
+          final peck = math.sin(ph * 5) > .55;
+          drawSparrow(c, spot + Offset(math.sin(ph * .7) * 5, -hop), t, flying: false, left: math.cos(ph * .7) < 0, peck: peck);
+        } else {
+          final k = (ui - 12.5) / 2.5;
+          if (k < 1) drawSparrow(c, Offset.lerp(spot, away, k * k)!, t + i, flying: true, left: side < 0);
+        }
+      }
     }
   }
 

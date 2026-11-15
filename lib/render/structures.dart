@@ -67,6 +67,15 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
           if (!sprite('san_phoi')) _yardBase(c, iso, x, y);
           _yardGrain(c, iso, farm, x, y, t);
         }
+      } else if (o.type == 'bu_nhin') {
+        // the scarecrow sways on its pole in the breeze, with a gust now and then
+        final gust = math.max(0.0, math.sin(t * .45 + o.id)) * math.sin(t * 5.5 + o.id);
+        c.save();
+        c.translate(foot.dx, foot.dy);
+        c.rotate(math.sin(t * 1.3 + o.id * 1.7) * .03 + gust * .05);
+        c.translate(-foot.dx, -foot.dy);
+        if (!sprite(o.type)) _deco(c, iso, o.type, x, y, foot, t, o.id);
+        c.restore();
       } else if (!sprite(o.type)) {
         _deco(c, iso, o.type, x, y, foot, t, o.id);
       }

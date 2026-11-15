@@ -11,9 +11,11 @@ import 'package:flutter/services.dart';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import '../core/quests.dart';
+import '../core/daynight.dart';
 import '../core/weather.dart';
 import '../render/farm_painter.dart';
 import '../render/iso.dart' show clearTextCache;
+import '../render/night.dart';
 import '../services/ads.dart';
 import '../services/analytics.dart';
 import '../services/cloud.dart';
@@ -850,7 +852,7 @@ class _FarmScreenState extends State<FarmScreen>
         if (!didPop) _onBack();
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF9FCB63),
+        backgroundColor: nightShade(const Color(0xFF9FCB63), farm),
         body: LayoutBuilder(builder: (context, cons) {
           _screen = cons.biggest;
           _placeCamera(_screen);
@@ -878,6 +880,23 @@ class _FarmScreenState extends State<FarmScreen>
                 ),
               ),
             ),
+            // the night sky over the top of the screen; tap the moon to see
+            // tonight's lunar day
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(painter: SkyPainter(farm, _clock, _moonAt(context, cons.biggest))),
+              ),
+            ),
+            if (SkyPainter.visible(farm))
+              Positioned(
+                left: _moonAt(context, cons.biggest).dx - 26,
+                top: _moonAt(context, cons.biggest).dy - 26,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _tapMoon,
+                  child: const SizedBox(width: 52, height: 52),
+                ),
+              ),
             Positioned(left: 0, right: 0, top: 0, child: SafeArea(child: _hudBar())),
             if (_toast != null)
               Positioned(
@@ -931,6 +950,15 @@ class _FarmScreenState extends State<FarmScreen>
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14.5)),
         ),
       );
+
+  /// Where the moon hangs: top right, below the HUD.
+  Offset _moonAt(BuildContext context, Size screen) =>
+      Offset(screen.width - 50, MediaQuery.of(context).padding.top + 172);
+
+  void _tapMoon() {
+    final day = moonDayAt(farm.now());
+    _say('${moonIcon(day)} Đêm ${lunarDayName(day)} âm lịch: ${moonName(day).toLowerCase()}');
+  }
 
   Widget _hudBar() {
     final need = xpToNext(farm.level);
@@ -1031,7 +1059,7 @@ class _FarmScreenState extends State<FarmScreen>
           const SizedBox(width: 6),
           GestureDetector(
             onTap: () => showWeather(context, farm),
-            child: _chip(Text(weatherIcon(farm.weather), style: const TextStyle(fontSize: 19))),
+            child: _chip(Text(skyIcon(farm.weather, farm.now()), style: const TextStyle(fontSize: 19))),
           ),
           const SizedBox(width: 6),
           GestureDetector(

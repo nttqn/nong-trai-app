@@ -57,8 +57,14 @@ Game miễn phí, có quảng cáo. Nhiều quảng cáo do bạn tự chọn xe
 
 Hỗ trợ: trungsmail@gmail.com
 
-## Có gì mới (bản 1.0.0, ≤ 500 ký tự)
+## Có gì mới (bản 1.1.0, ≤ 500 ký tự)
+Đêm trăng làng quê: trời tối theo giờ thật, sao sáng đầy trời, trăng tròn khuyết đúng lịch âm (rằm trăng tròn), sao và trăng soi bóng xuống sông, hồ sen. Nhà lên đèn, đom đóm lập lòe bên bụi tre, có trạm biến áp thì đường làng sáng đèn. Bù nhìn rơm đung đưa trong gió, chim sẻ sà xuống ruộng gặp bù nhìn là bay mất. Chạm vào ông trăng để xem hôm nay ngày mấy âm lịch.
+
+## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.1.0, en-US)
+Moonlit nights: the village darkens with your clock, the sky fills with stars and the moon waxes and wanes with the real lunar calendar, mirrored in the river and the lotus lake. Houses light up, fireflies blink by the bamboo, and the transformer station lights the village road. The straw scarecrow sways in the breeze and scares off sparrows. Tap the moon to see the lunar date.
 
 ## What's new (1.0.0, en-US)
 First release: rice paddies, vegetable beds, pens, fish ponds, village crafts, New Countryside projects, neighbours and the village market. A real lunar calendar with crop seasons and 7 festivals, a rice-drying yard, and the Village Memories album.

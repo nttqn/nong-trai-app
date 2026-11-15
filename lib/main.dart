@@ -7,6 +7,7 @@ import 'core/defs.dart';
 import 'core/demo.dart';
 import 'core/farm.dart';
 import 'core/calendar.dart';
+import 'core/daynight.dart';
 import 'core/weather.dart';
 import 'render/sprites.dart';
 import 'services/ads.dart';
@@ -61,6 +62,7 @@ class _BootState extends State<_Boot> {
         if (q['weather'] == w.name) weatherOverride = w;
       }
       if (q['day'] != null) calendarOverride = DateTime.tryParse(q['day']!);
+      if (q['hour'] != null) hourOverride = double.tryParse(q['hour']!);
       sprites.then((_) {
         if (mounted) {
           final f = demoFarm(int.parse(q['demo']!), house: int.tryParse(q['house'] ?? '') ?? -1);

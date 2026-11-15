@@ -167,6 +167,29 @@ void drawEgret(Canvas c, Offset p, double t, double ph) {
   line(c, p + const Offset(-3, 1.5), p + const Offset(-8, 3), const Color(0xFF333333), 0.8);
 }
 
+/// A little sparrow (chim sẻ), flying or hopping on the ground.
+void drawSparrow(Canvas c, Offset p, double t, {required bool flying, required bool left, bool peck = false}) {
+  const body = Color(0xFF8D6A48), dark = Color(0xFF5D4330), belly = Color(0xFFD9C3A0);
+  final s = left ? -1.0 : 1.0;
+  if (!flying) shadow(c, p + const Offset(0, 1), 3.5, 1.3, .25);
+  final b = flying ? p : p - const Offset(0, 3);
+  // tail
+  line(c, b + Offset(-s * 2.5, 0), b + Offset(-s * 5.5, flying ? .5 : -1.5), dark, 1.5);
+  oval(c, b, 3.3, 2.2, body);
+  oval(c, b + Offset(s * .6, .9), 2.2, 1.1, belly);
+  final head = b + Offset(s * 2.8, peck ? 1.2 : -1.6);
+  circle(c, head, 1.7, dark);
+  line(c, head + Offset(s * 1.4, 0), head + Offset(s * 2.8, .5), const Color(0xFFE0A030), .9);
+  if (flying) {
+    final flap = math.sin(t * 22) * 3.2;
+    line(c, b + const Offset(-.5, -1), b + Offset(-2.5, -1 - flap), dark, 1.5);
+    line(c, b + const Offset(.5, -1), b + Offset(2.5, -1 - flap * .8), body, 1.5);
+  } else {
+    line(c, b + const Offset(-.6, 2), b + const Offset(-.8, 3.2), dark, .7);
+    line(c, b + const Offset(.6, 2), b + const Offset(.8, 3.2), dark, .7);
+  }
+}
+
 /// The guard dog: wags and looks about when fed, curls up asleep when hungry.
 void drawDog(Canvas c, Offset f, double t, {required bool awake}) {
   const fur = Color(0xFFC98B4B), dark = Color(0xFF8A5A2B), light = Color(0xFFF1D3A8);

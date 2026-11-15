@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/achievements.dart';
 import '../core/farm.dart';
+import '../core/daynight.dart';
 import '../core/weather.dart';
 import '../services/ads.dart';
 import 'sheets.dart' show Report;
@@ -232,10 +233,15 @@ Future<void> showWeather(BuildContext context, Farm farm) {
     builder: (c) => AlertDialog(
       backgroundColor: cream,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Text('${weatherIcon(w)} ${weatherName(w)}',
+      title: Text('${skyIcon(w, now)} ${skyName(w, now)}',
           textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w900, color: brown)),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
         Text(weatherDesc(w), textAlign: TextAlign.center, style: const TextStyle(color: brown, fontWeight: FontWeight.w600)),
+        if (nightAt(now) > .5) ...[
+          const SizedBox(height: 8),
+          Text('${moonIcon(moonDayAt(now))} Đêm ${lunarDayName(moonDayAt(now))} âm lịch: ${moonName(moonDayAt(now)).toLowerCase()}',
+              textAlign: TextAlign.center, style: const TextStyle(color: brown, fontWeight: FontWeight.w700)),
+        ],
         const SizedBox(height: 10),
         Text('Còn ${fmtTime(ends - now)} · Tiếp theo: ${weatherIcon(next)} ${weatherName(next)}',
             textAlign: TextAlign.center, style: const TextStyle(color: brownLight, fontSize: 12.5)),
