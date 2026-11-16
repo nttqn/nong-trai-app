@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import '../core/calendar.dart' show festivalDecos;
+import '../core/daynight.dart';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import 'animals.dart';
@@ -244,7 +245,10 @@ void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
 void _penAnimals(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a, double t) {
   final x = o.x.toDouble(), y = o.y.toDouble();
   final n = o.count;
+  // at night the bees are in their hives and the others sleep
+  final asleep = nightAt(farm.now()) > .55;
   if (a.id == 'ong') {
+    if (asleep) return;
     // bees just buzz around the hives
     for (var i = 0; i < n; i++) {
       final px = x + 1 + math.cos(t * .35 + i * 2.1) * .55;
@@ -256,9 +260,9 @@ void _penAnimals(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a, double t) {
     final hungry = o.end == 0;
     final fedAgo = hungry ? 1e9 : (farm.now() - o.start) / 1000;
     // draw back to front so nearer animals overlap farther ones
-    final beats = [for (var i = 0; i < n; i++) _beat(iso, o, i, n, t, hungry)]..sort((p, q) => p.pos.dy.compareTo(q.pos.dy));
+    final beats = [for (var i = 0; i < n; i++) asleep ? _sleepBeat(iso, o, a.id, i, n) : _beat(iso, o, i, n, t, hungry)]..sort((p, q) => p.pos.dy.compareTo(q.pos.dy));
     for (final b in beats) {
-      _drawAnimalBeat(c, a.id, b, t, hungry && b.i == beats.first.i);
+      _drawAnimalBeat(c, a.id, b, t, (hungry || asleep) && b.i == beats.first.i);
       if (fedAgo < 4) _heart(c, b, fedAgo);
     }
   }
@@ -983,6 +987,21 @@ class _Beat {
 double _rnd(int a, int b) {
   final v = math.sin(a * 127.1 + b * 311.7) * 43758.5453;
   return v - v.floorToDouble();
+}
+
+/// Where animal [i] sleeps: chickens and ducks huddle by the shed door,
+/// the big animals lie down in their own patch.
+_Beat _sleepBeat(Iso iso, Obj o, String id, int i, int n) {
+  final x = o.x.toDouble(), y = o.y.toDouble();
+  final seed = o.id * 37 + i * 101;
+  final flip = _rnd(seed, 9) > .5;
+  if (id == 'ga' || id == 'vit') {
+    final p = iso.p(x + .42 + (i % 3) * .2 + _rnd(seed, 7) * .05, y + 1.08 + (i ~/ 3) * .16);
+    return _Beat(i, p, flip, _Act.rest, 0, seed.toDouble());
+  }
+  // the spot of a fixed beat, so each one keeps its own place all night
+  final b = _beat(iso, o, i, n, 0, false);
+  return _Beat(i, b.pos, flip, _Act.rest, 0, seed.toDouble());
 }
 
 _Beat _beat(Iso iso, Obj o, int i, int n, double t, bool hungry) {

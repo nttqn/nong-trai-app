@@ -65,6 +65,7 @@ class _FarmScreenState extends State<FarmScreen>
   Timer? _toastTimer, _hud;
   int _lastRev = -1;
   final List<int> _levelUps = [];
+  bool _moonHinted = false;
 
   @override
   void initState() {
@@ -125,8 +126,14 @@ class _FarmScreenState extends State<FarmScreen>
         if (_levelUps.isNotEmpty) _showLevelUp();
       }
     })..start();
+    SoundService.instance.setNight(nightAt(farm.now()) > .5);
     _hud = Timer.periodic(const Duration(seconds: 1), (_) {
       farm.tickOrders();
+      SoundService.instance.setNight(nightAt(farm.now()) > .5);
+      if (farm.moonGiftReady && !_moonHinted && _toast == null && !(kIsWeb && Uri.base.queryParameters['shot'] != null)) {
+        _moonHinted = true;
+        _say('🌕 Đêm rằm trăng sáng! Chạm vào ông trăng để trông trăng nhận quà');
+      }
       _festivalNotice();
       _memoryCard();
       if (mounted) setState(() {});
@@ -957,6 +964,12 @@ class _FarmScreenState extends State<FarmScreen>
 
   void _tapMoon() {
     final day = moonDayAt(farm.now());
+    if (farm.moonGiftReady) {
+      final c = farm.moonCoins, x = farm.moonXp;
+      farm.claimMoon();
+      _say('🌕 Trông trăng đêm ${lunarDayName(day)}: +${fmtNum(c)} xu, +$x kinh nghiệm');
+      return;
+    }
     _say('${moonIcon(day)} Đêm ${lunarDayName(day)} âm lịch: ${moonName(day).toLowerCase()}');
   }
 

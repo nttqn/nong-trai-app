@@ -58,13 +58,13 @@ Game miễn phí, có quảng cáo. Nhiều quảng cáo do bạn tự chọn xe
 Hỗ trợ: trungsmail@gmail.com
 
 ## Có gì mới (bản 1.1.0, ≤ 500 ký tự)
-Đêm trăng làng quê: trời tối theo giờ thật, sao sáng đầy trời, trăng tròn khuyết đúng lịch âm (rằm trăng tròn), sao và trăng soi bóng xuống sông, hồ sen. Nhà lên đèn, đom đóm lập lòe bên bụi tre, có trạm biến áp thì đường làng sáng đèn. Bù nhìn rơm đung đưa trong gió, chim sẻ sà xuống ruộng gặp bù nhìn là bay mất. Chạm vào ông trăng để xem hôm nay ngày mấy âm lịch.
+Đêm trăng làng quê: trời tối theo giờ thật, sao sáng đầy trời, trăng tròn khuyết đúng lịch âm, soi bóng xuống sông và hồ sen. Nhà lên đèn, đom đóm lập lòe, ếch nhái dế kêu cùng tiếng sáo đêm; gà vịt lên chuồng, trâu bò nằm ngủ. Đêm rằm chạm ông trăng để trông trăng nhận quà và mở ký ức mới. Bù nhìn rơm đung đưa đuổi chim sẻ, thêm nhiệm vụ dựng bù nhìn.
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
 
 ## What's new (1.1.0, en-US)
-Moonlit nights: the village darkens with your clock, the sky fills with stars and the moon waxes and wanes with the real lunar calendar, mirrored in the river and the lotus lake. Houses light up, fireflies blink by the bamboo, and the transformer station lights the village road. The straw scarecrow sways in the breeze and scares off sparrows. Tap the moon to see the lunar date.
+Moonlit nights: the village darkens with your clock, stars fill the sky and the moon follows the real lunar calendar, mirrored in the river and lotus lake. Lamps glow, fireflies blink, frogs and crickets sing with a night flute tune; hens go to roost and buffaloes sleep. On full-moon nights tap the moon for a gift and a new memory. The straw scarecrow sways and scares off sparrows, with a new scarecrow quest.
 
 ## What's new (1.0.0, en-US)
 First release: rice paddies, vegetable beds, pens, fish ponds, village crafts, New Countryside projects, neighbours and the village market. A real lunar calendar with crop seasons and 7 festivals, a rice-drying yard, and the Village Memories album.
@@ -102,7 +102,7 @@ Mô phỏng, Nông trại, Thư giãn, Offline, Xây dựng
   - Google Play điện thoại 1080×2160: store/phone/
   - Google Play máy tính bảng 7" 1200×1920: store/tablet-7in/
   - Google Play máy tính bảng 10" 1600×2560: store/tablet-10in/
-- Thứ tự ảnh: 01 toàn cảnh làng · 02 Tết với đồ lễ hội · 03 ruộng lúa và sân phơi · 04 chuồng trại · 05 lịch làng, Trung thu · 06 ký ức Tết sum vầy · 07 album ký ức · 08 bản đồ hàng xóm.
+- Thứ tự ảnh: 01 toàn cảnh làng · 02 Tết với đồ lễ hội · 03 ruộng lúa và sân phơi · 04 chuồng trại · 05 lịch làng, Trung thu · 06 ký ức Tết sum vầy · 07 đêm trăng rằm (bản 1.1) · 08 bản đồ hàng xóm.
 
 ---
 

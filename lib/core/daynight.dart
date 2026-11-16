@@ -33,11 +33,14 @@ double nightAt(int ms) {
 
 /// Lunar day (1..30) of the night at [ms]: after midnight it is still the
 /// evening's moon.
-int moonDayAt(int ms) {
+int moonDayAt(int ms) => moonDateAt(ms).day;
+
+/// Lunar date of the evening the night at [ms] belongs to.
+LunarDate moonDateAt(int ms) {
   final h = hourAt(ms);
   final day = calendarDay(ms);
   final d = h < 12 && calendarOverride == null ? day.subtract(const Duration(days: 1)) : day;
-  return LunarDate.of(d).day;
+  return LunarDate.of(d);
 }
 
 /// The moon on lunar day [day]: lit fraction 0..1 and whether it is waxing

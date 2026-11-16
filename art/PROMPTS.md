@@ -349,3 +349,11 @@ Làm y như đợt 7: dán một biểu tượng đã có (ví dụ `item_gaotam
 | `item_sinhto` | A tall glass of thick orange mango smoothie with a straw and a mango slice on the rim. |
 | `item_phomai` | A small round wheel of white goat cheese with one wedge cut out. |
 | `item_chekho` | A small paper packet of dark-green dried rolled tea leaves, a few leaves spilled in front. |
+
+## Đợt 11 (bản 1.1): tranh ký ức "Đêm trăng rằm"
+
+Cùng kiểu với đợt 10: một bức tranh cảnh đầy đủ, khung ngang 4:3, giữ nguyên nền. Lưu vào `art_src/ky_uc_trang_ram.png`. Khi chưa có tranh, game hiện nền sepia kèm biểu tượng 🌕.
+
+| Tên file | Mô tả (thêm sau phần style chung của đợt 10) |
+|---|---|
+| `ky_uc_trang_ram` | A full-moon night in a Vietnamese village yard: a big round moon over bamboo tops, a family on a straw mat in the courtyard, the mother peeling a pomelo, a grandmother fanning with a palm-leaf fan telling stories to children, fireflies over the rice field beyond, warm lamplight from the house door, deep blue starry sky. |

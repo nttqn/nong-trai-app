@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import 'achievements.dart';
 import 'calendar.dart';
+import 'daynight.dart';
 import 'defs.dart';
 import 'memories.dart';
 import 'quests.dart';
@@ -111,6 +112,9 @@ class Farm {
   /// Lễ hội: the festival whose orders are in [fest], and festival
   /// decorations won but not placed yet.
   String festKey = '';
+
+  /// Lunar month ("2026-10") whose full moon was last admired.
+  String moonKey = '';
   final List<Order> fest = [];
   final Map<String, int> giftDeco = {};
   /// Sân phơi: grain spread out to dry, how long it has dried (ms), when
@@ -1263,7 +1267,7 @@ class Farm {
         if (visitLog.isNotEmpty) 'visitLog': visitLog,
         'orders': [for (final o in orders) o.toJson()],
         'stats': stats,
-        'quest': quest, 'questBase': questBase,
+        'quest': quest, 'questBase': questBase, 'qv': questChainVersion,
         'savedAt': savedAt,
         if (name.isNotEmpty) 'name': name,
         if (loginDay != 0) 'login': [loginDay, loginStreak],
@@ -1271,6 +1275,7 @@ class Farm {
         if (title.isNotEmpty) 'title': title,
         if (stalls.isNotEmpty) 'stalls': [for (final s in stalls) s.toJson()],
         if (tut != tutDone) 'tut': tut,
+        if (moonKey.isNotEmpty) 'moon': moonKey,
         if (festKey.isNotEmpty) 'fest': {'k': festKey, 'o': [for (final o in fest) o.toJson()]},
         if (giftDeco.isNotEmpty) 'gift': giftDeco,
         if (mem.isNotEmpty) 'mem': mem,
@@ -1290,7 +1295,11 @@ class Farm {
       ..savedAt = j['savedAt'] ?? 0
       ..name = j['name'] ?? ''
       ..title = j['title'] ?? ''
-      ..tut = j['tut'] ?? tutDone;
+      ..tut = j['tut'] ?? tutDone
+      ..moonKey = j['moon'] ?? '';
+    // 1.1 put two quests in at questInsertAt: keep older saves on the quest
+    // they were doing
+    if ((j['qv'] ?? 1) < 2 && f.quest >= questInsertAt) f.quest += questInserted;
     final login = j['login'] as List?;
     if (login != null && login.length == 2) {
       f.loginDay = login[0];

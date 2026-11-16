@@ -477,3 +477,58 @@ track('chieu_que', 16, 70, (mix, spb) => {
   }
   crickets(mix, 16 * bar + 3, 0.012);
 }, { wet: 0.36, size: 1.25 });
+
+// Ếch nhái: ếch's low "ộp ộp" (a buzzy, fast-pulsed croak) from the paddies
+// and nhái's short high "ẹc" chirps, scattered over [dur] seconds.
+function frogs(mix, dur, amp) {
+  const calls = Math.round(dur * 0.55);
+  for (let c = 0; c < calls; c++) {
+    const t0 = rnd() * (dur - 1.5);
+    const pan = rnd() * 1.6 - 0.8;
+    if (rnd() < 0.6) {
+      // ếch: 2-3 croaks in a row
+      const f = 150 + rnd() * 90, reps = 2 + Math.floor(rnd() * 2);
+      for (let r = 0; r < reps; r++) {
+        const s0 = Math.round((t0 + r * 0.32) * RATE), n = Math.round(0.17 * RATE);
+        let ph = 0;
+        for (let i = 0; i < n; i++) {
+          const k = i / n, tt = i / RATE;
+          ph += f * (1 + 0.12 * (1 - k)) / RATE;
+          const p = 2 * Math.PI * ph;
+          const buzz = 0.55 + 0.45 * Math.sin(2 * Math.PI * 38 * tt);
+          const v = (Math.sin(p) + 0.6 * Math.sin(2 * p) + 0.35 * Math.sin(3 * p)) * buzz;
+          mix.add(s0 + i, v * Math.sin(Math.PI * k) * amp, pan, 0.3);
+        }
+      }
+    } else {
+      // nhái: quick high chirps
+      const f = 1500 + rnd() * 700, reps = 3 + Math.floor(rnd() * 4);
+      for (let r = 0; r < reps; r++) {
+        const s0 = Math.round((t0 + r * 0.11) * RATE), n = Math.round(0.045 * RATE);
+        for (let i = 0; i < n; i++) {
+          const k = i / n, tt = i / RATE;
+          const v = Math.sin(2 * Math.PI * f * (1 - 0.15 * k) * tt) * Math.sin(Math.PI * k);
+          mix.add(s0 + i, v * amp * 0.45, pan, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// Đêm trăng (night): a slow sáo trúc lullaby over a few đàn tranh notes and
+// a low drone, with crickets and frogs from the fields. E yu pentatonic.
+track('dem_trang', 16, 62, (mix, spb) => {
+  const key = { root: 64, mode: 'yu', spb };
+  const A = '2:3 1:1 | 0:2 -1:2 | 0:1.5 1:.5 2:2 | 1:4 | 3:3 2:1 | 1:2 0:2 | -1:1 0:1 1:2 | 0:4';
+  const B = 'r:4 | 2:2 3:2 | 4:3 3:1 | 2:4 | 1:2 2:1 1:1 | 0:2 -1:2 | -2:2 -1:2 | 0:4';
+  const chords = [0, 0, 3, 3, 2, 2, 4, 0, 3, 3, 2, 2, 4, 4, 3, 0];
+  const bar = 4 * spb;
+  lineVN(mix, A, { ...key, inst: 'dizi', amp: 0.27, pan: -0.15, send: 0.6 });
+  lineVN(mix, B, { ...key, t0: 8 * bar, inst: 'danbau', amp: 0.34, pan: 0.1, send: 0.55 });
+  lineVN(mix, 'r:16 r:8 5:4 | 4:4 | r:8 3:4 | 2:4', { ...key, t0: 8 * bar, inst: 'dizi', amp: 0.1, pan: -0.5, send: 0.7 });
+  lineVN(mix, 'r:2 0:2 | r:2 2:2 | r:2 3:2 | r:2 1:2 | r:2 2:2 | r:2 4:2 | r:2 4:2 | r:2 0:2 | r:2 3:2 | r:2 3:2 | r:2 2:2 | r:2 2:2 | r:2 4:2 | r:2 1:2 | r:2 3:2 | r:2 0:2',
+    { ...key, inst: 'zheng', amp: 0.17, oct: -1, grace: true, pan: 0.4 });
+  drone(mix, chords, { ...key, amp: 0.07 });
+  crickets(mix, 16 * bar + 3, 0.016);
+  frogs(mix, 16 * bar, 0.05);
+}, { wet: 0.42, size: 1.35 });

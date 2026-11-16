@@ -11,6 +11,12 @@ class QuestDef {
       {this.absolute = false});
 }
 
+/// Bumped when quests are inserted into the chain; see Farm.fromJson.
+const questChainVersion = 2;
+
+/// Index where the 1.1 quests were inserted, and how many.
+const questInsertAt = 14, questInserted = 2;
+
 const questChain = [
   QuestDef('Gieo lúa trên 4 ô ruộng', 'plant:lua', 4, 30, 5),
   QuestDef('Thu hoạch 4 ô lúa chín', 'harvest:lua', 4, 40, 5),
@@ -26,6 +32,9 @@ const questChain = [
   QuestDef('Đạt cấp 3', 'level', 3, 80, 0, absolute: true),
   QuestDef('Xây máy xay xát', 'build:may_xay', 1, 100, 10, absolute: true),
   QuestDef('Xay được 3 bao gạo', 'get:gao', 3, 100, 10),
+  // added in 1.1 (questChainVersion 2): saves from before are shifted
+  QuestDef('Đạt cấp 4', 'level', 4, 100, 0, absolute: true),
+  QuestDef('Dựng bù nhìn rơm giữ ruộng', 'build:bu_nhin', 1, 100, 10, absolute: true),
   QuestDef('Góp công xây giếng làng', 'project:gieng', 1, 150, 15, absolute: true),
   QuestDef('Trồng 4 luống ngô', 'plant:ngo', 4, 100, 10),
   QuestDef('Mua thêm một mảnh đất', 'lot', 1, 200, 20),

@@ -53,6 +53,8 @@ final memories = <MemoryDef>[
       'Đèn ông sao đỏ rực đi khắp ngõ, tiếng trống ếch tùng tùng. Mâm cỗ có bưởi, có hồng, có chiếc bánh nướng bố mua tận chợ huyện, lũ trẻ chia nhau từng miếng.'),
   MemoryDef('com_moi', '🌾', 'Tết cơm mới', 'Giao đủ đơn Tết cơm mới', 600, (f) => _s(f, 'fest:com_moi') >= 1,
       'Mồng mười tháng Mười, mẹ nấu nồi cơm gạo mới đầu mùa dâng tổ tiên. Hương cốm, hương gạo mới thơm khắp nhà, báo một vụ mùa no ấm.'),
+  MemoryDef('trang_ram', '🌕', 'Đêm trăng rằm', 'Trông trăng đêm rằm', 300, (f) => _s(f, 'moon') >= 1,
+      'Trăng rằm lên tròn vành vạnh trên ngọn tre. Cả nhà trải chiếu ngoài sân, mẹ bổ quả bưởi, bà phe phẩy quạt nan kể chuyện chú Cuội ngồi gốc cây đa. Ngoài đồng ếch nhái kêu ran, đom đóm lập lòe, gió đưa hương lúa thơm vào tận hiên nhà.'),
   MemoryDef('thu_con', '✉️', 'Lá thư từ thành phố', 'Đạt cấp 15', 500, (f) => f.level >= 15,
       'Bố mẹ ơi, con ở thành phố vẫn khỏe. Phố đông lắm, nhưng chẳng ở đâu có mùi rơm rạ như quê mình. Tết này con xin nghỉ sớm, về phụ bố mẹ gói bánh chưng. Con nhớ nhà nhiều lắm.',
       letter: true),

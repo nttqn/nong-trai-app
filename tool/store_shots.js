@@ -19,7 +19,7 @@ const shots = [
   ['04-chan-nuoi', `demo=3&${base}&day=2026-11-06&fx=8&fy=15&zoom=1.8`, 8000],
   ['05-lich-le-hoi', `demo=3&${base}&day=2026-09-25&sheet=calendar`, 9000],
   ['06-ky-uc', `demo=3&${base}&day=2026-11-06&memcard=tet_sum_vay`, 10000],
-  ['07-album', `demo=3&${base}&day=2026-11-06&sheet=album`, 9000],
+  ['07-dem-trang', `demo=3&shot=1&weather=sunny&day=2026-11-23&hour=21.2&fx=12&fy=9&zoomw=1.15`, 10000],
   ['08-hang-xom', `demo=3&${base}&day=2026-11-06&sheet=map&worldmap=demo`, 9000],
 ];
 
@@ -34,7 +34,10 @@ const shots = [
     // one at a time: in parallel the emoji font and pictures load too late
     for (const [name, q, wait] of shots.filter(([n]) => !onlyShot || n.startsWith(onlyShot))) {
       const page = await ctx.newPage();
-      await page.goto(`http://localhost:8790/?${q}&nocache=${Date.now()}`);
+      // zoomw=: a zoom for the phone width, scaled up on wider screens so
+      // tablets frame the same part of the farm
+      const qq = q.replace(/zoomw=([\d.]+)/, (_, z) => `zoom=${(z * Math.max(1, w / 360 * .7)).toFixed(2)}`);
+      await page.goto(`http://localhost:8790/?${qq}&nocache=${Date.now()}`);
       await page.waitForTimeout(wait + 4000);
       await page.screenshot({ path: `store/${dev}/${name}.png` });
       await page.close();

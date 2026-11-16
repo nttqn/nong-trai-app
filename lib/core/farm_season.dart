@@ -9,6 +9,38 @@ extension FarmSeason on Farm {
   Season get season => seasonOf(today);
   bool cropInSeason(CropDef c) => inSeason(c.id, today);
 
+  // ------------------------------------------------------------ đêm rằm
+  /// Trông trăng: on a clear night of the full moon (lunar 14-16) the moon
+  /// can be tapped once per lunar month for a small gift.
+  String? get fullMoonKey {
+    final ms = now();
+    if (nightAt(ms) <= .5 || weatherAt(ms) == Weather.rain) return null;
+    final l = moonDateAt(ms);
+    if (l.day < 14 || l.day > 16) return null;
+    return '${l.year}-${l.month}${l.leap ? 'n' : ''}';
+  }
+
+  bool get moonGiftReady {
+    final k = fullMoonKey;
+    return level >= 2 && k != null && k != moonKey;
+  }
+
+  int get moonCoins => 100 + 40 * level;
+  int get moonXp => 5 + 2 * level;
+
+  /// Takes tonight's gift; false when there is none.
+  bool claimMoon() {
+    if (!moonGiftReady) return false;
+    moonKey = fullMoonKey!;
+    coins += moonCoins;
+    addXp(moonXp);
+    _stat('moon');
+    _snd('quest');
+    _ev('moon_gift', {'level': level});
+    _changed();
+    return true;
+  }
+
   // ------------------------------------------------------------ festivals
   static const festLevel = 3;
 

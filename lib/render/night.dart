@@ -245,6 +245,7 @@ class SkyPainter extends CustomPainter {
     }
     _shootingStar(c, size, h, t, n);
     if (lit >= .03) _moon(c, moonAt, lit, waxing, n);
+    if (farm.moonGiftReady) _giftSparkle(c, moonAt, t, n);
   }
 
   void _halo(Canvas c, Offset at, double r, double a) {
@@ -303,6 +304,26 @@ class SkyPainter extends CustomPainter {
       c.drawCircle(at + Offset(dx, dy), rr, Paint()..color = Color.fromRGBO(214, 200, 160, .55 * n));
     }
     c.restore();
+  }
+
+  /// A full-moon gift is waiting: a pulsing ring and sparkles round the moon.
+  void _giftSparkle(Canvas c, Offset at, double t, double n) {
+    final pulse = (math.sin(t * 3) + 1) / 2;
+    c.drawCircle(
+        at,
+        moonR + 6 + pulse * 4,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = Color.fromRGBO(255, 224, 130, n * (.4 + .5 * pulse)));
+    final p = Paint()..color = Color.fromRGBO(255, 248, 210, n);
+    for (var i = 0; i < 4; i++) {
+      final a = t * .8 + i * math.pi / 2;
+      final s = at + Offset(math.cos(a), math.sin(a)) * (moonR + 14);
+      final r = 2.2 + 1.6 * math.max(0, math.sin(t * 4 + i * 1.7));
+      c.drawLine(s - Offset(r, 0), s + Offset(r, 0), p..strokeWidth = 1.2);
+      c.drawLine(s - Offset(0, r), s + Offset(0, r), p);
+    }
   }
 
   /// Whether the moon is up on screen (at night, not behind rain clouds).

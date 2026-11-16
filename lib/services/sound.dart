@@ -20,6 +20,10 @@ class SoundService {
   ];
   static const tracks = ['dong_que', 'chieu_que'];
 
+  /// Played on its own, looping, while it is night on the farm.
+  static const nightTrack = 'dem_trang';
+  bool _night = false;
+
   final ValueNotifier<bool> sfxOn = ValueNotifier<bool>(true);
   final ValueNotifier<bool> musicOn = ValueNotifier<bool>(true);
 
@@ -59,7 +63,7 @@ class SoundService {
       await p.setReleaseMode(ReleaseMode.release);
       // One track ends -> the other one starts.
       p.onPlayerComplete.listen((_) {
-        _track = (_track + 1) % tracks.length;
+        if (!_night) _track = (_track + 1) % tracks.length;
         _loaded = false;
         _applyMusic();
       });
@@ -95,7 +99,7 @@ class SoundService {
         try {
           await m.setVolume(_musicVolume);
           await m
-              .setSource(AssetSource('audio/music/${tracks[_track]}.$_ext'))
+              .setSource(AssetSource('audio/music/${_night ? nightTrack : tracks[_track]}.$_ext'))
               .timeout(const Duration(seconds: 8));
           if (musicOn.value && _foreground) await m.resume();
         } catch (_) {
@@ -105,6 +109,18 @@ class SoundService {
       return;
     }
     if (m.state != PlayerState.playing) _guard(m.resume());
+  }
+
+  /// Night music (sáo, crickets and frogs) from dusk to dawn; switches
+  /// over at once when the farm crosses into night or day.
+  void setNight(bool night) {
+    if (night == _night) return;
+    _night = night;
+    final m = _music;
+    if (m == null || !_ready) return;
+    _loaded = false;
+    _guard(m.stop());
+    _applyMusic();
   }
 
   /// Plays effect [name] (a file in [sfxFiles]).
