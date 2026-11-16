@@ -16,6 +16,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # pinned: newer stables demand Gradle 9.3.1 + AGP 9.1.1
+          flutter-version: 3.44.8
           cache: true
 
       # Gradle, Kotlin and Maven downloads kept between runs: GitHub's
