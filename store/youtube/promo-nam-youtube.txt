@@ -2,6 +2,7 @@ VIDEO QUẢNG CÁO MÙA LÚA CHÍN (bản 1.1, giọng nam NamMinh) - NỘI DUNG
 ==============================================================================
 File video: store/video/mua-lua-chin-promo-nam-16x9.mp4 (video thường, 42 giây)
             store/video/mua-lua-chin-promo-nam-9x16.mp4 (Shorts / TikTok / Reels)
+Thumbnail:  store/youtube/thumbnail-dem-trang.png (1280x720, đêm trăng)
 Link tải:   https://play.google.com/store/apps/details?id=com.trungsmail.nongtrai
 Mốc thời gian trong video: gặt lúa 0:06-0:10 · phơi thóc/che bạt 0:15-0:19 ·
             đêm trăng 0:19-0:24 · lễ hội 0:24-0:29 · màn kết 0:36
@@ -56,8 +57,7 @@ CÀI ĐẶT GỢI Ý:
 - Đối tượng: "Không, nội dung này không dành cho trẻ em"
 - Danh mục: Trò chơi (Gaming); Trò chơi: Mùa Lúa Chín
 - Ngôn ngữ video và phụ đề: Tiếng Việt
-- Thumbnail: dùng lại store/youtube/thumbnail.png, hoặc chọn khung hình đêm trăng (0:20-0:23)
-  cho khác video giọng nữ
+- Thumbnail: store/youtube/thumbnail-dem-trang.png
 - Màn hình kết thúc (từ 0:36): nút Đăng ký + video giọng nữ
 - Thêm vào cùng danh sách phát với video giọng nữ
 - Bình luận ghim: "📲 Tải game miễn phí: https://play.google.com/store/apps/details?id=com.trungsmail.nongtrai  Hồi nhỏ bạn có đi bắt đom đóm không? 🌙👇"

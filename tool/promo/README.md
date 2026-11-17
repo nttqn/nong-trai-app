@@ -25,3 +25,8 @@ out/mua-lua-chin-promo-nam-9x16.mp4 / -16x9.mp4 (42 s). It adds the 1.1.0
 full-moon night scene (`node capture.js frames k_night`, hour=21, lunar 16/10)
 and swaps the theme for the dem_trang night track (frogs) during that scene.
 FFDIR env overrides the ffmpeg folder (default: lullaby-videos/tools).
+
+Night thumbnail: thumb-dem-trang.html (1280x720) expects next to it bg.png
+(1280x1000 @1.5x capture, `demo=3&shot=1&weather=sunny&day=2026-11-24&hour=21.5&fx=11&fy=10&zoom=1.25`),
+phone.png (540x960 @2x, same with fx=9&fy=9.3&zoom=1.6), icon-512.png and the
+two BeVietnamPro fonts; screenshot with Playwright → store/youtube/thumbnail-dem-trang.png.
