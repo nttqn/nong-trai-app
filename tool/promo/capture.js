@@ -55,6 +55,11 @@ const scenes = {
     for (let i = 0; i < 10; i++) { await p.mouse.wheel(0, 40); await wait(p, 90); }
   } },
   j_map: { q: `demo=3&${base}&day=2026-11-06&sheet=map&worldmap=demo`, secs: 5 },
+  // 1.1.0: full-moon night (lunar 16/10), fireflies and lamplight; slow pan
+  k_night: { q: `demo=3&shot=1&weather=sunny&day=2026-11-24&hour=21&fx=9&fy=9&zoom=1.4`, secs: 7, act: async (p) => {
+    await wait(p, 300);
+    await swipe(p, [[380, 560], [200, 480]], 6200);
+  } },
 };
 
 (async () => {

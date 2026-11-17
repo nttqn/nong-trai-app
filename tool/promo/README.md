@@ -16,3 +16,12 @@ the voice, a few game sound effects and Vietnamese subtitles.
 4. `node build.js` (FF points at a local ffmpeg 8.1 build) writes
    out/mua-lua-chin-promo-9x16.mp4 and -16x9.mp4 (copied to store/video/,
    gitignored). Posting texts: store/youtube/promo-youtube.txt.
+
+## Male-voice variant (2026-11-17)
+
+`node build.js nam` uses script-nam.json + voice-nam/ (vi-VN-NamMinhNeural,
+rate +0%, pitch -2Hz; same silenceremove/loudnorm step) and writes
+out/mua-lua-chin-promo-nam-9x16.mp4 / -16x9.mp4 (42 s). It adds the 1.1.0
+full-moon night scene (`node capture.js frames k_night`, hour=21, lunar 16/10)
+and swaps the theme for the dem_trang night track (frogs) during that scene.
+FFDIR env overrides the ffmpeg folder (default: lullaby-videos/tools).

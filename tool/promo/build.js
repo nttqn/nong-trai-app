@@ -6,7 +6,12 @@
 const fs = require('fs');
 const { execFileSync } = require('child_process');
 
-const FFDIR = 'C:/Users/Hi/AppData/Local/Temp/claude/c--Users-Hi--gemini-antigravity-scratch-finance-app/569b67c7-8a47-45d9-82e4-06715cbf6635/scratchpad/ffmpeg/ffmpeg-n8.1-latest-win64-gpl-8.1/bin';
+const FFDIR = process.env.FFDIR || 'C:/Users/Hi/.gemini/antigravity/scratch/lullaby-videos/tools/ffmpeg-master-latest-win64-gpl/bin';
+// variant: node build.js [nam] → script-nam.json, voice-nam/, *-promo-nam-*.mp4
+const VAR = process.argv[2];
+const SCRIPT = VAR ? `script-${VAR}.json` : 'script.json';
+const VOICE = VAR ? `voice-${VAR}` : 'voice';
+const NAME = VAR ? `mua-lua-chin-promo-${VAR}` : 'mua-lua-chin-promo';
 const FF = `${FFDIR}/ffmpeg.exe`, FP = `${FFDIR}/ffprobe.exe`;
 const P = 'C:/Users/Hi/.gemini/antigravity/scratch/nong-trai-app';
 const MUSIC = `${P}/assets/audio/music/dong_que.ogg`;
@@ -36,18 +41,19 @@ const EFFECTS = {
   s2: [['harvest', 0.25, 0.7], ['harvest', 0.75, 0.6], ['harvest', 1.25, 0.7], ['harvest', 1.75, 0.6], ['harvest', 2.25, 0.7], ['coin', 2.7, 0.4]],
   s3: [['ga', 0.4, 0.5], ['vit', 1.6, 0.5], ['trau', 2.8, 0.45]],
   s4: [['place', 2.6, 0.6]],
-  s5: [['sparkle', 0.3, 0.6]],
+  s5: VAR ? [] : [['sparkle', 0.3, 0.6]],
+  s6: VAR ? [['sparkle', 0.3, 0.6]] : [],
   s7: [['quest', 0.2, 0.6]],
   s8: [['tap', 0.3, 0.6]],
   s9: [['levelup', 0.1, 0.7]],
 };
 
-const script = JSON.parse(fs.readFileSync('script.json', 'utf8'));
+const script = JSON.parse(fs.readFileSync(SCRIPT, 'utf8'));
 const GAP = 0.8;
 let t = 0;
 const segs = [], sfx = [], subs = [], voices = [];
 for (const [n, line] of script.entries()) {
-  const vfile = `voice/${line.id}.wav`;
+  const vfile = `${VOICE}/${line.id}.wav`;
   const lead = n === 0 ? 0.4 : 0;
   const len = dur(vfile) + GAP + lead;
   voices.push({ at: t + lead, file: vfile });
@@ -97,8 +103,15 @@ const mix = (items, outFile) => {
 };
 mix(sfx, 'seg/sfx.wav');
 mix(voices, 'seg/voice.wav');
-ff(['-stream_loop', '-1', '-i', MUSIC, '-i', 'seg/voice.wav', '-i', 'seg/sfx.wav', '-filter_complex',
-  `[0]atrim=0:${TOTAL.toFixed(3)},aresample=44100,aformat=channel_layouts=stereo,volume=0.6,afade=t=in:d=0.5,afade=t=out:st=${(TOTAL - 2.5).toFixed(2)}:d=2.5[m];` +
+// a k_night scene swaps the theme for the moonlit-night track (frogs)
+const night = script.find((l) => l.scene.includes('k_night'));
+const nf = night && subs.find((x) => x.id === night.id);
+const [na, nb] = nf ? [nf.from - 0.6, nf.to + 0.4] : [-9, -9];
+const ramp = `min(1,max(0,min((t-${na.toFixed(2)})/0.9,(${nb.toFixed(2)}-t)/0.9)))`;
+const NIGHT = `${P}/assets/audio/music/dem_trang.ogg`;
+ff(['-stream_loop', '-1', '-i', MUSIC, '-i', 'seg/voice.wav', '-i', 'seg/sfx.wav', '-stream_loop', '-1', '-i', NIGHT, '-filter_complex',
+  `[0]atrim=0:${TOTAL.toFixed(3)},aresample=44100,aformat=channel_layouts=stereo,volume=0.6,volume='1-0.85*${ramp}':eval=frame,afade=t=in:d=0.5,afade=t=out:st=${(TOTAL - 2.5).toFixed(2)}:d=2.5[m0];` +
+  `[3]atrim=0:${TOTAL.toFixed(3)},asetpts=PTS-STARTPTS,aresample=44100,aformat=channel_layouts=stereo,volume=0.75,volume='${ramp}':eval=frame[n];[m0][n]amix=inputs=2:normalize=0[m];` +
   '[1]asplit=2[v][vk];[m][vk]sidechaincompress=threshold=0.03:ratio=6:attack=30:release=400[md];' +
   '[2]volume=0.9[fx];[md][v][fx]amix=inputs=3:normalize=0,alimiter=limit=0.95[o]',
   '-map', '[o]', '-t', TOTAL.toFixed(3), '-c:a', 'pcm_s16le', 'seg/mix.wav']);
@@ -108,12 +121,12 @@ const subFilter = (size, y, xExpr = '(w-text_w)/2') => subs.filter((s) => s.id !
   `drawtext=fontfile=${FONT}:textfile=${s.file}:fontsize=${size}:fontcolor=white:line_spacing=14:text_align=center:` +
   `borderw=4:bordercolor=0x2B1D0E:box=1:boxcolor=0x2B1D0E@0.62:boxborderw=26:x=${xExpr}:y=${y}:` +
   `enable='between(t,${s.from.toFixed(2)},${s.to.toFixed(2)})':alpha='if(lt(t-${s.from.toFixed(2)},0.25),(t-${s.from.toFixed(2)})/0.25,1)'`).join(',');
-const endAt = (TOTAL - (dur('voice/s9.wav') + GAP + 1.2)).toFixed(2);
+const endAt = (TOTAL - (dur(`${VOICE}/s9.wav`) + GAP + 1.2)).toFixed(2);
 
 // 9:16: the game full screen, subtitles in the lower middle of the map
 ff(['-i', 'seg/master.mp4', '-i', 'seg/mix.wav', '-filter_complex', `[0]${subFilter(66, 1420)}[v]`,
   '-map', '[v]', '-map', '1:a', '-r', '30', '-c:v', 'libx264', '-crf', '18', '-preset', 'medium', '-pix_fmt', 'yuv420p',
-  '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', 'out/mua-lua-chin-promo-9x16.mp4']);
+  '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', `out/${NAME}-9x16.mp4`]);
 
 // 16:9: blurred fill, the portrait game in the middle, icon and title on
 // the left, subtitles on the right; the end card fills the frame
@@ -125,5 +138,5 @@ ff(['-i', 'seg/master.mp4', '-i', 'seg/mix.wav', '-i', ICON, '-filter_complex',
   `drawtext=fontfile=${FONT_R}:textfile=txt/tagline.txt:fontsize=36:fontcolor=white:borderw=3:bordercolor=0x3B2A14:x=(656-text_w)/2:y=640:enable='lt(t,${endAt})',` +
   `${subFilter(54, 470, '1264+(656-text_w)/2')}[v]`,
   '-map', '[v]', '-map', '1:a', '-r', '30', '-c:v', 'libx264', '-crf', '18', '-preset', 'medium', '-pix_fmt', 'yuv420p',
-  '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', 'out/mua-lua-chin-promo-16x9.mp4']);
+  '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', `out/${NAME}-16x9.mp4`]);
 console.log('done');
