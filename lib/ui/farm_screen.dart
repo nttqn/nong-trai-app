@@ -18,6 +18,8 @@ import '../render/iso.dart' show clearTextCache;
 import '../render/night.dart';
 import '../services/ads.dart';
 import '../services/analytics.dart';
+import '../core/chat.dart';
+import '../services/chat.dart';
 import '../services/cloud.dart';
 import '../services/leaderboard.dart';
 import '../services/notify.dart';
@@ -27,6 +29,7 @@ import '../services/sound.dart';
 import '../core/memories.dart';
 import 'album_sheet.dart';
 import 'calendar_sheet.dart';
+import 'chat_sheet.dart';
 import 'cloud_tile.dart';
 import 'extras.dart';
 import 'leaderboard_sheet.dart';
@@ -72,7 +75,9 @@ class _FarmScreenState extends State<FarmScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // store screenshots on web: ?sheet=calendar|album|orders|shop|storage|map
+    // store screenshots on web: ?sheet=calendar|album|orders|shop|storage|map|chat
+    // (?chat=demo fills the chat with sample lines instead of Firebase)
+    if (kIsWeb && Uri.base.queryParameters['chat'] == 'demo') ChatService.instance.debugMessages = _demoChat();
     final demoSheet = kIsWeb ? Uri.base.queryParameters['sheet'] : null;
     if (demoSheet != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -89,6 +94,8 @@ class _FarmScreenState extends State<FarmScreen>
             _openStorage();
           case 'map':
             _openMap();
+          case 'chat':
+            _openChat();
         }
       });
     }
@@ -1076,6 +1083,11 @@ class _FarmScreenState extends State<FarmScreen>
             onTap: _openLeaderboard,
             child: _chip(const Text('🏆', style: TextStyle(fontSize: 19))),
           ),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: _openChat,
+            child: _chip(const Text('💬', style: TextStyle(fontSize: 19))),
+          ),
         ]),
         const SizedBox(height: 4),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1195,6 +1207,26 @@ class _FarmScreenState extends State<FarmScreen>
     SoundService.instance.play('tap');
     _select(null);
     showFarmSheet(context, (_) => LeaderboardSheet(farm), height: .8);
+  }
+
+  void _openChat() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showChatSheet(context, farm);
+  }
+
+  static List<ChatMsg> _demoChat() {
+    final t = DateTime.now().millisecondsSinceEpoch;
+    var i = 0;
+    ChatMsg m(String name, int lv, String text) =>
+        ChatMsg(id: 'd${i++}', uid: name, name: name, level: lv, text: text, at: t - (12 - i) * 240000);
+    return [
+      m('Vườn Bác Tư', 38, 'Chào bà con, sáng nay trời nắng đẹp phơi thóc được rồi!'),
+      m('Trại Gà Út Hiền', 22, 'Ai có lá dâu dư bán em với ạ'),
+      m('Nông trại Hai Lúa', 44, 'Lên chợ phiên mình đang bày 20 kén tằm nè'),
+      m('Ruộng Nhà Ngoại', 31, 'Nếp cẩm trồng lâu mà làm sữa chua bán được giá ghê'),
+      m('Vườn Bác Tư', 38, 'Ghé làng mình thu hoạch hộ nha, cảm ơn cả nhà 🌾'),
+    ];
   }
 
   void _claimQuest() {

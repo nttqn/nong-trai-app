@@ -73,5 +73,23 @@
   },
   "cay_du": {
     "scale": 0.85
+  },
+  "cay_cam": {
+    "scale": 1.3
+  },
+  "cay_cam_qua": {
+    "scale": 1.3
+  },
+  "cay_mit": {
+    "scale": 1.3
+  },
+  "cay_mit_qua": {
+    "scale": 1.3
+  },
+  "cay_cau": {
+    "scale": 1.05
+  },
+  "cay_cau_qua": {
+    "scale": 1.05
   }
 }

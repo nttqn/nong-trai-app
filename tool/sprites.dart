@@ -55,6 +55,7 @@ int maxWidthFor(String key) {
   if (key.startsWith('item_') || key == 'cho_thuc' || key == 'cho_ngu') return 128;
   if (key == 'ho_sen') return 768; // one picture for the whole lake
   if (key.startsWith('cau_') || key.startsWith('san_phoi') || key == 'cay_du') return 400;
+  if (key == 'nha_tam') return 400;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',

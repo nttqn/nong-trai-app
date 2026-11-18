@@ -58,6 +58,9 @@ quảng cáo.</p>
   của bạn; người mua cũng được ghi tên nông trại.</li>
   <li><strong>Bảng xếp hạng:</strong> tên nông trại, cấp, số đơn hàng đã giao và số công trình
   của làng. Bạn có thể bật <em>Ẩn tôi khỏi bảng</em> trong màn xếp hạng bất cứ lúc nào.</li>
+  <li><strong>Kênh Thế Giới (chat):</strong> tin bạn gửi kèm tên nông trại, cấp và giờ gửi, lưu
+  trên Firebase Realtime Database và tự xóa sau 3 ngày. Tin bị báo cáo được xem xét; tài khoản vi
+  phạm có thể bị cấm chat. Danh sách người bạn chặn chỉ lưu trên máy của bạn.</li>
 </ul>
 <p>Không nơi nào hiện email hay tên tài khoản Google của bạn.</p>
 
@@ -143,7 +146,10 @@ and save times). Each player can read and write only their own save.</p>
 name, level, title and farm layout, so neighbours can visit, help harvest or sneak a few crops;
 each visit is recorded with the visitor's farm name), goods you put on your <strong>market
 stall</strong> (item, quantity, price and your farm name; buyers are recorded by farm name), and
-the <strong>leaderboard</strong> (farm name, level, orders delivered and village projects). Turn on
+the <strong>leaderboard</strong> (farm name, level, orders delivered and village projects), and
+messages you post in the <strong>world chat</strong> (with your farm name, level and time; kept
+in Firebase Realtime Database and deleted after 3 days; reported messages are reviewed and
+accounts that break the rules may be muted). Turn on
 <em>Hide me from the leaderboard</em> at any time. No email address or Google account name is
 shown anywhere.</p>
 
