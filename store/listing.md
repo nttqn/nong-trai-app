@@ -57,6 +57,9 @@ Game miễn phí, có quảng cáo. Nhiều quảng cáo do bạn tự chọn xe
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.2.0, ≤ 500 ký tự)
+Thêm 54 nhiệm vụ mới từ cấp 31 đến cấp 60 cho bà con chơi lâu: nâng các công trình làng lên cấp 3, làm bánh cốm, trà mật ong, hồng sấy, phô mai dê, giao đơn đặc biệt... thưởng xu và kinh nghiệm lớn. Cảnh đêm dịu mắt hơn, vào ☰ → Hiển thị → Cảnh đêm để chọn Tắt, Dịu hoặc Đậm.
+
 ## Có gì mới (bản 1.1.1, ≤ 500 ký tự)
 Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng sao và ánh đèn. Vào ☰ → Hiển thị → Cảnh đêm để chọn Tắt, Dịu hoặc Đậm theo ý thích. Cảm ơn bà con đã góp ý!
 
@@ -65,6 +68,9 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.2.0, en-US)
+54 new quests from level 31 to 60 for long-time farmers: raise every village project to level 3, make green-rice cakes, honey tea, dried persimmons and goat cheese, deliver special orders and more, with big coin and XP rewards. Nights are easier on the eyes; pick Off, Soft or Deep in ☰ → Display → Night scene.
 
 ## What's new (1.1.1, en-US)
 Easier on the eyes at night: the village no longer gets so dark, while keeping the moon, stars and lamplight. Go to ☰ → Display → Night scene to pick Off, Soft or Deep. Thanks for your feedback!

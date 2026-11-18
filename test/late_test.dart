@@ -88,7 +88,7 @@ void main() {
 
   test('every quest key is one the farm records', () {
     const prefixes = ['plant:', 'harvest:', 'build:', 'project:', 'project_lv:', 'buy:', 'feed:', 'get:', 'stock:'];
-    const plain = {'clear', 'order', 'level', 'lot', 'house', 'fertilize', 'daily', 'project_up'};
+    const plain = {'clear', 'order', 'level', 'lot', 'house', 'fertilize', 'daily', 'project_up', 'dry'};
     for (final q in questChain) {
       expect(plain.contains(q.key) || prefixes.any(q.key.startsWith), isTrue, reason: q.key);
     }

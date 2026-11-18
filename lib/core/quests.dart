@@ -12,10 +12,15 @@ class QuestDef {
 }
 
 /// Bumped when quests are inserted into the chain; see Farm.fromJson.
-const questChainVersion = 2;
+const questChainVersion = 3;
 
 /// Index where the 1.1 quests were inserted, and how many.
 const questInsertAt = 14, questInserted = 2;
+
+/// Length of the chain before 1.2 appended the cấp 31+ quests. A farm that
+/// had finished it has questBase 0, so it restarts counting at the first
+/// new quest (see Farm.fromJson).
+const questChainV2Length = 50;
 
 const questChain = [
   QuestDef('Gieo lúa trên 4 ô ruộng', 'plant:lua', 4, 30, 5),
@@ -70,4 +75,60 @@ const questChain = [
   QuestDef('Làm 3 bánh cốm', 'get:banhcom', 3, 6000, 600),
   QuestDef('Giao 20 đơn đặc biệt', 'daily', 20, 8000, 800),
   QuestDef('Nâng đình làng lên cấp 3', 'project_lv:dinh_lang', 3, 15000, 1500, absolute: true),
+  // cấp 31+ (1.2, questChainVersion 3): only things that are always doable
+  // again (no land or one-off buildings), so the chain never gets stuck
+  QuestDef('Đạt cấp 31', 'level', 31, 8000, 0, absolute: true),
+  QuestDef('Lên biệt thự nhà vườn', 'house', 4, 10000, 800, absolute: true),
+  QuestDef('Nâng trường mầm non lên cấp 3', 'project_lv:truong', 3, 10000, 800, absolute: true),
+  QuestDef('Thu 30 hũ mật ong', 'get:matong', 30, 10000, 900),
+  QuestDef('Làm 10 túi hồng sấy', 'get:hongsay', 10, 12000, 1000),
+  QuestDef('Đạt cấp 32', 'level', 32, 9000, 0, absolute: true),
+  QuestDef('Nâng trạm y tế lên cấp 3', 'project_lv:tram_y_te', 3, 12000, 1000, absolute: true),
+  QuestDef('Cấy và gặt 40 ô lúa tám thơm', 'harvest:tam', 40, 12000, 1000),
+  QuestDef('Làm 10 bánh phô mai dê', 'get:phomai', 10, 14000, 1100),
+  QuestDef('Giao 30 đơn đặc biệt', 'daily', 30, 15000, 1200),
+  QuestDef('Đạt cấp 34', 'level', 34, 10000, 0, absolute: true),
+  QuestDef('Nâng chợ quê lên cấp 3', 'project_lv:cho_que', 3, 15000, 1200, absolute: true),
+  QuestDef('Thu 60 quả hồng', 'get:hong', 60, 15000, 1200),
+  QuestDef('Pha 15 ấm trà mật ong', 'get:chemat', 15, 16000, 1300),
+  QuestDef('Giao 100 đơn hàng', 'order', 100, 18000, 1400),
+  QuestDef('Đạt cấp 36', 'level', 36, 12000, 0, absolute: true),
+  QuestDef('Nâng nhà văn hóa lên cấp 3', 'project_lv:nha_van_hoa', 3, 18000, 1400, absolute: true),
+  QuestDef('Làm 15 bánh cốm', 'get:banhcom', 15, 18000, 1500),
+  QuestDef('Thu 80 con tôm càng', 'get:tom', 80, 18000, 1500),
+  QuestDef('Phơi khô 200 thóc trên sân', 'dry', 200, 20000, 1600),
+  QuestDef('Đạt cấp 38', 'level', 38, 14000, 0, absolute: true),
+  QuestDef('Nâng giếng làng lên cấp 3', 'project_lv:gieng', 3, 15000, 1200, absolute: true),
+  QuestDef('Nâng cổng làng lên cấp 3', 'project_lv:cong_lang', 3, 18000, 1400, absolute: true),
+  QuestDef('Gói 20 chiếc bánh chưng', 'get:banhchung', 20, 22000, 1800),
+  QuestDef('Bón phân chuồng cho 30 ruộng', 'fertilize', 30, 20000, 1600),
+  QuestDef('Đạt cấp 40', 'level', 40, 16000, 0, absolute: true),
+  QuestDef('Nâng đường bê tông lên cấp 3', 'project_lv:duong_be_tong', 3, 20000, 1600, absolute: true),
+  QuestDef('Nâng trạm bơm lên cấp 3', 'project_lv:tram_bom', 3, 20000, 1600, absolute: true),
+  QuestDef('Nâng trạm biến áp lên cấp 3', 'project_lv:tram_dien', 3, 20000, 1600, absolute: true),
+  QuestDef('Làm 20 hộp sữa đậu nành', 'get:suadaunanh', 20, 22000, 1800),
+  QuestDef('Làm 20 lọ tương ớt', 'get:tuongot', 20, 22000, 1800),
+  QuestDef('Đạt cấp 42', 'level', 42, 18000, 0, absolute: true),
+  QuestDef('Thu 60 sữa dê', 'get:suade', 60, 24000, 2000),
+  QuestDef('Thu 100 quả nhãn lồng', 'get:nhan', 100, 24000, 2000),
+  QuestDef('Giao 50 đơn đặc biệt', 'daily', 50, 28000, 2200),
+  QuestDef('Đạt cấp 44', 'level', 44, 20000, 0, absolute: true),
+  QuestDef('Làm 20 bánh đậu xanh', 'get:banhdauxanh', 20, 26000, 2200),
+  QuestDef('Làm 25 gói kẹo lạc', 'get:keolac', 25, 26000, 2200),
+  QuestDef('Thu 100 bình sữa bò', 'get:sua', 100, 28000, 2300),
+  QuestDef('Đạt cấp 46', 'level', 46, 22000, 0, absolute: true),
+  QuestDef('Thu 80 hũ mật ong', 'get:matong', 80, 30000, 2500),
+  QuestDef('Làm 30 túi hồng sấy', 'get:hongsay', 30, 32000, 2600),
+  QuestDef('Giao 200 đơn hàng', 'order', 200, 35000, 2800),
+  QuestDef('Đạt cấp 48', 'level', 48, 24000, 0, absolute: true),
+  QuestDef('Làm 30 bánh cốm', 'get:banhcom', 30, 36000, 3000),
+  QuestDef('Làm 25 bánh phô mai dê', 'get:phomai', 25, 36000, 3000),
+  QuestDef('Pha 30 ấm trà mật ong', 'get:chemat', 30, 38000, 3100),
+  QuestDef('Đạt cấp 50', 'level', 50, 30000, 0, absolute: true),
+  QuestDef('Gói 40 chiếc bánh chưng', 'get:banhchung', 40, 40000, 3300),
+  QuestDef('Giao 100 đơn đặc biệt', 'daily', 100, 45000, 3600),
+  QuestDef('Đạt cấp 55', 'level', 55, 40000, 0, absolute: true),
+  QuestDef('Giao 400 đơn hàng', 'order', 400, 50000, 4000),
+  QuestDef('Làm 50 bánh cốm', 'get:banhcom', 50, 55000, 4500),
+  QuestDef('Đạt cấp 60', 'level', 60, 60000, 0, absolute: true),
 ];

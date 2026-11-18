@@ -1336,6 +1336,11 @@ class Farm {
     f.daily.addAll([for (final o in (j['daily'] as List? ?? const [])) Order.fromJson(o)]);
     f.orders.addAll([for (final o in j['orders']) Order.fromJson(o)]);
     f.stats.addAll(Map<String, int>.from(j['stats']));
+    // 1.2 appended cấp 31+ quests: a farm that had finished the chain starts
+    // the first new one counting from now, not from its lifetime stats
+    if ((j['qv'] ?? 1) < 3 && f.quest == questChainV2Length) {
+      f.questBase = f.stats[questChain[f.quest].key] ?? 0;
+    }
     try {
       final fe = j['fest'] as Map?;
       if (fe != null) {
