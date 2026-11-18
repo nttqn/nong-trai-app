@@ -57,6 +57,9 @@ Game miễn phí, có quảng cáo. Nhiều quảng cáo do bạn tự chọn xe
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.3.0, ≤ 500 ký tự)
+Nội dung mới cho cấp 31–45: nuôi tằm ăn lá dâu, ươm tơ, dệt lụa và chiếu cói ở nhà khung cửi; trồng nghệ, cói, lúa nếp cẩm; cây cam, mít, cau; thả lươn, cá quả; bếp chè mứt với mứt cam, nghệ mật ong, sữa chua nếp cẩm; cháo lươn, cá kho tộ và tráp ăn hỏi. Thêm 27 nhiệm vụ dẫn đường.
+
 ## Có gì mới (bản 1.2.0, ≤ 500 ký tự)
 Thêm 54 nhiệm vụ mới từ cấp 31 đến cấp 60 cho bà con chơi lâu: nâng các công trình làng lên cấp 3, làm bánh cốm, trà mật ong, hồng sấy, phô mai dê, giao đơn đặc biệt... thưởng xu và kinh nghiệm lớn. Cảnh đêm dịu mắt hơn, vào ☰ → Hiển thị → Cảnh đêm để chọn Tắt, Dịu hoặc Đậm.
 
@@ -68,6 +71,9 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.3.0, en-US)
+New content for levels 31–45: raise silkworms on mulberry leaves, reel silk and weave silk cloth and sedge mats at the loom house; grow turmeric, sedge and black sticky rice; orange, jackfruit and areca trees; eels and snakehead fish; a jam kitchen for candied orange, turmeric honey and black-rice yogurt; eel porridge, braised fish and wedding gift boxes. Plus 27 new guide quests.
 
 ## What's new (1.2.0, en-US)
 54 new quests from level 31 to 60 for long-time farmers: raise every village project to level 3, make green-rice cakes, honey tea, dried persimmons and goat cheese, deliver special orders and more, with big coin and XP rewards. Nights are easier on the eyes; pick Off, Soft or Deep in ☰ → Display → Night scene.

@@ -29,6 +29,11 @@ const items = <String, ItemDef>{
   'dautuong': ItemDef('dautuong', 'Đậu tương', '🫘', 30, Color(0xFFE6C77A)),
   'che': ItemDef('che', 'Chè búp', '🍃', 45, Color(0xFF6BAA45)),
   'thoctam': ItemDef('thoctam', 'Thóc tám thơm', '🌾', 26, Color(0xFFF0D98A)),
+  // cấp 31+
+  'nghe': ItemDef('nghe', 'Củ nghệ', '🫚', 52, Color(0xFFF9A825)),
+  'la_dau': ItemDef('la_dau', 'Lá dâu tằm', '🌿', 30, Color(0xFF8BC34A)),
+  'coi': ItemDef('coi', 'Cói', '🌾', 55, Color(0xFFB5C46A)),
+  'nepcam': ItemDef('nepcam', 'Thóc nếp cẩm', '🌾', 70, Color(0xFF7E57C2)),
   // animals
   'trung': ItemDef('trung', 'Trứng gà', '🥚', 12, Color(0xFFF3E3C3)),
   'trungvit': ItemDef('trungvit', 'Trứng vịt', '🥚', 18, Color(0xFFB9DCD2)),
@@ -37,11 +42,14 @@ const items = <String, ItemDef>{
   'phan': ItemDef('phan', 'Phân chuồng', '💩', 30, Color(0xFF8D6E4C)),
   'suade': ItemDef('suade', 'Sữa dê', '🍼', 75, Color(0xFFF1F1E6)),
   'matong': ItemDef('matong', 'Mật ong', '🍯', 120, Color(0xFFFFB300)),
+  'ken': ItemDef('ken', 'Kén tằm', '🐛', 90, Color(0xFFFFF59D)),
   // fish
   'caro': ItemDef('caro', 'Cá rô phi', '🐟', 16, Color(0xFF7FB3D5)),
   'catram': ItemDef('catram', 'Cá trắm', '🐟', 30, Color(0xFF5D8AA8)),
   'cachep': ItemDef('cachep', 'Cá chép', '🐠', 48, Color(0xFFF0A040)),
   'tom': ItemDef('tom', 'Tôm càng', '🦐', 70, Color(0xFFF07860)),
+  'luon': ItemDef('luon', 'Lươn đồng', '🐍', 90, Color(0xFFA1887F)),
+  'caqua': ItemDef('caqua', 'Cá quả', '🐟', 110, Color(0xFF607D8B)),
   // fruit
   'chuoi': ItemDef('chuoi', 'Chuối', '🍌', 15, Color(0xFFFFE066)),
   'xoai': ItemDef('xoai', 'Xoài', '🥭', 32, Color(0xFFFFB347)),
@@ -50,6 +58,9 @@ const items = <String, ItemDef>{
   'vai': ItemDef('vai', 'Vải thiều', '🍒', 70, Color(0xFFE57373)),
   'nhan': ItemDef('nhan', 'Nhãn lồng', '🌰', 95, Color(0xFFC8A165)),
   'hong': ItemDef('hong', 'Hồng', '🟠', 85, Color(0xFFFF8A3D)),
+  'camvinh': ItemDef('camvinh', 'Cam', '🍊', 100, Color(0xFFFFA726)),
+  'mit': ItemDef('mit', 'Mít', '🍈', 125, Color(0xFFCDDC39)),
+  'cau': ItemDef('cau', 'Quả cau', '🫒', 150, Color(0xFF9CCC65)),
   // processed
   'gao': ItemDef('gao', 'Gạo', '🍚', 14, Color(0xFFFFFFFF)),
   'cam': ItemDef('cam', 'Cám', '🟫', 5, Color(0xFFBCAAA4)),
@@ -74,6 +85,19 @@ const items = <String, ItemDef>{
   'com': ItemDef('com', 'Cốm làng Vòng', '🟢', 110, Color(0xFFA5D66B)),
   'banhdauxanh': ItemDef('banhdauxanh', 'Bánh đậu xanh', '🟨', 300, Color(0xFFFFE57F)),
   'banhcom': ItemDef('banhcom', 'Bánh cốm', '🟩', 460, Color(0xFF7CB342)),
+  // cấp 31+
+  'tinhbotnghe': ItemDef('tinhbotnghe', 'Tinh bột nghệ', '🟡', 200, Color(0xFFFFCA28)),
+  'to': ItemDef('to', 'Tơ tằm', '🧶', 330, Color(0xFFFFF8E1)),
+  'chieu': ItemDef('chieu', 'Chiếu cói', '🧺', 300, Color(0xFFD7C27A)),
+  'lua_to': ItemDef('lua_to', 'Tấm lụa', '🧣', 820, Color(0xFFE57373)),
+  'chaoluon': ItemDef('chaoluon', 'Cháo lươn', '🥣', 330, Color(0xFFFFE0B2)),
+  'mutcam': ItemDef('mutcam', 'Mứt cam', '🍬', 600, Color(0xFFFF9800)),
+  'nghematong': ItemDef('nghematong', 'Nghệ mật ong', '🫙', 580, Color(0xFFFFB300)),
+  'mitsay': ItemDef('mitsay', 'Mít sấy', '🟨', 520, Color(0xFFFFD54F)),
+  'xoinepcam': ItemDef('xoinepcam', 'Xôi nếp cẩm', '🍙', 380, Color(0xFF9575CD)),
+  'suachuanepcam': ItemDef('suachuanepcam', 'Sữa chua nếp cẩm', '🍧', 450, Color(0xFFB39DDB)),
+  'cakho': ItemDef('cakho', 'Cá kho tộ', '🍲', 620, Color(0xFF8D6E63)),
+  'trap_cuoi': ItemDef('trap_cuoi', 'Tráp ăn hỏi', '🎁', 2500, Color(0xFFD32F2F)),
 };
 
 ItemDef item(String id) => items[id]!;
@@ -106,6 +130,10 @@ const crops = <String, CropDef>{
   'dautuong': CropDef('dautuong', 'Đậu tương', Plot.bed, 20, 3600, 18, 'dautuong', 2, 9),
   'che': CropDef('che', 'Chè', Plot.bed, 22, 6000, 22, 'che', 2, 12),
   'tam': CropDef('tam', 'Lúa tám thơm', Plot.paddy, 25, 4800, 20, 'thoctam', 2, 11, bonus: 'rom'),
+  'nghe': CropDef('nghe', 'Nghệ', Plot.bed, 31, 5400, 24, 'nghe', 2, 12),
+  'dau_tam': CropDef('dau_tam', 'Dâu tằm', Plot.bed, 32, 3600, 15, 'la_dau', 2, 8),
+  'coi': CropDef('coi', 'Cói', Plot.paddy, 34, 6000, 25, 'coi', 2, 13),
+  'nep_cam': CropDef('nep_cam', 'Lúa nếp cẩm', Plot.paddy, 38, 7200, 30, 'nepcam', 2, 16, bonus: 'rom'),
 };
 
 class TreeDef {
@@ -123,6 +151,9 @@ const trees = <String, TreeDef>{
   'cay_vai': TreeDef('cay_vai', 'Cây vải', 17, 1300, 9000, 'vai', 3, 11),
   'cay_nhan': TreeDef('cay_nhan', 'Cây nhãn', 23, 1800, 10800, 'nhan', 3, 13),
   'cay_hong': TreeDef('cay_hong', 'Cây hồng', 27, 2400, 12600, 'hong', 3, 15),
+  'cay_cam': TreeDef('cay_cam', 'Cây cam', 33, 3000, 14400, 'camvinh', 3, 17),
+  'cay_mit': TreeDef('cay_mit', 'Cây mít', 36, 3800, 16200, 'mit', 3, 20),
+  'cay_cau': TreeDef('cay_cau', 'Cây cau', 40, 5000, 18000, 'cau', 3, 22),
 };
 
 class AnimalDef {
@@ -140,6 +171,7 @@ const animals = <String, AnimalDef>{
   'trau': AnimalDef('trau', 'Trâu', 'chuong_trau', 10, 250, 'rom', 'phan', 2400, 3, 4),
   'de': AnimalDef('de', 'Dê', 'chuong_de', 21, 400, 'rau', 'suade', 3000, 4, 7),
   'ong': AnimalDef('ong', 'Đàn ong', 'vuon_ong', 24, 500, 'cuc', 'matong', 3600, 3, 9),
+  'tamto': AnimalDef('tamto', 'Nong tằm', 'nha_tam', 32, 600, 'la_dau', 'ken', 3000, 4, 10),
 };
 
 AnimalDef? animalForPen(String pen) {
@@ -161,6 +193,8 @@ const fishes = <String, FishDef>{
   'catram': FishDef('catram', 'Cá trắm', 9, 45, 3600, 'catram', 4, 6),
   'cachep': FishDef('cachep', 'Cá chép', 13, 80, 5400, 'cachep', 4, 9),
   'tom': FishDef('tom', 'Tôm càng', 17, 120, 7200, 'tom', 4, 12),
+  'luon': FishDef('luon', 'Lươn đồng', 35, 160, 9000, 'luon', 4, 15),
+  'caqua': FishDef('caqua', 'Cá quả', 41, 200, 10800, 'caqua', 4, 18),
 };
 
 class RecipeDef {
@@ -196,6 +230,19 @@ const recipes = <String, RecipeDef>{
   'chekho': RecipeDef('chekho', 'xuong_che', 22, {'che': 3}, 'chekho', 1, 2700, 12),
   'chemat': RecipeDef('chemat', 'xuong_che', 24, {'chekho': 1, 'matong': 1}, 'chemat', 1, 2400, 15),
   'hongsay': RecipeDef('hongsay', 'xuong_che', 29, {'hong': 3}, 'hongsay', 1, 4200, 17),
+  // cấp 31+
+  'tinhbotnghe': RecipeDef('tinhbotnghe', 'may_xay', 31, {'nghe': 3}, 'tinhbotnghe', 1, 2400, 10),
+  'to': RecipeDef('to', 'khung_cui', 32, {'ken': 3}, 'to', 1, 2400, 14),
+  'chieu': RecipeDef('chieu', 'khung_cui', 34, {'coi': 4}, 'chieu', 1, 3600, 15),
+  'lua_to': RecipeDef('lua_to', 'khung_cui', 35, {'to': 2}, 'lua_to', 1, 4800, 24),
+  'chaoluon': RecipeDef('chaoluon', 'lo_banh', 35, {'luon': 2, 'gao': 2}, 'chaoluon', 1, 1800, 13),
+  'mutcam': RecipeDef('mutcam', 'xuong_mut', 36, {'camvinh': 3, 'duong': 1}, 'mutcam', 1, 3600, 18),
+  'nghematong': RecipeDef('nghematong', 'xuong_mut', 36, {'tinhbotnghe': 1, 'matong': 2}, 'nghematong', 1, 3000, 17),
+  'mitsay': RecipeDef('mitsay', 'xuong_che', 37, {'mit': 3}, 'mitsay', 1, 4800, 19),
+  'xoinepcam': RecipeDef('xoinepcam', 'lo_banh', 38, {'nepcam': 3, 'dua_xiem': 1}, 'xoinepcam', 1, 2400, 15),
+  'suachuanepcam': RecipeDef('suachuanepcam', 'xuong_mut', 39, {'nepcam': 2, 'sua': 3}, 'suachuanepcam', 1, 3000, 17),
+  'cakho': RecipeDef('cakho', 'xuong_ca', 41, {'caqua': 2, 'nuocmam': 1, 'duong': 1}, 'cakho', 1, 4200, 22),
+  'trap_cuoi': RecipeDef('trap_cuoi', 'khung_cui', 44, {'cau': 4, 'banhcom': 1, 'lua_to': 1}, 'trap_cuoi', 1, 7200, 45),
 };
 
 List<RecipeDef> recipesFor(String building) =>
@@ -249,6 +296,15 @@ const buildings = <String, BuildingDef>{
       desc: 'Đậu phụ, sữa đậu nành, phô mai dê.', xp: 30),
   'xuong_che': BuildingDef('xuong_che', 'Lò sao sấy', BKind.factory, 2, 2, 22, 6000,
       desc: 'Sao chè khô, pha trà mật ong, sấy hồng.', xp: 35),
+  'nha_tam': BuildingDef('nha_tam', 'Nhà nuôi tằm', BKind.pen, 2, 2, 32, 7000,
+      desc: 'Tằm ăn lá dâu, nhả kén.', xp: 40),
+  'khung_cui': BuildingDef('khung_cui', 'Nhà khung cửi', BKind.factory, 2, 2, 32, 9000,
+      desc: 'Ươm tơ, dệt lụa, dệt chiếu cói, sửa tráp ăn hỏi.', xp: 45),
+  'xuong_mut': BuildingDef('xuong_mut', 'Bếp chè mứt', BKind.factory, 2, 2, 36, 12000,
+      desc: 'Sên mứt cam, làm nghệ mật ong, sữa chua nếp cẩm.', xp: 50),
+  'cay_cam': BuildingDef('cay_cam', 'Cây cam', BKind.tree, 1, 1, 33, 3000),
+  'cay_mit': BuildingDef('cay_mit', 'Cây mít', BKind.tree, 1, 1, 36, 3800),
+  'cay_cau': BuildingDef('cay_cau', 'Cây cau', BKind.tree, 1, 1, 40, 5000),
   'cay_nhan': BuildingDef('cay_nhan', 'Cây nhãn', BKind.tree, 1, 1, 23, 1800),
   'cay_hong': BuildingDef('cay_hong', 'Cây hồng', BKind.tree, 1, 1, 27, 2400),
   'cay_chuoi': BuildingDef('cay_chuoi', 'Cây chuối', BKind.tree, 1, 1, 4, 150),

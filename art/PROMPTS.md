@@ -357,3 +357,58 @@ Cùng kiểu với đợt 10: một bức tranh cảnh đầy đủ, khung ngang
 | Tên file | Mô tả (thêm sau phần style chung của đợt 10) |
 |---|---|
 | `ky_uc_trang_ram` | A full-moon night in a Vietnamese village yard: a big round moon over bamboo tops, a family on a straw mat in the courtyard, the mother peeling a pomelo, a grandmother fanning with a palm-leaf fan telling stories to children, fireflies over the rice field beyond, warm lamplight from the house door, deep blue starry sky. |
+
+## Đợt 12 (bản 1.3) — nội dung cấp 31–45
+
+> Giống đợt 4: câu PHONG CÁCH ở đầu file + lời nhắc riêng. Cây trồng đính kèm `rau_N` (luống) hoặc `lua_N` (ruộng) cùng số làm mẫu bố cục. Chưa có ảnh nào thì game tạm vẽ bằng code, nên làm dần cũng được. Ưu tiên: `nha_tam`, `khung_cui`, `xuong_mut`, 3 cây, rồi tới cây trồng, cuối cùng là biểu tượng.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `nghe_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small turmeric shoots, two or three young lance-shaped leaves each. Plants only, no ground. |
+| `nghe_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: turmeric plants with tall broad upright glossy green leaves. Plants only, no ground. |
+| `nghe_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: mature turmeric plants, leaves yellowing at the tips, bright orange turmeric roots peeking out of the soil at the base. Plants only, no ground. |
+| `dau_tam_1` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_1`), all 9 plants identical and at the same growth stage: small mulberry cuttings with a few heart-shaped leaves. Plants only, no ground. |
+| `dau_tam_2` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_2`), all 9 plants identical and at the same growth stage: low mulberry bushes with broad bright-green leaves. Plants only, no ground. |
+| `dau_tam_3` | Same layout, size and isometric diamond 3x3 arrangement as the attached image (`rau_3`), all 9 plants identical and at the same growth stage: lush mulberry bushes thick with big leaves ready to pick, a few dark purple mulberries. Plants only, no ground. |
+| `coi_1` | Same layout, size and 3x3 arrangement as the attached image (`lua_1`), all 9 plants identical and at the same growth stage: young sedge (cói) shoots, thin round green stems standing straight up out of the water. Plants only, no water, no ground. |
+| `coi_2` | Same layout, size and 3x3 arrangement as the attached image (`lua_2`), all 9 plants identical and at the same growth stage: tall dense clumps of thin straight round green sedge stems, taller than rice. Plants only, no ground. |
+| `coi_3` | Same layout, size and 3x3 arrangement as the attached image (`lua_3`), all 9 plants identical and at the same growth stage: very tall mature sedge, straight stems turning olive-tan with small brown flower tufts at the tips, ready to cut for weaving mats. Plants only, no ground. |
+| `nep_cam_1` | Same layout, size and 3x3 arrangement as the attached image (`lua_1`), all 9 plants identical and at the same growth stage: young black sticky rice seedlings, green with a purplish tint at the base. Plants only, no water, no ground. |
+| `nep_cam_2` | Same layout, size and 3x3 arrangement as the attached image (`lua_2`), all 9 plants identical and at the same growth stage: growing black sticky rice, green clumps with dark purple stems and leaf edges. Plants only, no ground. |
+| `nep_cam_3` | Same layout, size and 3x3 arrangement as the attached image (`lua_3`), all 9 plants identical and at the same growth stage: ripe black sticky rice (nếp cẩm), golden-brown stalks with heavy drooping heads of very dark purple-black grains. Plants only, no ground. |
+| `cay_cam` | An orange tree (cam), round dense glossy dark-green canopy, no fruit, standing directly on the ground: no base tile, no platform, no soil block underneath. |
+| `cay_cam_qua` | The same orange tree hung with many round bright orange oranges. |
+| `cay_mit` | A big jackfruit tree, thick trunk, wide dark-green canopy, no fruit, standing directly on the ground: no base tile, no platform, no soil block underneath. |
+| `cay_mit_qua` | The same jackfruit tree with several huge spiky yellow-green jackfruits hanging straight from the trunk and the thick branches. |
+| `cay_cau` | A tall slender areca palm (cây cau) with a thin grey ringed trunk and a small crown of feathery fronds at the top, no nuts, standing directly on the ground: no base tile, no platform, no soil block underneath. |
+| `cay_cau_qua` | The same areca palm with a big bunch of oval green-and-orange areca nuts hanging under the crown. |
+| `nha_tam` | A silkworm-rearing house on a 2x2 tile base: an airy open-sided thatched shed on wooden posts, inside it wooden racks stacked with large round flat bamboo trays (nong) covered in green mulberry leaves and small white silkworms, a basket of mulberry leaves by the entrance. |
+| `khung_cui` | A traditional Vietnamese silk-weaving house on a 2x2 tile base: whitewashed walls, red tile roof, a big wooden hand loom on the porch of the lower-left face with red silk cloth on it, a basket of pale yellow cocoons and a spinning wheel beside it, a rolled sedge mat leaning on the wall. |
+| `xuong_mut` | A small countryside jam and sweets kitchen on a 2x2 tile base: mud walls, thatched roof, an open clay stove with a big copper pan of orange jam in front on the lower-left face, rows of glass and clay jars on a wooden shelf, bundles of turmeric drying. |
+
+Biểu tượng (cách làm như đợt 7: dán ảnh mẫu, gõ `Same icon style, size and lighting as the attached image. ` + **PHONG CÁCH BIỂU TƯỢNG** + lời nhắc riêng):
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `item_nghe` | A few knobby turmeric roots, one broken open showing bright orange flesh. |
+| `item_la_dau` | A small bundle of fresh green heart-shaped mulberry leaves tied with a straw string. |
+| `item_coi` | A bundle of long dried olive-tan sedge stems tied in the middle. |
+| `item_nepcam` | A small woven basket of dark purple-black unhusked sticky rice grains. |
+| `item_ken` | A small pile of oval pale-yellow silk cocoons. |
+| `item_luon` | A curled slippery brown-olive rice-field eel. |
+| `item_caqua` | A dark grey snakehead fish with a long body and spotted sides. |
+| `item_camvinh` | Two round green-orange Vietnamese oranges with a leaf, one cut in half showing juicy orange segments. |
+| `item_mit` | A big spiky yellow-green jackfruit with a few yellow jackfruit bulbs in front of it. |
+| `item_cau` | A small bunch of oval green-and-orange areca nuts with a betel leaf. |
+| `item_tinhbotnghe` | A small glass jar of bright yellow turmeric powder with a wooden spoon. |
+| `item_to` | A skein of shiny pale golden raw silk thread. |
+| `item_chieu` | A rolled-up woven sedge mat with a red and green pattern. |
+| `item_lua_to` | A folded bolt of shiny red silk cloth with a subtle pattern. |
+| `item_chaoluon` | A bowl of rice porridge with eel pieces, herbs, chili and fried shallots on top. |
+| `item_mutcam` | A small glass jar of glossy candied orange peel strips. |
+| `item_nghematong` | A small jar of golden honey mixed with turmeric, a few turmeric roots beside it. |
+| `item_mitsay` | A small paper bag of crispy golden dried jackfruit chips, a few spilled in front. |
+| `item_xoinepcam` | A small round mound of purple black sticky rice on a banana leaf, sprinkled with coconut shreds. |
+| `item_suachuanepcam` | A small glass cup of white yogurt topped with dark purple black sticky rice and a spoon. |
+| `item_cakho` | A small black clay pot of caramelized braised fish in a dark brown glossy sauce with black pepper and chili. |
+| `item_trap_cuoi` | A red lacquered Vietnamese wedding gift box (tráp ăn hỏi) with a golden double-happiness pattern, areca nuts and betel leaves on top. |

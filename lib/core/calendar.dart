@@ -24,10 +24,10 @@ class SeasonDef {
 }
 
 const seasons = <Season, SeasonDef>{
-  Season.xuan: SeasonDef('Mùa xuân', 'Vụ chiêm xuân', '🌸', ['lua', 'lac', 'dau', 'che']),
+  Season.xuan: SeasonDef('Mùa xuân', 'Vụ chiêm xuân', '🌸', ['lua', 'lac', 'dau', 'che', 'dau_tam']),
   Season.ha: SeasonDef('Mùa hạ', 'Vụ hè thu', '☀️', ['ngo', 'dua', 'mia', 'ot']),
-  Season.thu: SeasonDef('Mùa thu', 'Vụ mùa', '🍂', ['lua', 'nep', 'tam', 'cuc']),
-  Season.dong: SeasonDef('Mùa đông', 'Vụ đông', '❄️', ['khoai', 'rau', 'dautuong']),
+  Season.thu: SeasonDef('Mùa thu', 'Vụ mùa', '🍂', ['lua', 'nep', 'tam', 'cuc', 'nep_cam']),
+  Season.dong: SeasonDef('Mùa đông', 'Vụ đông', '❄️', ['khoai', 'rau', 'dautuong', 'nghe']),
 };
 
 /// Crops in season grow this much faster.
@@ -87,25 +87,25 @@ class FestivalDef {
 
 const festivals = [
   FestivalDef('tet', 'Tết Nguyên đán', '🧧', (23, 12), (7, 1),
-      ['banhchung', 'gao', 'nep', 'thit', 'dau', 'cuc', 'keolac', 'xoi', 'gaotam', 'banhdauxanh'], 'cay_neu',
+      ['banhchung', 'gao', 'nep', 'thit', 'dau', 'cuc', 'keolac', 'xoi', 'gaotam', 'banhdauxanh', 'mutcam', 'camvinh'], 'cay_neu',
       'Từ ông Công ông Táo đến mồng 7: gói bánh chưng, sắm hoa, dựng cây nêu.'),
   FestivalDef('nguyen_tieu', 'Rằm tháng Giêng', '🏮', (13, 1), (16, 1),
       ['xoi', 'chuoi', 'buoi', 'cuc', 'gao', 'nep', 'matong'], 'den_long',
       'Tết Nguyên tiêu: lễ chùa, mâm xôi, treo đèn lồng.'),
   FestivalDef('hoi_lang', 'Hội làng mùa xuân', '🎊', (10, 2), (15, 2),
-      ['banhda', 'xoi', 'nuocmia', 'keolac', 'banhngo', 'trungvit', 'com'], 'cay_du',
+      ['banhda', 'xoi', 'nuocmia', 'keolac', 'banhngo', 'trungvit', 'com', 'chieu', 'lua_to', 'trap_cuoi'], 'cay_du',
       'Làng mở hội: đánh đu, kéo co, chọi gà, bánh trái đầy chợ.'),
   FestivalDef('doan_ngo', 'Tết Đoan ngọ', '🍑', (3, 5), (6, 5),
-      ['vai', 'xoai', 'nep', 'dua', 'trungvit', 'chuoi', 'dua_xiem'], 'gio_qua',
+      ['vai', 'xoai', 'nep', 'dua', 'trungvit', 'chuoi', 'dua_xiem', 'xoinepcam', 'mit'], 'gio_qua',
       'Tết giết sâu bọ mồng 5 tháng 5: ăn hoa quả, rượu nếp, trứng vịt.'),
   FestivalDef('vu_lan', 'Rằm tháng Bảy', '🪷', (12, 7), (16, 7),
       ['xoi', 'chuoi', 'buoi', 'gao', 'dauphu', 'chekho', 'banhda'], 'chau_sen',
       'Lễ Vu lan báo hiếu: mâm chay, xôi chè, hoa sen.'),
   FestivalDef('trung_thu', 'Tết Trung thu', '🥮', (10, 8), (16, 8),
-      ['banhngo', 'buoi', 'hong', 'keolac', 'banhdauxanh', 'com', 'banhcom', 'matong'], 'den_ong_sao',
+      ['banhngo', 'buoi', 'hong', 'keolac', 'banhdauxanh', 'com', 'banhcom', 'matong', 'camvinh'], 'den_ong_sao',
       'Rằm tháng Tám: rước đèn ông sao, bày cỗ trông trăng cho trẻ con.'),
   FestivalDef('com_moi', 'Tết cơm mới', '🍚', (8, 10), (12, 10),
-      ['gao', 'gaotam', 'com', 'thoctam', 'nep', 'xoi', 'banhcom'], 'coi_gia',
+      ['gao', 'gaotam', 'com', 'thoctam', 'nep', 'xoi', 'banhcom', 'nepcam', 'xoinepcam'], 'coi_gia',
       'Mồng 10 tháng 10: được mùa, nấu nồi cơm gạo mới dâng tổ tiên.'),
 ];
 

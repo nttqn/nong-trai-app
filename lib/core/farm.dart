@@ -1297,9 +1297,9 @@ class Farm {
       ..title = j['title'] ?? ''
       ..tut = j['tut'] ?? tutDone
       ..moonKey = j['moon'] ?? '';
-    // 1.1 put two quests in at questInsertAt: keep older saves on the quest
-    // they were doing
-    if ((j['qv'] ?? 1) < 2 && f.quest >= questInsertAt) f.quest += questInserted;
+    // quests added since the save: stay on the same quest in the new chain
+    final (mq, finished) = migrateQuest(f.quest, j['qv'] ?? 1);
+    f.quest = mq;
     final login = j['login'] as List?;
     if (login != null && login.length == 2) {
       f.loginDay = login[0];
@@ -1317,7 +1317,17 @@ class Farm {
     for (final o in j['objs'] as List) {
       try {
         final obj = Obj.fromJson(Map<String, dynamic>.from(o as Map));
-        if (buildings.containsKey(obj.type)) f.objs.add(obj);
+        if (!buildings.containsKey(obj.type)) continue;
+        // a crop or fish this version does not know (a newer neighbour's
+        // farm): leave the plot empty rather than crash on it
+        final k = obj.def.kind;
+        final c = obj.crop;
+        if (c != null &&
+            ((k == BKind.pond && !fishes.containsKey(c)) ||
+                ((k == BKind.paddy || k == BKind.bed) && !crops.containsKey(c)))) {
+          obj.crop = null;
+        }
+        f.objs.add(obj);
       } catch (_) {
         // one bad object must not lose the whole farm
       }
@@ -1336,11 +1346,9 @@ class Farm {
     f.daily.addAll([for (final o in (j['daily'] as List? ?? const [])) Order.fromJson(o)]);
     f.orders.addAll([for (final o in j['orders']) Order.fromJson(o)]);
     f.stats.addAll(Map<String, int>.from(j['stats']));
-    // 1.2 appended cấp 31+ quests: a farm that had finished the chain starts
-    // the first new one counting from now, not from its lifetime stats
-    if ((j['qv'] ?? 1) < 3 && f.quest == questChainV2Length) {
-      f.questBase = f.stats[questChain[f.quest].key] ?? 0;
-    }
+    // a farm that had finished the old chain counts the next quest from now,
+    // not from its lifetime stats
+    if (finished && f.currentQuest != null) f.questBase = f.stats[f.currentQuest!.key] ?? 0;
     try {
       final fe = j['fest'] as Map?;
       if (fe != null) {

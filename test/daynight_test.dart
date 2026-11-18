@@ -37,8 +37,8 @@ void main() {
   });
 
   test('old saves keep their quest across the 1.1 inserts', () {
-    expect(questChain[questInsertAt].text, 'Đạt cấp 4');
-    expect(questChain[questInsertAt + 1].key, 'build:bu_nhin');
+    expect(questChain[14].text, 'Đạt cấp 4');
+    expect(questChain[15].key, 'build:bu_nhin');
     Farm load(int quest, {bool old = true}) {
       final j = jsonDecode(jsonEncode(Farm.fresh(now: () => at(10)).toJson())) as Map<String, dynamic>;
       j['quest'] = quest;

@@ -35,15 +35,27 @@ void drawBamboo(Canvas c, Offset foot, double s, {int seed = 0, double t = 0}) {
   oval(c, foot + Offset(0, -55 * s), 15 * s, 13 * s, const Color(0x8869A93A));
 }
 
-/// Rice clump. g: 0..1 growth; ripe turns it golden and drooping.
-void drawRice(Canvas c, Offset base, double g, bool ripe, double t, int seed) {
-  final h = 4 + g * 13;
+/// Rice clump. g: 0..1 growth; ripe turns it golden and drooping. [crop]
+/// picks the look: cói grows as tall straight reeds, nếp cẩm ripens purple.
+void drawRice(Canvas c, Offset base, double g, bool ripe, double t, int seed, {String? crop}) {
+  final reed = crop == 'coi';
+  final h = reed ? 5 + g * 19 : 4 + g * 13;
   final sway = math.sin(t * 1.5 + seed) * (0.6 + g);
-  final col = ripe ? const Color(0xFFE2B940) : Color.lerp(const Color(0xFF9BD25B), const Color(0xFF4F9B2D), g)!;
+  final col = ripe
+      ? (reed ? const Color(0xFF9CAF4A) : crop == 'nep_cam' ? const Color(0xFF8E7A3A) : const Color(0xFFE2B940))
+      : Color.lerp(const Color(0xFF9BD25B), const Color(0xFF4F9B2D), g)!;
   for (var i = -2; i <= 2; i++) {
-    final tip = base + Offset(i * (1.4 + g * 1.3) + sway, -h + i.abs() * 1.5);
-    line(c, base, tip, col, 1.3);
-    if (ripe) {
+    final tip = base + Offset(i * (reed ? .8 + g * .6 : 1.4 + g * 1.3) + sway, -h + i.abs() * 1.5);
+    line(c, base, tip, col, reed ? 1.1 : 1.3);
+    if (ripe && reed) {
+      circle(c, tip, 1.1, const Color(0xFF8D6E3F));
+    } else if (ripe && crop == 'nep_cam') {
+      // heavy dark-purple ears hanging off the tips
+      final d = i >= 0 ? 1.0 : -1.0;
+      for (var k = 0; k < 3; k++) {
+        circle(c, tip + Offset(d * (1 + k * 1.1), 1 + k * 1.4), 1.3, const Color(0xFF4A1E5C));
+      }
+    } else if (ripe) {
       final droop = tip + Offset(i >= 0 ? 3 : -3, 3);
       line(c, tip, droop, const Color(0xFFC9962A), 2);
     }
@@ -174,6 +186,28 @@ void drawBedCrop(Canvas c, String id, Offset b, double g, bool ripe, double t, i
           circle(c, p, 1.1, const Color(0xFFE65100));
         }
       }
+    case 'nghe':
+      // broad upright turmeric leaves; the ripe bed shows orange roots
+      for (var i = 0; i < 4; i++) {
+        final a = -math.pi / 2 + (i - 1.5) * .35;
+        final tip = b + Offset(math.cos(a) * 11 * s + sway * .4, math.sin(a) * 11 * s);
+        line(c, b, tip, i.isEven ? const Color(0xFF4E9A2E) : const Color(0xFF66AF3D), 3.2 * s);
+      }
+      if (ripe) {
+        for (var i = 0; i < 3; i++) {
+          oval(c, b + Offset(-4 + i * 4.0, 1.5), 2.2, 1.2, const Color(0xFFF57C00));
+        }
+      }
+    case 'dau_tam':
+      // a low mulberry bush; ripe = full of big leaves and dark berries
+      line(c, b, b + Offset(0, -7 * s), const Color(0xFF6D4C30), 1.6);
+      oval(c, b + Offset(0, -9 * s), 7 * s, 5 * s, const Color(0xFF3F8A34));
+      oval(c, b + Offset(-3 * s, -11 * s), 4 * s, 3 * s, const Color(0xFF5CA845));
+      if (ripe) {
+        for (var i = 0; i < 4; i++) {
+          circle(c, b + Offset(-5 + i * 3.3, -8 * s + (i % 2) * 2), 1.2, const Color(0xFF4A148C));
+        }
+      }
     default:
       oval(c, b + Offset(0, -4 * s), 5 * s, 4 * s, leaf);
   }
@@ -217,6 +251,28 @@ void drawTree(Canvas c, String type, Offset f, double fruit, double t, int seed)
         }
         oval(c, p + const Offset(0, 12), 2, 3, const Color(0xFF8E2B4E));
       }
+    case 'cay_cau':
+      // tall thin areca palm, a crown of fronds, a bunch of nuts under it
+      shadow(c, f, 9, 3.5);
+      final top = f + Offset(sway, -50);
+      line(c, f, top, const Color(0xFF9E9E8A), 3);
+      for (var k = 1; k < 7; k++) {
+        final p = Offset.lerp(f, top, k / 7)!;
+        line(c, p - const Offset(1.6, 0), p + const Offset(1.6, 0), const Color(0xFF7D7D6B), .8);
+      }
+      for (var i = 0; i < 7; i++) {
+        final a = -math.pi / 2 + (i - 3) * .48;
+        final tip = top + Offset(math.cos(a) * 17, math.sin(a) * 10 + 6);
+        final path = Path()
+          ..moveTo(top.dx, top.dy)
+          ..quadraticBezierTo((top.dx + tip.dx) / 2, top.dy - 6, tip.dx, tip.dy);
+        pathStroke(c, path, i.isEven ? const Color(0xFF4E9A2E) : const Color(0xFF66AF3D), 2.6);
+      }
+      final nuts = (fruit * 6).round();
+      for (var k = 0; k < nuts; k++) {
+        circle(c, top + Offset(-4 + (k % 3) * 3.2, 5 + (k ~/ 3) * 3.0), 2.1,
+            fruit >= 1 ? const Color(0xFFF9A825) : const Color(0xFF7CB342));
+      }
     case 'cay_dua':
       shadow(c, f, 12, 4);
       final top = f + Offset(8 + sway, -46);
@@ -249,6 +305,8 @@ void drawTree(Canvas c, String type, Offset f, double fruit, double t, int seed)
         'cay_vai' => (const Color(0xFF47852C), const Color(0xFFE53935), 16.0),
         'cay_nhan' => (const Color(0xFF3E6E26), const Color(0xFFC8A165), 17.0),
         'cay_hong' => (const Color(0xFF6B9A3A), const Color(0xFFFF7A1A), 15.0),
+        'cay_cam' => (const Color(0xFF2E7D32), const Color(0xFFFF9800), 15.0),
+        'cay_mit' => (const Color(0xFF33691E), const Color(0xFFC0CA33), 19.0),
         _ => (leaf, const Color(0xFFFFC107), 15.0),
       };
       shadow(c, f, r * .9, r * .35);

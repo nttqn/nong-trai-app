@@ -1,0 +1,113 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:BVP;src:url(fonts/BeVietnamPro-ExtraBold.ttf);font-weight:800}
+@font-face{font-family:BVP;src:url(fonts/BeVietnamPro-Bold.ttf);font-weight:700}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#000}
+#ad{position:relative;overflow:hidden;font-family:BVP;color:#fff}
+.bg{position:absolute;inset:0;overflow:hidden}
+.bg img{position:absolute;display:block}
+.shade{position:absolute;inset:0}
+.phone{position:absolute;border-radius:5.5%/2.8%;background:#1d1d1f;padding:1.6%;box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 0 3px rgba(255,255,255,.25)}
+.phone img{display:block;width:100%;border-radius:4.6%/2.3%}
+.title{position:absolute;font-weight:800;line-height:1.08;text-shadow:0 3px 0 rgba(70,35,0,.55),0 6px 18px rgba(0,0,0,.45);letter-spacing:-.5px}
+.title em{font-style:normal;color:#ffd84a}
+.sub{position:absolute;font-weight:700;line-height:1.3;text-shadow:0 2px 8px rgba(0,0,0,.65)}
+.brand{position:absolute;display:flex;align-items:center;gap:.45em;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.brand img{border-radius:22%;box-shadow:0 4px 14px rgba(0,0,0,.4);border:3px solid #fff}
+.cta{position:absolute;font-weight:800;color:#5a3000;background:linear-gradient(#ffe066,#ffb627);border-radius:999px;box-shadow:0 5px 0 #b8700a,0 10px 24px rgba(0,0,0,.35);text-align:center;white-space:nowrap}
+</style></head>
+<body><div id="ad"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const size = q.get('s'), concept = q.get('c');
+const W = {land:1200, sq:1200, port:1200}[size], H = {land:628, sq:1200, port:1500}[size];
+const ad = document.getElementById('ad');
+ad.style.width = W + 'px'; ad.style.height = H + 'px';
+
+// source images and their pixel sizes
+const SRC = {
+  fields: ['plate-fields.png', 2600, 3000], wide: ['plate-wide.png', 3000, 2600],
+  tet: ['plate-tet.png', 2600, 3000], pens: ['plate-pens.png', 2600, 3000],
+  phoi: ['mem/phoi_thoc.jpg', 900, 675], tetp: ['mem/tet_sum_vay.jpg', 900, 675],
+  trau: ['mem/con_trau.jpg', 900, 675], banh: ['mem/banh_chung.jpg', 900, 675],
+};
+// show region (x,y,w,h in source px, focus point fx,fy 0..1) covering the whole ad
+function bg(key, r, fx = .5, fy = .5) {
+  const [file, sw, sh] = SRC[key];
+  const [x, y, w, h] = r || [0, 0, sw, sh];
+  const k = Math.max(W / w, H / h);
+  const img = new Image(); img.src = file;
+  img.style.width = sw * k + 'px';
+  const left = -(x * k) - (w * k - W) * fx, top = -(y * k) - (h * k - H) * fy;
+  img.style.left = left + 'px'; img.style.top = top + 'px';
+  const d = document.createElement('div'); d.className = 'bg'; d.appendChild(img); ad.appendChild(d);
+}
+function el(cls, html, css) {
+  const d = document.createElement('div'); d.className = cls; d.innerHTML = html;
+  Object.assign(d.style, css); ad.appendChild(d); return d;
+}
+function shade(css) { el('shade', '', {background: css}); }
+function phone(shot, css) { el('phone', `<img src="shots/${shot}.png">`, css); }
+function brand(css, px) {
+  el('brand', `<img src="icon.png" style="width:${px * 2.1}px;height:${px * 2.1}px">Mùa Lúa Chín`, {fontSize: px + 'px', ...css});
+}
+function cta(css, px) { el('cta', 'Tải miễn phí', {fontSize: px + 'px', padding: `${px * .55}px ${px * 1.3}px`, ...css}); }
+
+const C = {
+  // A: the farm itself
+  A: {
+    bgs: () => bg('fields', [0, 330, 2600, 1650], .45, .5),
+    title: 'Về quê<br><em>làm nông</em> thôi!',
+    sub: 'Cấy lúa · Nuôi trâu · Đào ao thả cá',
+    shot: '01-lang-que', noPhone: true,
+  },
+  B: {
+    bgs: () => bg('phoi', null, .4, .5),
+    title: 'Trời sắp mưa,<br><em>che thóc</em> mau!',
+    sub: 'Gặt lúa, phơi thóc ngoài sân gạch',
+    shot: '03-phoi-thoc',
+  },
+  C: {
+    bgs: () => bg('tetp', null, .45, .4),
+    title: 'Ăn Tết<br><em>theo lịch âm</em>',
+    sub: 'Bánh chưng, cây nêu, đèn ông sao',
+    shot: '02-tet',
+  },
+  D: {
+    bgs: () => bg('trau', null, .35, .5),
+    title: 'Tuổi thơ<br><em>trên lưng trâu</em>',
+    sub: 'Nuôi gà vịt, lợn, trâu bò, dê, ong',
+    shot: '04-chan-nuoi',
+  },
+}[concept];
+
+C.bgs();
+if (size === 'land') {
+  shade('linear-gradient(90deg,rgba(25,15,0,.78) 0%,rgba(25,15,0,.55) 42%,rgba(0,0,0,0) 68%)');
+  brand({left: '48px', top: '38px'}, 30);
+  el('title', C.title, {left: '48px', top: '130px', fontSize: '66px'});
+  el('sub', C.sub, {left: '50px', top: '312px', fontSize: '27px', width: '560px'});
+  cta({left: '50px', top: '440px'}, 34);
+  if (!C.noPhone) phone(C.shot, {right: '70px', top: '60px', width: '290px', transform: 'rotate(4deg)'});
+} else if (size === 'sq') {
+  shade(C.noPhone?'linear-gradient(180deg,rgba(25,15,0,.85) 0%,rgba(25,15,0,.7) 34%,rgba(0,0,0,0) 52%,rgba(0,0,0,.35) 100%)':'linear-gradient(180deg,rgba(25,15,0,.8) 0%,rgba(25,15,0,.45) 38%,rgba(0,0,0,0) 60%,rgba(0,0,0,.35) 100%)');
+  brand({left: '60px', top: '52px'}, 38);
+  el('title', C.title, {left: '60px', top: '170px', fontSize: C.noPhone ? '108px' : '96px'});
+  el('sub', C.sub, {left: '62px', top: C.noPhone ? '440px' : '410px', fontSize: '36px', width: C.noPhone ? '1000px' : '620px'});
+  cta({left: '62px', bottom: '80px'}, 46);
+  if (!C.noPhone) phone(C.shot, {right: '70px', top: '330px', width: '380px', transform: 'rotate(5deg)'});
+} else {
+  shade('linear-gradient(180deg,rgba(25,15,0,.85) 0%,rgba(25,15,0,.62) 30%,rgba(0,0,0,0) 50%,rgba(0,0,0,.4) 100%)');
+  brand({left: '60px', top: '56px'}, 40);
+  el('title', C.title, {left: '60px', top: '180px', fontSize: '112px'});
+  el('sub', C.sub, {left: '62px', top: '455px', fontSize: '40px', width: '1080px'});
+  if (C.noPhone) cta({left: '50%', bottom: '90px', transform: 'translateX(-50%)'}, 52);
+  else {
+    phone(C.shot, {right: '80px', top: '560px', width: '440px', transform: 'rotate(5deg)'});
+    cta({left: '62px', bottom: '110px'}, 48);
+  }
+}
+document.fonts.ready.then(() => Promise.all([...document.images].map(i => i.decode().catch(() => {})))).then(() => document.title = 'ready');
+</script></body></html>

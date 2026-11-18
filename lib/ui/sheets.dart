@@ -22,10 +22,10 @@ class ShopSheet extends StatefulWidget {
 
 class _ShopSheetState extends State<ShopSheet> {
   static const tabs = [
-    ('Trồng trọt', ['ruong', 'luong', 'san_phoi', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong']),
-    ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'ao']),
+    ('Trồng trọt', ['ruong', 'luong', 'san_phoi', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong', 'cay_cam', 'cay_mit', 'cay_cau']),
+    ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'nha_tam', 'ao']),
     ('Nhà cửa', ['nha_phu', 'nha_kho']),
-    ('Chế biến', [ 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che']),
+    ('Chế biến', [ 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che', 'khung_cui', 'xuong_mut']),
     ('Trang trí', ['tre', 'rom_dong', 'chum', 'bu_nhin', 'cho', 'hoa_dao', 'cay_da']),
   ];
 

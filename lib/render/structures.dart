@@ -148,7 +148,7 @@ void _paddyCrops(Canvas c, Iso iso, Farm farm, Obj o, double t) {
   final ripe = farm.isReady(o);
   for (var j = 0; j < 3; j++) {
     for (var i = 0; i < 3; i++) {
-      drawRice(c, iso.p(x + .22 + i * .28, y + .22 + j * .28, -1), g, ripe, t, o.id * 9 + i + j * 3);
+      drawRice(c, iso.p(x + .22 + i * .28, y + .22 + j * .28, -1), g, ripe, t, o.id * 9 + i + j * 3, crop: o.crop);
     }
   }
 }
@@ -202,6 +202,7 @@ void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
     'trau' || 'bo' => const Color(0xFFB59B62),
     'de' => const Color(0xFFA9B76A),
     'ong' => const Color(0xFF9CC25A),
+    'tamto' => const Color(0xFFCDB58A),
     _ => const Color(0xFFD7BE7E),
   };
   fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), ground);
@@ -219,6 +220,16 @@ void _penBack(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a) {
     for (var i = 0; i < 10; i++) {
       final p = iso.p(x + .2 + hash2(o.id + 3, i) * 1.6, y + .2 + hash2(i + 5, o.id) * 1.6);
       circle(c, p + const Offset(0, -2), 1.6, i.isEven ? const Color(0xFFFFD54F) : const Color(0xFFFFFFFF));
+    }
+  }
+  if (a.id == 'tamto') {
+    for (var i = 0; i < 4; i++) {
+      final p = iso.p(x + .75 + (i % 2) * .7, y + .75 + (i ~/ 2) * .6);
+      line(c, p + const Offset(-8, 0), p + const Offset(-8, -6), const Color(0xFF7A5230), 1.2);
+      line(c, p + const Offset(8, 0), p + const Offset(8, -6), const Color(0xFF7A5230), 1.2);
+      oval(c, p + const Offset(0, -7), 11, 5, const Color(0xFFC9A66B));
+      ovalStroke(c, p + const Offset(0, -7), 11, 5, const Color(0xFF9C7A4D), 1);
+      oval(c, p + const Offset(0, -7.5), 8, 3.4, const Color(0xFF7CB342)); // mulberry leaves
     }
   }
   if (a.id == 'vit' || a.id == 'trau') {
@@ -247,7 +258,17 @@ void _penAnimals(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a, double t) {
   final n = o.count;
   // at night the bees are in their hives and the others sleep
   final asleep = nightAt(farm.now()) > .55;
-  if (a.id == 'ong') {
+  if (a.id == 'tamto') {
+    // silkworms nibbling on the trays (they do not wander or sleep)
+    for (var i = 0; i < n; i++) {
+      final p = iso.p(x + .75 + (i % 2) * .7, y + .75 + (i ~/ 2) * .6) + const Offset(0, -8);
+      for (var k = 0; k < 3; k++) {
+        final w = p + Offset(-5 + k * 5.0, (k % 2) * 1.5 - .5);
+        final wig = math.sin(t * 2 + i + k) * .8;
+        line(c, w, w + Offset(3, wig), const Color(0xFFF5F0E1), 1.8);
+      }
+    }
+  } else if (a.id == 'ong') {
     if (asleep) return;
     // bees just buzz around the hives
     for (var i = 0; i < n; i++) {
@@ -270,6 +291,9 @@ void _penAnimals(Canvas c, Iso iso, Farm farm, Obj o, AnimalDef a, double t) {
   if (farm.isReady(o)) {
     for (var i = 0; i < math.min(n, 6); i++) {
       final p = iso.p(x + .4 + (i % 3) * .5, y + 1.75 - (i ~/ 3) * .3);
+      if (a.product == 'ken') {
+        oval(c, p, 2.4, 1.6, const Color(0xFFFFF59D));
+      }
       if (a.product == 'trung' || a.product == 'trungvit') {
         oval(c, p, 2.6, 3.2, a.product == 'trung' ? const Color(0xFFF3E3C3) : const Color(0xFFCFE8DF));
       }
@@ -342,7 +366,12 @@ void _pondFish(Canvas c, Farm farm, Obj o, Offset cx, double t) {
       final j = (t * 1.3) % 2;
       if (j < 1) {
         final p = cx + Offset(10, -math.sin(j * math.pi) * 16);
-        oval(c, p, 4.5, 2.2, o.crop == 'cachep' ? const Color(0xFFF0A040) : const Color(0xFF8FB8D0));
+        oval(c, p, 4.5, 2.2, switch (o.crop) {
+          'cachep' => const Color(0xFFF0A040),
+          'luon' => const Color(0xFF6D5A3A),
+          'caqua' => const Color(0xFF546E7A),
+          _ => const Color(0xFF8FB8D0),
+        });
       }
     }
   }
@@ -404,6 +433,44 @@ void _factory(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         final p = iso.p(x + 1.55, y + .6 + i * .55);
         oval(c, p + const Offset(0, -6), 6, 6, const Color(0xFF9E9E9E));
         oval(c, p + const Offset(0, -11), 5, 1.8, const Color(0xFFFFF8E1));
+      }
+    case 'khung_cui':
+      wallBox(c, iso, x + .2, y + .25, 1.4, 1.1, 0, 22, const Color(0xFFE8D9B8));
+      leftWallRect(c, iso, x + .5, y + 1.35, x + 1.0, 0, 15, doorCol);
+      gableRoof(c, iso, x + .2, y + .25, 1.4, 1.1, 22, 11, RoofStyle.tile, gableWall: const Color(0xFFE8D9B8));
+      // a loom in the yard with cloth on it, a basket of cocoons
+      {
+        final p = iso.p(x + 1.65, y + .7);
+        line(c, p + const Offset(-9, 0), p + const Offset(-9, -16), woodDark, 1.6);
+        line(c, p + const Offset(9, 4), p + const Offset(9, -12), woodDark, 1.6);
+        line(c, p + const Offset(-9, -16), p + const Offset(9, -12), woodDark, 1.6);
+        final cloth = Path()
+          ..moveTo(p.dx - 8, p.dy - 14)
+          ..lineTo(p.dx + 8, p.dy - 10)
+          ..lineTo(p.dx + 8, p.dy - 2)
+          ..lineTo(p.dx - 8, p.dy - 6)
+          ..close();
+        pathFill(c, cloth, working ? const Color(0xFFE57373) : const Color(0xFFF3E5C8));
+        final b = iso.p(x + 1.6, y + 1.5);
+        oval(c, b + const Offset(0, -3), 6, 3.5, const Color(0xFFB08A55));
+        for (var i = 0; i < 4; i++) {
+          oval(c, b + Offset(-3 + i * 2.0, -5), 1.6, 1.1, const Color(0xFFFFF59D));
+        }
+      }
+    case 'xuong_mut':
+      wallBox(c, iso, x + .25, y + .25, 1.3, 1.1, 0, 20, mudWall);
+      leftWallRect(c, iso, x + .5, y + 1.35, x + .95, 0, 13, doorCol);
+      gableRoof(c, iso, x + .25, y + .25, 1.3, 1.1, 20, 11, RoofStyle.thatch, gableWall: mudWall);
+      // a clay stove with a big copper pan of jam, jars beside it
+      {
+        final p = iso.p(x + 1.6, y + .75);
+        box(c, iso, x + 1.4, y + .55, .45, .45, 0, 8, const Color(0xFFB0643A), const Color(0xFF8E4E2C), const Color(0xFF7A4224));
+        oval(c, p + const Offset(0, -9), 9, 4, const Color(0xFFB87333));
+        oval(c, p + const Offset(0, -9.5), 7, 2.8, working ? const Color(0xFFFF9800) : const Color(0xFF8D5A2B));
+        for (var i = 0; i < 3; i++) {
+          final j = iso.p(x + 1.45 + i * .15, y + 1.45);
+          oval(c, j + const Offset(0, -4), 2.6, 4, const Color(0xFFD7A54B));
+        }
       }
     case 'xuong_che':
       wallBox(c, iso, x + .2, y + .3, 1.3, 1.1, 0, 20, mudWall);

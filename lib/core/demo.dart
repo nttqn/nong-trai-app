@@ -102,20 +102,20 @@ Farm demoFarm(int stage, {int house = -1}) {
     }
     f.build('duong_be_tong', 0, 0);
   }
+  void anywhere(String type, {int count = 0, double prog = .5}) {
+    for (var i = 0; i < mapSize * mapSize; i++) {
+      final x = i % mapSize, y = i ~/ mapSize;
+      if (f.canPlace(type, x, y)) {
+        put(type, x, y, count: count, prog: prog);
+        return;
+      }
+    }
+  }
   if (stage >= 3) {
     // late game: new pens, workshops, trees, upgraded projects, daily orders
     f.level = 30;
     f.lots.addAll([for (var i = 0; i < lotsPerSide * lotsPerSide; i++) i]);
     f.objs.removeWhere((o) => o.def.kind == BKind.obstacle);
-    void anywhere(String type, {int count = 0, double prog = .5}) {
-      for (var i = 0; i < mapSize * mapSize; i++) {
-        final x = i % mapSize, y = i ~/ mapSize;
-        if (f.canPlace(type, x, y)) {
-          put(type, x, y, count: count, prog: prog);
-          return;
-        }
-      }
-    }
     anywhere('chuong_de', count: 3, prog: .5);
     anywhere('vuon_ong', count: 3, prog: 1.2);
     anywhere('xuong_dau');
@@ -132,6 +132,29 @@ Farm demoFarm(int stage, {int house = -1}) {
     }
     f.projectLv.addAll({'gieng': 3, 'tram_bom': 2, 'dinh_lang': 2});
     f.rollDaily();
+  }
+  if (stage >= 4) {
+    // cấp 31+: silk, turmeric, cói, nếp cẩm, the new trees and workshops
+    f.level = 44;
+    final coins = f.coins;
+    f.coins = 1 << 30;
+    anywhere('nha_tam', count: 4, prog: 1.2);
+    anywhere('khung_cui');
+    f.objs.last.jobs.add(Job('lua_to', now + 100000));
+    anywhere('xuong_mut');
+    for (final t in ['cay_cam', 'cay_mit', 'cay_cau']) {
+      anywhere(t, prog: 1.2);
+    }
+    f.coins = coins;
+    // replant the demo beds and paddies with the new crops
+    var i = 0;
+    for (final o in f.objs) {
+      if (o.crop == null) continue;
+      if (o.def.kind == BKind.bed) o.crop = i.isEven ? 'nghe' : 'dau_tam';
+      if (o.def.kind == BKind.paddy) o.crop = i.isEven ? 'coi' : 'nep_cam';
+      if (o.def.kind == BKind.pond) o.crop = 'luon';
+      i++;
+    }
   }
   // guard dog, fed, next to the house
   for (var i = 0; i < mapSize * mapSize && f.dog == null; i++) {
