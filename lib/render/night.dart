@@ -18,7 +18,7 @@ const _nightBlue = Color(0xFF26346A);
 
 /// Darkens what is drawn under it (multiply), less on bright moonlit nights.
 void drawNightTint(Canvas c, Rect area, double n, double lit) {
-  final k = n * (.8 - .14 * lit); // keep in step with nightShade
+  final k = tintOf(n) * (.8 - .14 * lit); // keep in step with nightShade
   c.drawRect(
       area,
       Paint()
@@ -201,8 +201,12 @@ class SkyPainter extends CustomPainter {
   @override
   void paint(Canvas c, Size size) {
     final now = farm.now();
+    // the moon and stars at full strength; only the dark band is softened.
+    // With the night look off only the moon stays (the full-moon gift).
     final n = nightAt(now);
     if (n < .01) return;
+    final off = nightLook <= 0;
+    final shade = off ? 0.0 : glowOf(n);
     final t = clock.value;
     final rain = weatherAt(now) == Weather.rain;
     final day = moonDayAt(now);
@@ -213,8 +217,8 @@ class SkyPainter extends CustomPainter {
         band,
         Paint()
           ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-            Color.fromRGBO(10, 16, 44, .92 * n),
-            Color.fromRGBO(22, 32, 76, .6 * n),
+            Color.fromRGBO(10, 16, 44, .92 * shade),
+            Color.fromRGBO(22, 32, 76, .6 * shade),
             Color.fromRGBO(30, 44, 96, 0),
           ], stops: const [0, .55, 1])
               .createShader(band));
@@ -225,7 +229,7 @@ class SkyPainter extends CustomPainter {
     }
     // stars, thicker towards the top and on dark (moonless) nights
     final p = Paint();
-    final stars = (90 - 35 * lit).round();
+    final stars = off ? 0 : (90 - 35 * lit).round();
     for (var i = 0; i < stars; i++) {
       final y = math.pow(hash2(i, 71), 1.6) * h * .9;
       final x = hash2(i, 72) * size.width;
@@ -243,7 +247,7 @@ class SkyPainter extends CustomPainter {
         c.drawLine(Offset(x, y - r), Offset(x, y + r), p);
       }
     }
-    _shootingStar(c, size, h, t, n);
+    if (!off) _shootingStar(c, size, h, t, n);
     if (lit >= .03) _moon(c, moonAt, lit, waxing, n);
     if (farm.moonGiftReady) _giftSparkle(c, moonAt, t, n);
   }
@@ -336,8 +340,16 @@ class SkyPainter extends CustomPainter {
   bool shouldRepaint(covariant SkyPainter old) => old.moonAt != moonAt;
 }
 
-/// Night strength for the painter (0 by day).
-double nightOf(Farm farm) => nightAt(farm.now());
+/// Night strength for the painter (0 by day, and always 0 with the night
+/// look turned off).
+double nightOf(Farm farm) => nightLook <= 0 ? 0 : nightAt(farm.now());
+
+/// The tint is scaled by the player setting: lights, stars and glows keep
+/// more of their strength so a soft night still reads as night.
+double tintOf(double n) => n * nightLook;
+
+/// Lights and the sky on a softer night.
+double glowOf(double n) => n * (.35 + .65 * nightLook);
 
 /// Moonlight strength (lit fraction) for tonight.
 double moonLitOf(Farm farm) => moonPhase(moonDayAt(farm.now())).$1;
@@ -347,6 +359,6 @@ double moonLitOf(Farm farm) => moonPhase(moonDayAt(farm.now())).$1;
 Color nightShade(Color base, Farm farm) {
   final n = nightOf(farm);
   if (n < .01) return base;
-  final k = Color.lerp(const Color(0xFFFFFFFF), _nightBlue, n * (.8 - .14 * moonLitOf(farm)))!;
+  final k = Color.lerp(const Color(0xFFFFFFFF), _nightBlue, tintOf(n) * (.8 - .14 * moonLitOf(farm)))!;
   return Color.from(alpha: 1, red: base.r * k.r, green: base.g * k.g, blue: base.b * k.b);
 }

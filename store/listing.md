@@ -57,11 +57,17 @@ Game miễn phí, có quảng cáo. Nhiều quảng cáo do bạn tự chọn xe
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.1.1, ≤ 500 ký tự)
+Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng sao và ánh đèn. Vào ☰ → Hiển thị → Cảnh đêm để chọn Tắt, Dịu hoặc Đậm theo ý thích. Cảm ơn bà con đã góp ý!
+
 ## Có gì mới (bản 1.1.0, ≤ 500 ký tự)
 Đêm trăng làng quê: trời tối theo giờ thật, sao sáng đầy trời, trăng tròn khuyết đúng lịch âm, soi bóng xuống sông và hồ sen. Nhà lên đèn, đom đóm lập lòe, ếch nhái dế kêu cùng tiếng sáo đêm; gà vịt lên chuồng, trâu bò nằm ngủ. Đêm rằm chạm ông trăng để trông trăng nhận quà và mở ký ức mới. Bù nhìn rơm đung đưa đuổi chim sẻ, thêm nhiệm vụ dựng bù nhìn.
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.1.1, en-US)
+Easier on the eyes at night: the village no longer gets so dark, while keeping the moon, stars and lamplight. Go to ☰ → Display → Night scene to pick Off, Soft or Deep. Thanks for your feedback!
 
 ## What's new (1.1.0, en-US)
 Moonlit nights: the village darkens with your clock, stars fill the sky and the moon follows the real lunar calendar, mirrored in the river and lotus lake. Lamps glow, fireflies blink, frogs and crickets sing with a night flute tune; hens go to roost and buffaloes sleep. On full-moon nights tap the moon for a gift and a new memory. The straw scarecrow sways and scares off sparrows, with a new scarecrow quest.

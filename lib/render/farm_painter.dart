@@ -220,9 +220,10 @@ class FarmPainter extends CustomPainter {
       final lit = moonLitOf(farm);
       final onScreen = list.where((o) => view.drawn.containsKey(o.id));
       drawNightTint(c, area, night, lit);
-      if (!rain) drawWaterSky(c, iso, t, night, lit);
-      drawNightLights(c, iso, farm, onScreen, t, night);
-      if (!rain) drawFireflies(c, iso, onScreen, t, night);
+      final glow = glowOf(night);
+      if (!rain) drawWaterSky(c, iso, t, glow, lit);
+      drawNightLights(c, iso, farm, onScreen, t, glow);
+      if (!rain) drawFireflies(c, iso, onScreen, t, glow);
     }
 
     _ghost(c, iso, t);

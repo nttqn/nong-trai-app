@@ -11,6 +11,10 @@ import 'weather.dart';
 /// Dev screenshots (?hour=21.5 on web): pretend it is this time of day.
 double? hourOverride;
 
+/// How strongly night is drawn (player setting): 0 = not at all, 1 = full.
+/// Only the look; game rules (moon gift, sleeping animals) use [nightAt].
+double nightLook = .45;
+
 /// Local time of day at [ms], in hours (0..24).
 double hourAt(int ms) {
   final o = hourOverride;

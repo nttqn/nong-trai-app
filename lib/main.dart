@@ -12,6 +12,7 @@ import 'core/weather.dart';
 import 'render/sprites.dart';
 import 'services/ads.dart';
 import 'services/cloud.dart';
+import 'services/display.dart';
 import 'services/leaderboard.dart';
 import 'services/notify.dart';
 import 'services/save.dart';
@@ -23,6 +24,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SoundService.instance.init();
+  DisplayService.instance.init();
   runApp(const NongTraiApp());
 }
 

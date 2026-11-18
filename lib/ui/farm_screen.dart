@@ -22,6 +22,7 @@ import '../services/cloud.dart';
 import '../services/leaderboard.dart';
 import '../services/notify.dart';
 import '../services/save.dart';
+import '../services/display.dart';
 import '../services/sound.dart';
 import '../core/memories.dart';
 import 'album_sheet.dart';
@@ -764,6 +765,31 @@ class _FarmScreenState extends State<FarmScreen>
             title: const Text('🔔 Hiệu ứng âm thanh', style: TextStyle(color: brown, fontWeight: FontWeight.w700)),
             value: on,
             onChanged: (_) => snd.toggleSfx(),
+          ),
+        ),
+        const SheetHeader('Hiển thị'),
+        ValueListenableBuilder<int>(
+          valueListenable: DisplayService.instance.nightMode,
+          builder: (_, m, _) => ListTile(
+            dense: true,
+            title: const Text('🌙 Cảnh đêm', style: TextStyle(color: brown, fontWeight: FontWeight.w700)),
+            subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('Buổi tối (theo giờ điện thoại) làng tối dần. Chọn Dịu hoặc Tắt nếu thấy mỏi mắt.',
+                  style: TextStyle(color: brown, fontSize: 12)),
+              const SizedBox(height: 6),
+              SegmentedButton<int>(
+                showSelectedIcon: false,
+                style: const ButtonStyle(visualDensity: VisualDensity.compact, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                segments: [
+                  for (var i = 0; i < 3; i++) ButtonSegment(value: i, label: Text(DisplayService.names[i])),
+                ],
+                selected: {m},
+                onSelectionChanged: (v) {
+                  DisplayService.instance.setNightMode(v.first);
+                  if (mounted) setState(() {});
+                },
+              ),
+            ]),
           ),
         ),
         const SheetHeader('Thông báo'),
