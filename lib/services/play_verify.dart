@@ -7,7 +7,8 @@ import 'package:crypto/crypto.dart';
 /// Monetisation setup → Licensing): base64 X.509 SubjectPublicKeyInfo of
 /// the RSA key Google signs every purchase with. Public by design. Empty =
 /// purchases are not signature-checked.
-const playLicenseKey = '';
+const playLicenseKey =
+    'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwgW2BOVqnj0KHi/Gf5AHFuMwhi96oJlV59tmDJhbwNkenKbcdiiO3SoU9uPfIb81QseU0XY84gmvEbcSBQThKVeQKKRRUFT5VE9UQr7+eudamsNp+8w9MLjsHsNgEuf0ayX0acp0scaOcocq9k7fTshcmfddMnKo1deXAjr2ha05qsHpVWGhGjguR7NRv9U/h3VPiA2nD5X8c+9vYYI/qYO1ejHzeZz56NZGE31kMw/pJ5UIKm7cMQ11S8TFcI/aA2671zA8yOKVeRwFGSg6BLzEepgN1vEDsxDtZjzzPMf1c1/RuHw+AYIsnxKLLNAuLoNCkLy1Jkb6hfagdpgVJwIDAQAB';
 
 /// Checks a Google Play purchase signature on the phone (from kiem-hiep-app).
 ///

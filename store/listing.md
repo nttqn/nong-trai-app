@@ -67,6 +67,9 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.6.1, ≤ 500 ký tự)
+Tăng cường bảo mật thanh toán: giao dịch được xác thực chữ ký Google Play ngay trên máy. Sửa lỗi nhỏ.
+
 ## Có gì mới (bản 1.6.0, ≤ 500 ký tự)
 Làng quê nhộn nhịp hơn: người gánh hàng, đạp xe, cưỡi trâu, chăn vịt đi lại trên đường làng; nông dân cấy lúa, cuốc đất; gà mẹ dẫn con, vịt bơi trên hồ, thuyền xuôi ngược trên sông.
 Thêm Cửa hàng 🛍️: Gói khởi đầu, Hầm chứa +250 chỗ, Thẻ Nhà Nông 30 ngày và Bỏ quảng cáo. Game vẫn chơi miễn phí trọn vẹn.
@@ -85,6 +88,9 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.6.1, en-US)
+Safer payments: purchases are verified with Google Play's signature on your device. Minor fixes.
 
 ## What's new (1.6.0, en-US)
 A livelier village: folks carry baskets, ride bikes, ride buffaloes and herd ducks along the village road; farmers plant rice and hoe beds; hens lead their chicks, ducks swim on the lake and boats sail the river.
