@@ -433,7 +433,7 @@ class Farm {
   int get storageCap =>
       houseLevels[houseLevel].storage +
       paidStorage +
-      (objs.any((o) => o.type == 'ham_chua') ? hamChuaStorage : 0) +
+      hamChuaCap +
       extraHouses.fold<int>(0, (s, o) => s + extraHouseCap(o)) +
       objs.where((o) => o.def.kind == BKind.storage).fold(0, (s, o) => s + warehouseLevels[o.level].storage);
 
@@ -592,13 +592,14 @@ class Farm {
     return null;
   }
 
-  /// Plots, trees and decorations can be removed (no refund).
+  /// Plots, trees, decorations, pens and ponds can be removed (no refund;
+  /// animals, fish and anything in progress go with it).
   bool canRemove(Obj o) {
     final k = o.def.kind;
     if (k == BKind.storage) return stored <= storageCap - warehouseLevels[o.level].storage;
     if (o.type == 'san_phoi' && yard.isNotEmpty) return false; // grain on it
     if (o.type == 'ham_chua') return false; // a paid building stays
-    return k == BKind.paddy || k == BKind.bed || k == BKind.tree || k == BKind.deco;
+    return k == BKind.paddy || k == BKind.bed || k == BKind.tree || k == BKind.deco || k == BKind.pen || k == BKind.pond;
   }
 
   void remove(Obj o) {

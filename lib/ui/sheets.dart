@@ -97,7 +97,7 @@ class _ShopSheetState extends State<ShopSheet> {
           if (id == 'ham_chua' && !f.hamChua)
             const Text('🛍️ Gói Cửa hàng', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFFC62828)))
           else if (id == 'ham_chua')
-            Text(f.canBuy(id) == null ? '+$hamChuaStorage chỗ chứa' : 'Đã xây',
+            Text(f.canBuy(id) == null ? '+$hamChuaStorage chỗ chứa' : 'Đã xây · ${f.hamChuaCap}',
                 style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: greenDark))
           else if (festivalDecos.contains(id))
             Text('🎁 Quà lễ hội ×${f.giftCount(id)}',

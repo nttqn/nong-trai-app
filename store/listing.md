@@ -59,13 +59,17 @@ Chơi được không cần mạng. Đăng nhập Google (không bắt buộc) �
 
 🛍️ CỬA HÀNG (KHÔNG BẮT BUỘC)
 • Gói khởi đầu: xu, thêm 50 chỗ chứa, 10 Vé Xong ngay, chậu sen và giàn đèn lồng.
-• Hầm chứa đá ong: công trình riêng, thêm 250 chỗ chứa.
+• Hầm chứa đá ong: công trình riêng, thêm 250 chỗ chứa, nâng cấp bằng xu lên tới 3000.
 • Thẻ Nhà Nông 30 ngày: mỗi ngày 5 lượt Xong ngay miễn phí, đơn hàng thêm 20% xu, quà đăng nhập nhân đôi.
 • Bỏ quảng cáo: tắt quảng cáo xen giữa.
 
 Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhiều quảng cáo do bạn tự chọn xem để nhận thưởng: làm xong ngay, nhân đôi quà lên cấp.
 
 Hỗ trợ: trungsmail@gmail.com
+
+## Có gì mới (bản 1.7.0, ≤ 500 ký tự)
+Hầm chứa đá ong nay nâng cấp được bằng xu: 500 chỗ (cấp 10), 1000 chỗ (cấp 20), 3000 chỗ (cấp 30). Bà con đã mua Hầm chứa chạm vào hầm để nâng cấp.
+Cho phép phá bỏ ao cá và chuồng trại (gà, vịt, lợn, trâu, bò, dê, ong, tằm) để sắp xếp lại nông trại.
 
 ## Có gì mới (bản 1.6.1, ≤ 500 ký tự)
 Tăng cường bảo mật thanh toán: giao dịch được xác thực chữ ký Google Play ngay trên máy. Sửa lỗi nhỏ.
@@ -88,6 +92,10 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.7.0, en-US)
+The Laterite Cellar can now be upgraded with coins: 500 storage (level 10), 1000 (level 20), 3000 (level 30). Tap your cellar to upgrade it.
+Fish ponds and animal pens can now be demolished so you can rearrange your farm.
 
 ## What's new (1.6.1, en-US)
 Safer payments: purchases are verified with Google Play's signature on your device. Minor fixes.
@@ -202,7 +210,7 @@ Head back to the countryside! Plant rice, raise water buffalo, dry the harvest i
 
 🛍️ SHOP (OPTIONAL)
 • Starter Pack: coins, +50 storage, 10 Instant Finish tickets, a lotus pot and a lantern arbor.
-• Laterite Cellar: its own building with +250 storage.
+• Laterite Cellar: its own building with +250 storage, upgradable with coins up to 3000.
 • 30-day Farmer Card: 5 free Instant Finishes a day, +20% coins on orders, doubled login gifts.
 • Remove Ads: turns off interstitial ads.
 

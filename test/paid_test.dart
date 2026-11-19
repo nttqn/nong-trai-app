@@ -42,6 +42,37 @@ void main() {
     expect(f.canRemove(f.objs.firstWhere((o) => o.type == 'ham_chua')), isFalse);
     expect(f.canBuy('ham_chua'), isNotNull); // only one
     expect(reload(f).storageCap, cap + hamChuaStorage);
+
+    // 1.7.0: upgrades with xu, gated by level, kept in the save
+    final h = f.objs.firstWhere((o) => o.type == 'ham_chua');
+    f.level = 9;
+    expect(f.upgradeHamChua(h), isNotNull);
+    f.level = 30;
+    f.coins = 1000000;
+    for (final want in [500, 1000, 3000]) {
+      expect(f.upgradeHamChua(h), isNull);
+      expect(f.storageCap, cap + want);
+    }
+    expect(f.upgradeHamChua(h), isNotNull); // max
+    expect(f.coins, 1000000 - 20000 - 80000 - 300000);
+    expect(reload(f).storageCap, cap + 3000);
+  });
+
+  test('pens and ponds can be demolished', () {
+    final f = farm()..coins = 100000..level = 10;
+    for (final t in ['chuong_ga', 'ao']) {
+      var placed = false;
+      for (var y = 0; y < mapSize && !placed; y++) {
+        for (var x = 0; x < mapSize && !placed; x++) {
+          if (f.canPlace(t, x, y)) placed = f.build(t, x, y) == null;
+        }
+      }
+      expect(placed, isTrue, reason: t);
+      final o = f.objs.lastWhere((o) => o.type == t);
+      expect(f.canRemove(o), isTrue, reason: t);
+      f.remove(o);
+      expect(f.objs.any((e) => e.type == t), isFalse);
+    }
   });
 
   test('Thẻ Nhà Nông: 30 days, stacks, 5 free Xong ngay a day, then tickets', () {

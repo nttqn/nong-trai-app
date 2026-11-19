@@ -18,10 +18,10 @@ Cả 4 gói là sản phẩm dùng một lần; game tự xử lý "mua 1 lần"
 ## 2. ham_chua — giá gợi ý 79.000 ₫
 
 **Tên (vi):** Hầm chứa đá ong
-**Mô tả (vi):** Mua 1 lần: mở khóa công trình Hầm chứa đá ong, thêm 250 chỗ chứa vào kho chung. Đặt ở đâu tùy thích trong Xây dựng → Nhà cửa.
+**Mô tả (vi):** Mua 1 lần: mở khóa công trình Hầm chứa đá ong, thêm 250 chỗ chứa vào kho chung, nâng cấp bằng xu lên 500, 1000, 3000 chỗ. Đặt ở đâu tùy thích trong Xây dựng → Nhà cửa.
 
 **Name (en-US):** Laterite Cellar
-**Description (en-US):** One-time: unlocks the Laterite Cellar building, adding 250 storage to your barn. Place it anywhere from Build → Houses.
+**Description (en-US):** One-time: unlocks the Laterite Cellar building, adding 250 storage to your barn, upgradable with coins to 500, 1000 and 3000. Place it anywhere from Build → Houses.
 
 ## 3. the_nha_nong — giá gợi ý 49.000 ₫
 

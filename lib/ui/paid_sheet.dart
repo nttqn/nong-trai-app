@@ -43,6 +43,7 @@ class PaidShopSheet extends StatelessWidget {
                 lines: const [
                   'Mở khóa công trình Hầm chứa đá ong',
                   '+$hamChuaStorage chỗ chứa, thêm vào cả kho chung',
+                  'Nâng cấp bằng xu: 500 → 1000 → 3000 chỗ chứa',
                   'Đặt ở đâu tùy thích (Xây dựng → Nhà cửa)',
                 ],
                 owned: farm.hamChua,

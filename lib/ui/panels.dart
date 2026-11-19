@@ -42,6 +42,7 @@ class ObjPanel extends StatelessWidget {
       BKind.house => o.type == 'nha' ? _house() : _extraHouse(),
       BKind.storage => _warehouse(),
       BKind.obstacle => _obstacle(),
+      _ when o.type == 'ham_chua' => _cellar(),
       _ when o.type == 'cho' => _dog(),
       _ when o.type == 'san_phoi' => _yard(),
       _ => _info(),
@@ -85,6 +86,7 @@ class ObjPanel extends StatelessWidget {
     if (o.type == 'nha_phu') return 'Nhà con cháu · ${houseLevels[o.level].name}';
     if (o.def.kind == BKind.house) return houseLevels[o.level].name;
     if (o.def.kind == BKind.storage) return warehouseLevels[o.level].name;
+    if (o.type == 'ham_chua') return hamChuaLevels[o.level.clamp(0, hamChuaLevels.length - 1)].name;
     if (o.def.kind == BKind.pen) return '${o.def.name} (${o.count}/${animalForPen(o.type)!.maxCount})';
     return o.def.name;
   }
@@ -95,7 +97,7 @@ class ObjPanel extends StatelessWidget {
       builder: (c) => AlertDialog(
         backgroundColor: cream,
         title: Text('Phá bỏ ${o.def.name}?'),
-        content: const Text('Không được hoàn lại xu.'),
+        content: Text(_removeWarning()),
         actions: [
           TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Thôi')),
           TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Phá bỏ')),
@@ -106,6 +108,14 @@ class ObjPanel extends StatelessWidget {
       farm.remove(o);
       a.close();
     }
+  }
+
+  String _removeWarning() {
+    final lose = <String>[];
+    if (o.def.kind == BKind.pen && o.count > 0) lose.add('${o.count} con ${animalForPen(o.type)!.name.toLowerCase()}');
+    if (o.def.kind == BKind.pond && o.crop != null) lose.add('mẻ cá đang nuôi');
+    if (o.def.kind == BKind.pen && o.end != 0) lose.add('sản phẩm đang làm');
+    return lose.isEmpty ? 'Không được hoàn lại xu.' : 'Mất luôn ${lose.join(', ')}. Không được hoàn lại xu.';
   }
 
   Widget _timer(String label) => Ticking(const Duration(seconds: 1), builder: (_) {
@@ -405,6 +415,28 @@ class ObjPanel extends StatelessWidget {
           PillButton('Nâng cấp',
               leading: Coin(n.cost, size: 12, color: Colors.white),
               onTap: farm.level >= n.level && farm.coins >= n.cost ? () => _do(farm.upgradeWarehouse(o)) : null),
+        ]),
+    ]);
+  }
+
+  Widget _cellar() {
+    final cur = hamChuaLevels[o.level.clamp(0, hamChuaLevels.length - 1)];
+    final n = farm.nextHamChua(o);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Chứa thêm ${cur.storage} · Kho chung: ${farm.stored}/${farm.storageCap}',
+          style: const TextStyle(color: brown, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 6),
+      if (n == null)
+        const Text('Đã nâng cấp tối đa', style: TextStyle(color: brownLight))
+      else
+        Row(children: [
+          Expanded(
+            child: Text('Nâng lên ${n.name}\nChứa thêm ${n.storage}${farm.level < n.level ? ' · cần cấp ${n.level}' : ''}',
+                style: const TextStyle(fontSize: 12.5, color: brownLight)),
+          ),
+          PillButton('Nâng cấp',
+              leading: Coin(n.cost, size: 12, color: Colors.white),
+              onTap: farm.level >= n.level && farm.coins >= n.cost ? () => _do(farm.upgradeHamChua(o)) : null),
         ]),
     ]);
   }

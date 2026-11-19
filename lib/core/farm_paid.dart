@@ -20,6 +20,21 @@ const allSkus = {skuNoAds, skuStarter, skuHamChua, skuCard};
 const oneTimeSkus = {skuNoAds, skuStarter, skuHamChua};
 
 const hamChuaStorage = 250;
+
+/// Hầm chứa levels (1.7.0): Obj.level 0..3. The pack gives the first; the
+/// rest are bought with xu so the pack keeps paying off later on.
+class HamChuaLevel {
+  final String name;
+  final int storage, cost, level;
+  const HamChuaLevel(this.name, this.storage, this.cost, this.level);
+}
+
+const hamChuaLevels = [
+  HamChuaLevel('Hầm chứa', hamChuaStorage, 0, 1),
+  HamChuaLevel('Hầm chứa rộng', 500, 20000, 10),
+  HamChuaLevel('Hầm chứa lớn', 1000, 80000, 20),
+  HamChuaLevel('Đại hầm chứa', 3000, 300000, 30),
+];
 const starterStorage = 50, starterTickets = 10;
 const starterDecos = ['chau_sen', 'den_long'];
 int starterCoins(int level) => 3000 + 300 * level;
@@ -66,6 +81,35 @@ extension FarmPaid on Farm {
       tickets--;
     }
     _ev('speedup_paid', {'via': viaCard ? 'card' : 'ticket'});
+    _changed();
+    return null;
+  }
+
+  Obj? get hamChuaObj {
+    for (final o in objs) {
+      if (o.type == 'ham_chua') return o;
+    }
+    return null;
+  }
+
+  int get hamChuaCap {
+    final o = hamChuaObj;
+    return o == null ? 0 : hamChuaLevels[o.level.clamp(0, hamChuaLevels.length - 1)].storage;
+  }
+
+  HamChuaLevel? nextHamChua(Obj o) => o.level + 1 < hamChuaLevels.length ? hamChuaLevels[o.level + 1] : null;
+
+  String? upgradeHamChua(Obj o) {
+    final n = nextHamChua(o);
+    if (n == null) return 'Hầm chứa đã nâng cấp tối đa';
+    if (level < n.level) return 'Cần đạt cấp ${n.level}';
+    if (coins < n.cost) return 'Không đủ xu';
+    coins -= n.cost;
+    o.level++;
+    _ev('ham_chua_upgrade', {'lv': o.level + 1, 'level': level});
+    _snd('build');
+    addXp(30 * o.level);
+    _fx(o, '🏺 ${n.name}');
     _changed();
     return null;
   }
