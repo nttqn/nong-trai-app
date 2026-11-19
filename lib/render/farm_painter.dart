@@ -11,6 +11,7 @@ import '../core/weather.dart';
 import 'animals.dart';
 import 'ground.dart';
 import 'iso.dart';
+import 'life.dart';
 import 'night.dart';
 import 'sprites.dart';
 import 'structures.dart';
@@ -185,6 +186,7 @@ class FarmPainter extends CustomPainter {
     drawWaterAnim(c, iso, t);
     final night = nightOf(farm);
     final rain = weatherAt(farm.now()) == Weather.rain;
+    drawWaterLife(c, iso, t, night: night);
     drawStreetLamps(c, iso, farm, night);
 
     // selection footprint under the object
@@ -203,12 +205,26 @@ class FarmPainter extends CustomPainter {
     view.drawn.clear();
     // only what is on screen (the map is big; zoomed in most of it is not)
     final shown = c.getLocalClipBounds().inflate(160);
+    // villagers and free-range animals, slotted in by depth among the objects
+    final life = [
+      for (final a in villageLife(farm, iso, t, night: night, rain: rain))
+        if (shown.contains(a.at)) a,
+    ]..sort((a, b) => a.depth.compareTo(b.depth));
+    var li = 0;
     for (final o in list) {
+      final d = depthOf(o);
+      Sprites.rec = null;
+      while (li < life.length && life[li].depth < d) {
+        life[li++].draw(c);
+      }
       if (!shown.contains(iso.p(o.x + o.w / 2, o.y + o.h / 2))) continue;
       Sprites.rec = view.drawn[o.id] = [];
       drawObj(c, iso, farm, o, t);
     }
     Sprites.rec = null;
+    while (li < life.length) {
+      life[li++].draw(c);
+    }
     if (night < .5 && !rain) _sparrows(c, iso, t, list);
     if (night < .5) _egrets(c, iso, t);
     if (night < .4) _butterflies(c, iso, t, list);

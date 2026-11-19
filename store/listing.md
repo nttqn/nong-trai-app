@@ -57,6 +57,9 @@ Game miễn phí, có quảng cáo. Nhiều quảng cáo do bạn tự chọn xe
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.5.0, ≤ 500 ký tự)
+Làng quê nhộn nhịp hơn: bà con gánh lúa, gánh rau, cô gái đạp xe chở hoa, chú bé cưỡi trâu thổi sáo, người chăn vịt lùa cả đàn và lũ trẻ thả diều đi lại trên đường làng. Bác nông dân ra đồng cấy lúa, cuốc đất; gà mẹ dẫn đàn con kiếm ăn trước sân; vịt mẹ dắt vịt con bơi trên hồ sen; thuyền nan chở nông sản xuôi ngược trên sông.
+
 ## Có gì mới (bản 1.3.0, ≤ 500 ký tự)
 Nội dung mới cho cấp 31–45: nuôi tằm ăn lá dâu, ươm tơ, dệt lụa và chiếu cói ở nhà khung cửi; trồng nghệ, cói, lúa nếp cẩm; cây cam, mít, cau; thả lươn, cá quả; bếp chè mứt với mứt cam, nghệ mật ong, sữa chua nếp cẩm; cháo lươn, cá kho tộ và tráp ăn hỏi. Thêm 27 nhiệm vụ dẫn đường.
 

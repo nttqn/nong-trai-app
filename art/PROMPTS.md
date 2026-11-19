@@ -412,3 +412,16 @@ Biểu tượng (cách làm như đợt 7: dán ảnh mẫu, gõ `Same icon styl
 | `item_suachuanepcam` | A small glass cup of white yogurt topped with dark purple black sticky rice and a spoon. |
 | `item_cakho` | A small black clay pot of caramelized braised fish in a dark brown glossy sauce with black pepper and chili. |
 | `item_trap_cuoi` | A red lacquered Vietnamese wedding gift box (tráp ăn hỏi) with a golden double-happiness pattern, areca nuts and betel leaves on top. |
+
+## Đợt 13 (bản 1.5, tuỳ chọn) — người dân đi lại trong làng
+
+Hiện game vẽ người bằng code. Nếu muốn đồng bộ với tranh, tạo các ảnh dưới đây (cách làm như đợt 1: dán ảnh mẫu, gõ câu mở đầu + **PHONG CÁCH** + lời nhắc riêng). Mỗi ảnh là **một người, đứng/đi nghiêng về phía dưới bên trái** (giống hướng các con vật), toàn thân, không có ô đất bên dưới. Mình sẽ thêm nhún nhảy khi đi.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `nguoi_ganh` | A cute chibi Vietnamese farmer in a conical hat (nón lá) and brown peasant clothes walking toward the lower-left, carrying a bamboo shoulder pole (đòn gánh) with a round woven basket of golden rice hanging from each end. Whole figure, standing directly on the ground, no base tile. |
+| `nguoi_xe_dap` | A cute chibi Vietnamese girl in a white áo bà ba and conical hat riding an old green bicycle toward the lower-left, a basket of pink and yellow flowers on the front. Whole figure and bicycle, no base tile. |
+| `nguoi_chan_vit` | A cute chibi Vietnamese duck herder in a conical hat and indigo clothes walking toward the lower-left, holding a long thin bamboo pole with a small red cloth tied at the tip. Person only (no ducks), no base tile. |
+| `be_thoi_sao` | A cute chibi Vietnamese village boy in a white shirt and dark shorts sitting astride (legs apart, as if riding an animal), facing the lower-left, playing a bamboo flute. Boy only, nothing under him, no base tile. |
+| `nguoi_cay_lua` | A cute chibi Vietnamese woman in a conical hat and brown clothes with rolled-up trousers, bent over at the waist transplanting rice seedlings, a bunch of green seedlings in her hand, facing the lower-left. Person only, no water, no base tile. |
+| `nguoi_cuoc_dat` | A cute chibi Vietnamese farmer in a conical hat and brown clothes swinging a hoe over his shoulder, facing the lower-left. Person only, no base tile. |
