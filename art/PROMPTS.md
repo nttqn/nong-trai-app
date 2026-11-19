@@ -432,7 +432,7 @@ Hiện game vẽ người bằng code. Nếu muốn đồng bộ với tranh, t�
 
 ## Đợt 14 (bản 1.6) — Hầm chứa (công trình trả phí)
 
-Chưa có ảnh thì game tạm dùng ảnh Nhà kho gạch.
+Đã có ảnh (2026-11-19).
 
 | Tên file | Lời nhắc riêng |
 |---|---|
