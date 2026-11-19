@@ -2,7 +2,7 @@
 
 Play Console → Kiếm tiền bằng Play → Sản phẩm → **Sản phẩm dùng một lần** → Tạo sản phẩm.
 Mã sản phẩm phải gõ ĐÚNG như dưới (game tìm theo mã). Tên ≤ 55 ký tự, mô tả ≤ 200 ký tự.
-Ảnh minh họa từng gói: store/iap/<mã>.png (cắt từ màn Cửa hàng trong game).
+Icon từng gói (ô Icon, bắt buộc nên có): store/iap/<mã>.png — 512×512, PNG 32-bit, không chữ; ghép từ tranh art_src bằng `powershell -File tool/iap_icons.ps1`.
 Cả 4 gói là sản phẩm dùng một lần; game tự xử lý "mua 1 lần" hay "mua lại" (Thẻ Nhà Nông được tiêu thụ để mua lại).
 
 ---
