@@ -1,0 +1,28 @@
+GOOGLE ADS - CHIẾN DỊCH ỨNG DỤNG - MÙA LÚA CHÍN
+(Ngôn ngữ: Tiếng Việt · Vị trí: Việt Nam)
+
+TIÊU ĐỀ (tối đa 30 ký tự, nhập tối đa 5)
+Về quê làm nông thôi!           (21)
+Cấy lúa, nuôi trâu, phơi thóc   (29)
+Game nông trại làng quê Việt    (28)
+Ăn Tết theo lịch âm thật        (24)
+Gói bánh chưng, xây làng mới    (28)
+-- dự phòng --
+Thăm hàng xóm, hái trộm rau     (27)
+Chơi offline, miễn phí          (22)
+
+MÔ TẢ (tối đa 90 ký tự, nhập tối đa 5)
+Cấy lúa, nuôi trâu, đào ao thả cá, phơi thóc ngoài sân. Về quê làm nông thư thả mỗi ngày!   (89)
+Game chạy theo âm lịch thật: 24 tiết khí, 7 lễ hội Tết, Trung thu, Rằm tháng Giêng...      (85)
+Từ mái tranh lên nhà ngói, xây giếng làng, cổng làng, đình làng. Tải miễn phí ngay!        (83)
+Thăm nông trại hàng xóm, thu hoạch hộ, hái trộm, bày hàng ở chợ phiên cùng bạn bè.         (82)
+Gói bánh chưng, xay gạo, làm kẹo lạc, nước mắm. Nhạc sáo trúc, đàn bầu đậm hồn quê.        (83)
+
+HÌNH ẢNH (store/ads/, mỗi mẫu 3 tỉ lệ Google yêu cầu: ngang 1.91:1, vuông 1:1, dọc 4:5)
+A  Về quê làm nông thôi!         - toàn cảnh nông trại
+B  Trời sắp mưa, che thóc mau!   - tranh phơi thóc + màn hình game
+C  Ăn Tết theo lịch âm           - tranh Tết sum vầy + màn hình Tết trong game
+D  Tuổi thơ trên lưng trâu       - tranh chăn trâu + màn hình chuồng trại
+
+VIDEO: Google Ads chỉ nhận link YouTube. Đăng store/video/mua-lua-chin-promo-9x16.mp4
+(dọc) và -16x9.mp4 (ngang) lên YouTube ở chế độ "Không công khai" rồi dán link.

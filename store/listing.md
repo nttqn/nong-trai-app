@@ -48,12 +48,22 @@ Về quê thôi! Cấy lúa, nuôi trâu, phơi thóc, gói bánh chưng và cù
 📖 KÝ ỨC LÀNG QUÊ
 • Mỗi chặng đường mở một bức tranh ký ức: mùa gặt đầu tiên, nồi bánh chưng đêm ba mươi, phiên chợ quê, lá thư con gửi từ thành phố…
 
+👨‍🌾 LÀNG QUÊ NHỘN NHỊP
+• Bà con gánh hàng, đạp xe chở hoa, chú bé cưỡi trâu thổi sáo, người chăn vịt lùa cả đàn đi lại trên đường làng.
+• Nông dân ra đồng cấy lúa, cuốc đất; gà mẹ dẫn đàn con kiếm ăn trước sân; vịt bơi trên hồ sen, thuyền nan xuôi ngược trên sông.
+
 🎵 ÂM THANH ĐỒNG QUÊ
 • Nhạc nền với sáo trúc, đàn bầu, đàn tranh; tiếng gà gáy, trâu kêu, vịt quạc.
 
 Chơi được không cần mạng. Đăng nhập Google (không bắt buộc) để lưu nông trại lên mây, đổi máy không mất, và giao lưu với hàng xóm.
 
-Game miễn phí, có quảng cáo và gói mua trong ứng dụng (không bắt buộc). Nhiều quảng cáo do bạn tự chọn xem để nhận thưởng: làm xong ngay, nhân đôi quà lên cấp. Gói Bỏ quảng cáo tắt quảng cáo xen giữa.
+🛍️ CỬA HÀNG (KHÔNG BẮT BUỘC)
+• Gói khởi đầu: xu, thêm 50 chỗ chứa, 10 Vé Xong ngay, chậu sen và giàn đèn lồng.
+• Hầm chứa đá ong: công trình riêng, thêm 250 chỗ chứa.
+• Thẻ Nhà Nông 30 ngày: mỗi ngày 5 lượt Xong ngay miễn phí, đơn hàng thêm 20% xu, quà đăng nhập nhân đôi.
+• Bỏ quảng cáo: tắt quảng cáo xen giữa.
+
+Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhiều quảng cáo do bạn tự chọn xem để nhận thưởng: làm xong ngay, nhân đôi quà lên cấp.
 
 Hỗ trợ: trungsmail@gmail.com
 
@@ -103,7 +113,7 @@ Mô phỏng, Nông trại, Thư giãn, Offline, Xây dựng
 
 ## Đối tượng mục tiêu và nội dung
 - Độ tuổi mục tiêu: 13 tuổi trở lên. Không chọn nhóm dưới 13 để game không phải theo chính sách Gia đình (quảng cáo dành cho trẻ em).
-- Bảng câu hỏi xếp hạng nội dung (IARC): không bạo lực, không nội dung người lớn, không cờ bạc. "Người dùng có tương tác với nhau không": **Có** (thăm nông trại, hái trộm, chợ phiên, tên nông trại công khai trên bảng xếp hạng). Không chia sẻ vị trí. Có mua bán vật phẩm ảo: **Không** (chưa có mua trong ứng dụng).
+- Bảng câu hỏi xếp hạng nội dung (IARC): không bạo lực, không nội dung người lớn, không cờ bạc. "Người dùng có tương tác với nhau không": **Có** (thăm nông trại, hái trộm, chợ phiên, tên nông trại công khai trên bảng xếp hạng). Không chia sẻ vị trí. Có mua bán vật phẩm ảo / mua trong ứng dụng: **Có** (từ 1.6.0: 4 gói qua Google Play Billing).
 - Quảng cáo: **Có**.
 
 ## An toàn dữ liệu (Data safety)
@@ -128,7 +138,7 @@ Mô phỏng, Nông trại, Thư giãn, Offline, Xây dựng
   - Google Play điện thoại 1080×2160: store/phone/
   - Google Play máy tính bảng 7" 1200×1920: store/tablet-7in/
   - Google Play máy tính bảng 10" 1600×2560: store/tablet-10in/
-- Thứ tự ảnh: 01 toàn cảnh làng · 02 Tết với đồ lễ hội · 03 ruộng lúa và sân phơi · 04 chuồng trại · 05 lịch làng, Trung thu · 06 ký ức Tết sum vầy · 07 đêm trăng rằm (bản 1.1) · 08 bản đồ hàng xóm.
+- Thứ tự ảnh: 01 toàn cảnh làng · 02 Tết với đồ lễ hội · 03 ruộng lúa và sân phơi · 04 làng nhộn nhịp (người, vịt, cấy lúa; bản 1.6) · 05 lịch làng, Trung thu · 06 ký ức Tết sum vầy · 07 đêm trăng rằm (bản 1.1) · 08 cửa hàng 4 gói (bản 1.6). Giá trong ảnh là giá gợi ý (22k/79k/49k/49k), hiện khi chạy web với ?shot=1.
 
 ---
 
@@ -180,8 +190,18 @@ Head back to the countryside! Plant rice, raise water buffalo, dry the harvest i
 📖 VILLAGE MEMORIES
 • Every milestone opens a painted memory: the first harvest, the rice cakes on New Year's Eve, the village market, a letter from a child in the city…
 
+👨‍🌾 A LIVELY VILLAGE
+• Villagers carry baskets on shoulder poles, cycle with flowers, a boy rides a buffalo playing his flute and a duck herder drives his flock down the road.
+• Farmers plant rice and hoe the beds; hens lead their chicks, ducks swim on the lotus lake and boats sail the river.
+
+🛍️ SHOP (OPTIONAL)
+• Starter Pack: coins, +50 storage, 10 Instant Finish tickets, a lotus pot and a lantern arbor.
+• Laterite Cellar: its own building with +250 storage.
+• 30-day Farmer Card: 5 free Instant Finishes a day, +20% coins on orders, doubled login gifts.
+• Remove Ads: turns off interstitial ads.
+
 Plays offline. Optional Google sign-in saves your farm to the cloud and lets you meet neighbours.
 
-Free to play with ads. Many ads are optional and give rewards.
+Free to play, fully playable without paying. Contains ads; many are optional and give rewards.
 
 Support: trungsmail@gmail.com

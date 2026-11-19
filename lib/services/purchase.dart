@@ -126,7 +126,15 @@ class PurchaseService {
 
   static bool genuine(PurchaseDetails p) => rejectReason(p) == null;
 
-  String? priceOf(String sku) => products[sku]?.price;
+  String? priceOf(String sku) => products[sku]?.price ?? (kIsWeb && Uri.base.queryParameters['shot'] != null ? _demoPrices[sku] : null);
+
+  // store screenshots on web (?shot=1): the suggested Play prices
+  static const _demoPrices = {
+    skuStarter: '22.000 ₫',
+    skuHamChua: '79.000 ₫',
+    skuCard: '49.000 ₫',
+    skuNoAds: '49.000 ₫',
+  };
 
   /// The farm already has everything [sku] gives once.
   bool owns(String sku) {

@@ -16,11 +16,11 @@ const shots = [
   ['01-lang-que', `demo=3&${base}&day=2026-11-06`, 8000],
   ['02-tet', `demo=3&${base}&day=2027-02-06&fest=1&fx=4&fy=13&zoom=1.7`, 9000],
   ['03-phoi-thoc', `demo=3&${base}&day=2026-11-06&fx=16&fy=8&zoom=1.8`, 8000],
-  ['04-chan-nuoi', `demo=3&${base}&day=2026-11-06&fx=8&fy=15&zoom=1.8`, 8000],
+  ['04-lang-nhon-nhip', `demo=3&${base}&day=2026-11-06&fx=11&fy=6&zoomw=1.4`, 8000],
   ['05-lich-le-hoi', `demo=3&${base}&day=2026-09-25&sheet=calendar`, 9000],
   ['06-ky-uc', `demo=3&${base}&day=2026-11-06&memcard=tet_sum_vay`, 10000],
   ['07-dem-trang', `demo=3&shot=1&weather=sunny&day=2026-11-23&hour=21.2&fx=12&fy=9&zoomw=1.15`, 10000],
-  ['08-hang-xom', `demo=3&${base}&day=2026-11-06&sheet=map&worldmap=demo`, 9000],
+  ['08-cua-hang', `demo=3&${base}&day=2026-11-06&sheet=paid`, 9000],
 ];
 
 (async () => {
