@@ -425,3 +425,7 @@ Hiện game vẽ người bằng code. Nếu muốn đồng bộ với tranh, t�
 | `be_thoi_sao` | A cute chibi Vietnamese village boy in a white shirt and dark shorts sitting astride (legs apart, as if riding an animal), facing the lower-left, playing a bamboo flute. Boy only, nothing under him, no base tile. |
 | `nguoi_cay_lua` | A cute chibi Vietnamese woman in a conical hat and brown clothes with rolled-up trousers, bent over at the waist transplanting rice seedlings, a bunch of green seedlings in her hand, facing the lower-left. Person only, no water, no base tile. |
 | `nguoi_cuoc_dat` | A cute chibi Vietnamese farmer in a conical hat and brown clothes swinging a hoe over his shoulder, facing the lower-left. Person only, no base tile. |
+| `tre_tha_dieu` | A cute chibi Vietnamese village kid (about 8 years old, no hat, short black hair, brown shirt, blue shorts, barefoot) running toward the lower-left, one hand raised up behind holding a thin kite string (string only, no kite). Whole figure, no base tile. |
+| `tre_chay` | Another cute chibi Vietnamese village kid (about 7 years old, no hat, short black hair, green shirt, blue shorts, barefoot) running toward the lower-left, happily waving one arm up in the air. Whole figure, no base tile. |
+
+(`tre_tha_dieu`, `tre_chay` thêm sau: diều vẫn vẽ bằng code, nối dây từ tay đứa trẻ.)

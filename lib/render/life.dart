@@ -239,7 +239,7 @@ double _bob(double ph) => math.sin(ph).abs() * .8;
 
 /// Farmer carrying two baskets on a shoulder pole (đòn gánh).
 void _carrier(Canvas c, Offset f, double ph, bool down, Color shirt, bool rice) {
-  if (Sprites.has('nguoi_ganh')) return _sprite(c, f, 'nguoi_ganh', 30, ph, down);
+  if (Sprites.has('nguoi_ganh')) return _sprite(c, f, 'nguoi_ganh', 34, ph, down);
   shadow(c, f, 13, 2.6, .18);
   _local(c, f, down, () {
     final b = _bob(ph);
@@ -275,7 +275,7 @@ void _carrier(Canvas c, Offset f, double ph, bool down, Color shirt, bool rice) 
 
 /// A girl on a bicycle with a basket of flowers.
 void _cyclist(Canvas c, Offset f, double t, bool down, Color shirt) {
-  if (Sprites.has('nguoi_xe_dap')) return _sprite(c, f, 'nguoi_xe_dap', 34, t * 9, down, bob: .3);
+  if (Sprites.has('nguoi_xe_dap')) return _sprite(c, f, 'nguoi_xe_dap', 30, t * 9, down, bob: .3);
   shadow(c, f, 14, 2.6, .18);
   _local(c, f, down, () {
     const r = 4.6, rear = Offset(-7.5, -4.6), fr = Offset(7.5, -4.6);
@@ -339,7 +339,7 @@ void _buffaloBoy(Canvas c, Offset f, double t, double ph, bool down) {
   c.restore();
   final seat = f + Offset(down ? 2 : -2, -back + step.abs() * .6);
   if (Sprites.has('be_thoi_sao')) {
-    Sprites.at(c, 'be_thoi_sao', seat + const Offset(0, 3), 16, flipX: !down);
+    Sprites.at(c, 'be_thoi_sao', seat + const Offset(0, 6), 18, flipX: !down);
   } else {
     _local(c, seat, down, () {
       // legs astride, dangling down the side
@@ -360,7 +360,7 @@ void _buffaloBoy(Canvas c, Offset f, double t, double ph, bool down) {
 
 /// The duck herder (người chăn vịt) with his long bamboo pole.
 void _herder(Canvas c, Offset f, double t, double ph, bool down, Color shirt) {
-  if (Sprites.has('nguoi_chan_vit')) return _sprite(c, f, 'nguoi_chan_vit', 30, ph, down);
+  if (Sprites.has('nguoi_chan_vit')) return _sprite(c, f, 'nguoi_chan_vit', 32, ph, down);
   shadow(c, f, 6, 2, .2);
   _local(c, f, down, () {
     final b = _bob(ph);
@@ -387,6 +387,8 @@ void _walkingDuck(Canvas c, Offset f, double t, double i, bool down) {
 }
 
 void _kid(Canvas c, Offset f, double ph, bool left, bool front, Color shirt, {bool wave = false}) {
+  final key = wave ? 'tre_chay' : 'tre_tha_dieu';
+  if (Sprites.has(key)) return _sprite(c, f, key, 24, ph, front);
   shadow(c, f, 4.5, 1.6, .2);
   _local(c, f, left, () {
     final b = _bob(ph) * 1.4;
@@ -400,7 +402,8 @@ void _kid(Canvas c, Offset f, double ph, bool left, bool front, Color shirt, {bo
 void _kiteKid(Canvas c, Offset f, double t, double ph, bool down, Color shirt) {
   _kid(c, f, ph, down, down, shirt);
   final s = down ? -1.0 : 1.0;
-  final hand = f + Offset(s * 3.2, -9);
+  // the painted kid holds the string up behind; the drawn one in front
+  final hand = Sprites.has('tre_tha_dieu') ? f + Offset(-s * 6, -22) : f + Offset(s * 3.2, -9);
   // the kite streams out behind, high up
   final kite = f + Offset(-s * (34 + math.sin(t * .7) * 6), -96 + math.sin(t * 1.1) * 7);
   final string = Path()
@@ -476,7 +479,7 @@ void _fieldWorkers(List<Actor> out, Farm farm, Iso iso, double t) {
 double depthOf2(Obj o) => ((o.x + o.w) + (o.y + o.h)).toDouble();
 
 void _planter(Canvas c, Offset f, double t, Color shirt, bool front) {
-  if (Sprites.has('nguoi_cay_lua')) return _sprite(c, f, 'nguoi_cay_lua', 26, t * 1.2, front, bob: .4);
+  if (Sprites.has('nguoi_cay_lua')) return _sprite(c, f, 'nguoi_cay_lua', 27, t * 1.2, front, bob: .4);
   oval(c, f + const Offset(0, .5), 8, 2, const Color(0x33FFFFFF)); // ripple in the paddy water
   _local(c, f, front, () {
     final dip = (math.sin(t * 1.5) + 1) / 2; // reach down, stand a bit
@@ -494,7 +497,7 @@ void _planter(Canvas c, Offset f, double t, Color shirt, bool front) {
 }
 
 void _hoer(Canvas c, Offset f, double t, Color shirt, bool front) {
-  if (Sprites.has('nguoi_cuoc_dat')) return _sprite(c, f, 'nguoi_cuoc_dat', 26, t * 1.6, front, bob: .4);
+  if (Sprites.has('nguoi_cuoc_dat')) return _sprite(c, f, 'nguoi_cuoc_dat', 29, t * 1.6, front, bob: .4);
   shadow(c, f, 6, 2, .2);
   _local(c, f, front, () {
     // lift the hoe overhead, bring it down; a puff of soil on each blow
