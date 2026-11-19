@@ -76,6 +76,10 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
 
+## What's new (1.6.0, en-US)
+A livelier village: folks carry baskets, ride bikes, ride buffaloes and herd ducks along the village road; farmers plant rice and hoe beds; hens lead their chicks, ducks swim on the lake and boats sail the river.
+New Shop 🛍️: Starter Pack, Cellar +250 storage, 30-day Farmer Card and Remove Ads. The game stays fully free to play.
+
 ## What's new (1.3.0, en-US)
 New content for levels 31–45: raise silkworms on mulberry leaves, reel silk and weave silk cloth and sedge mats at the loom house; grow turmeric, sedge and black sticky rice; orange, jackfruit and areca trees; eels and snakehead fish; a jam kitchen for candied orange, turmeric honey and black-rice yogurt; eel porridge, braised fish and wedding gift boxes. Plus 27 new guide quests.
 
