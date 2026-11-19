@@ -60,7 +60,12 @@ Future<void> showLoginGift(BuildContext context, Farm farm) async {
               if (got == null)
                 PillButton('Nhận quà ngày $today', color: gold, onTap: () => set(() => got = farm.claimLogin()))
               else ...[
-                if (!doubled)
+                if (!doubled && farm.cardActive)
+                  PillButton('🌾 Nhân đôi (Thẻ Nhà Nông)', color: gold, onTap: () {
+                    farm.doubleLogin(got!);
+                    set(() => doubled = true);
+                  })
+                else if (!doubled)
                   ValueListenableBuilder<bool>(
                     valueListenable: AdsService.instance.rewardedReady,
                     builder: (_, ready, _) => ready

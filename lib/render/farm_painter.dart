@@ -58,6 +58,7 @@ double objHeight(Obj o) => switch (o.def.kind) {
           'cay_da' || 'cay_neu' => 80,
           'cay_du' => 70,
           'san_phoi' => 10,
+          'ham_chua' => 34,
           _ => 40,
         },
       BKind.obstacle => 16,

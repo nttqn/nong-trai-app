@@ -23,6 +23,7 @@ import '../services/chat.dart';
 import '../services/cloud.dart';
 import '../services/leaderboard.dart';
 import '../services/notify.dart';
+import '../services/purchase.dart';
 import '../services/save.dart';
 import '../services/display.dart';
 import '../services/sound.dart';
@@ -35,6 +36,7 @@ import 'extras.dart';
 import 'leaderboard_sheet.dart';
 import 'world_map.dart';
 import '../services/neighbors.dart';
+import 'paid_sheet.dart';
 import 'panels.dart';
 import 'quest_sheet.dart';
 import 'sheets.dart';
@@ -96,6 +98,8 @@ class _FarmScreenState extends State<FarmScreen>
             _openMap();
           case 'chat':
             _openChat();
+          case 'paid':
+            _openPaidShop();
         }
       });
     }
@@ -110,6 +114,7 @@ class _FarmScreenState extends State<FarmScreen>
     };
     CloudSave.instance.addListener(_onCloud);
     Neighbors.instance.addListener(_onNeighbors);
+    PurchaseService.instance.message.addListener(_onPurchaseMessage);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onCloud();
       _loadErrorNotice();
@@ -153,6 +158,7 @@ class _FarmScreenState extends State<FarmScreen>
     WidgetsBinding.instance.removeObserver(this);
     CloudSave.instance.removeListener(_onCloud);
     Neighbors.instance.removeListener(_onNeighbors);
+    PurchaseService.instance.message.removeListener(_onPurchaseMessage);
     _ticker.dispose();
     _hud?.cancel();
     _toastTimer?.cancel();
@@ -753,6 +759,15 @@ class _FarmScreenState extends State<FarmScreen>
       (c) => ListView(padding: const EdgeInsets.all(8), children: [
         const SheetHeader('Lưu trữ đám mây'),
         const CloudTile(),
+        ListTile(
+          dense: true,
+          title: const Text('🛍️ Cửa hàng, khôi phục giao dịch', style: TextStyle(color: brown, fontWeight: FontWeight.w700)),
+          trailing: const Icon(Icons.chevron_right, color: brownLight),
+          onTap: () {
+            Navigator.pop(c);
+            _openPaidShop();
+          },
+        ),
         const SheetHeader('Âm thanh'),
         ValueListenableBuilder<bool>(
           valueListenable: snd.musicOn,
@@ -1123,6 +1138,16 @@ class _FarmScreenState extends State<FarmScreen>
             child: _chip(const Text('🗺️', style: TextStyle(fontSize: 19))),
           ),
         ]),
+        // Cửa hàng: on its own under the map button, so the rows above
+        // keep their room
+        const SizedBox(height: 4),
+        Align(
+          alignment: Alignment.centerRight,
+          child: GestureDetector(
+            onTap: _openPaidShop,
+            child: _chip(const Text('🛍️', style: TextStyle(fontSize: 19))),
+          ),
+        ),
       ]),
     );
   }
@@ -1207,6 +1232,34 @@ class _FarmScreenState extends State<FarmScreen>
     SoundService.instance.play('tap');
     _select(null);
     showFarmSheet(context, (_) => LeaderboardSheet(farm), height: .8);
+  }
+
+  /// A purchase went through (or failed): say so.
+  void _onPurchaseMessage() {
+    final m = PurchaseService.instance.message.value;
+    if (m == null || !mounted) return;
+    PurchaseService.instance.message.value = null;
+    if (m.contains('\n') || m.startsWith('🎁')) {
+      SoundService.instance.play('quest');
+      showDialog<void>(
+        context: context,
+        builder: (c) => AlertDialog(
+          backgroundColor: cream,
+          title: const Text('Cảm ơn bà con!', textAlign: TextAlign.center, style: TextStyle(color: brown, fontWeight: FontWeight.w900)),
+          content: Text(m, style: const TextStyle(color: brown, height: 1.4)),
+          actions: [Center(child: PillButton('Tuyệt vời!', onTap: () => Navigator.pop(c)))],
+        ),
+      );
+    } else {
+      _say(m, error: m.startsWith('Giao dịch lỗi') || m.startsWith('Giao dịch không') || m.startsWith('Không'));
+    }
+    setState(() {});
+  }
+
+  void _openPaidShop() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => PaidShopSheet(farm), height: .85);
   }
 
   void _openChat() {

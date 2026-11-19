@@ -53,9 +53,12 @@ Về quê thôi! Cấy lúa, nuôi trâu, phơi thóc, gói bánh chưng và cù
 
 Chơi được không cần mạng. Đăng nhập Google (không bắt buộc) để lưu nông trại lên mây, đổi máy không mất, và giao lưu với hàng xóm.
 
-Game miễn phí, có quảng cáo. Nhiều quảng cáo do bạn tự chọn xem để nhận thưởng: làm xong ngay, nhân đôi quà lên cấp.
+Game miễn phí, có quảng cáo và gói mua trong ứng dụng (không bắt buộc). Nhiều quảng cáo do bạn tự chọn xem để nhận thưởng: làm xong ngay, nhân đôi quà lên cấp. Gói Bỏ quảng cáo tắt quảng cáo xen giữa.
 
 Hỗ trợ: trungsmail@gmail.com
+
+## Có gì mới (bản 1.6.0, ≤ 500 ký tự)
+Thêm Cửa hàng 🛍️ (nút dưới bản đồ): Gói khởi đầu (xu, thêm chỗ chứa, vé Xong ngay, chậu sen và đèn lồng), Hầm chứa +250 chỗ chứa, Thẻ Nhà Nông 30 ngày (5 lượt Xong ngay miễn phí mỗi ngày, đơn hàng thêm 20% xu, quà đăng nhập nhân đôi) và gói Bỏ quảng cáo. Mua bằng Google Play, khôi phục được khi đổi máy. Game vẫn chơi miễn phí trọn vẹn.
 
 ## Có gì mới (bản 1.5.0, ≤ 500 ký tự)
 Làng quê nhộn nhịp hơn: bà con gánh lúa, gánh rau, cô gái đạp xe chở hoa, chú bé cưỡi trâu thổi sáo, người chăn vịt lùa cả đàn và lũ trẻ thả diều đi lại trên đường làng. Bác nông dân ra đồng cấy lúa, cuốc đất; gà mẹ dẫn đàn con kiếm ăn trước sân; vịt mẹ dắt vịt con bơi trên hồ sen; thuyền nan chở nông sản xuôi ngược trên sông.

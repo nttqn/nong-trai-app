@@ -24,7 +24,7 @@ class _ShopSheetState extends State<ShopSheet> {
   static const tabs = [
     ('Trồng trọt', ['ruong', 'luong', 'san_phoi', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong', 'cay_cam', 'cay_mit', 'cay_cau']),
     ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'nha_tam', 'ao']),
-    ('Nhà cửa', ['nha_phu', 'nha_kho']),
+    ('Nhà cửa', ['nha_phu', 'nha_kho', 'ham_chua']),
     ('Chế biến', [ 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che', 'khung_cui', 'xuong_mut']),
     ('Trang trí', ['tre', 'rom_dong', 'chum', 'bu_nhin', 'cho', 'hoa_dao', 'cay_da']),
   ];
@@ -94,7 +94,12 @@ class _ShopSheetState extends State<ShopSheet> {
               maxLines: 2,
               style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: brown)),
           const SizedBox(height: 2),
-          if (festivalDecos.contains(id))
+          if (id == 'ham_chua' && !f.hamChua)
+            const Text('🛍️ Gói Cửa hàng', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFFC62828)))
+          else if (id == 'ham_chua')
+            Text(f.canBuy(id) == null ? '+$hamChuaStorage chỗ chứa' : 'Đã xây',
+                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: greenDark))
+          else if (festivalDecos.contains(id))
             Text('🎁 Quà lễ hội ×${f.giftCount(id)}',
                 style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFFC62828)))
           else if (locked)

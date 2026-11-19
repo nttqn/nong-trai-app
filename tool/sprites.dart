@@ -44,6 +44,8 @@ final optional = [
   'cho_thuc', 'cho_ngu',
   // batch 13: villagers
   'nguoi_ganh', 'nguoi_xe_dap', 'nguoi_chan_vit', 'be_thoi_sao', 'nguoi_cay_lua', 'nguoi_cuoc_dat', 'tre_tha_dieu', 'tre_chay',
+  // batch 14: paid building
+  'ham_chua',
   // batch 9: drying yard states and festival gifts
   'san_phoi', 'san_phoi_thoc', 'san_phoi_bat', 'san_phoi_kho',
   'cay_neu', 'den_long', 'cay_du', 'gio_qua', 'chau_sen', 'den_ong_sao', 'coi_gia',
@@ -58,7 +60,7 @@ int maxWidthFor(String key) {
   if (key.startsWith('item_') || key == 'cho_thuc' || key == 'cho_ngu') return 128;
   if (key == 'ho_sen') return 768; // one picture for the whole lake
   if (key.startsWith('cau_') || key.startsWith('san_phoi') || key == 'cay_du') return 400;
-  if (key == 'nha_tam') return 400;
+  if (key == 'nha_tam' || key == 'ham_chua') return 400;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',

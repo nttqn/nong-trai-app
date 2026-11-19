@@ -429,3 +429,11 @@ Hiện game vẽ người bằng code. Nếu muốn đồng bộ với tranh, t�
 | `tre_chay` | Another cute chibi Vietnamese village kid (about 7 years old, no hat, short black hair, green shirt, blue shorts, barefoot) running toward the lower-left, happily waving one arm up in the air. Whole figure, no base tile. |
 
 (`tre_tha_dieu`, `tre_chay` thêm sau: diều vẫn vẽ bằng code, nối dây từ tay đứa trẻ.)
+
+## Đợt 14 (bản 1.6) — Hầm chứa (công trình trả phí)
+
+Chưa có ảnh thì game tạm dùng ảnh Nhà kho gạch.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `ham_chua` | A Vietnamese countryside storage cellar on a 2x2 tile base: low thick walls of reddish-brown laterite stone blocks half sunk into a grassy earth mound, an arched wooden door with iron studs on the lower-left face, a small curved terracotta tile hood over the door, big clay jars (chum) and rice sacks stacked beside the door, a bit of moss on the stones. Cosy and sturdy, a little special-looking (premium building). |

@@ -15,6 +15,7 @@ import 'services/cloud.dart';
 import 'services/display.dart';
 import 'services/leaderboard.dart';
 import 'services/notify.dart';
+import 'services/purchase.dart';
 import 'services/save.dart';
 import 'services/sound.dart';
 import 'ui/farm_screen.dart';
@@ -73,6 +74,21 @@ class _BootState extends State<_Boot> {
           if (q['yard'] == 'dry') f.yardDry = FarmSeason.yardNeedMs;
           if (q['yard'] == 'empty') f.yard.clear();
           if (q['fest'] != null) demoFestivalDecos(f);
+          // ?paid=1: every pack bought, the Hầm chứa placed near (fx, fy)
+          if (q['paid'] != null) {
+            f.grantPaid(skuStarter);
+            f.grantPaid(skuCard);
+            f.grantPaid(skuHamChua);
+            final px = int.tryParse(q['px'] ?? '') ?? 14, py = int.tryParse(q['py'] ?? '') ?? 14;
+            outer:
+            for (var r = 0; r < 12; r++) {
+              for (var y = py - r; y <= py + r; y++) {
+                for (var x = px - r; x <= px + r; x++) {
+                  if (f.canPlace('ham_chua', x, y) && f.build('ham_chua', x, y) == null) break outer;
+                }
+              }
+            }
+          }
           // promo video capture: everything runs ?slow= times slower (the
           // recorder speeds the frames back up), so every frame is caught
           final slow = double.tryParse(q['slow'] ?? '');
@@ -115,6 +131,13 @@ class _BootState extends State<_Boot> {
       cloud.current = () => _farm!;
       cloud.replace = _replace;
       SaveService.onSaved = cloud.queueUpload;
+      final shop = PurchaseService.instance;
+      shop.farm = () => _farm;
+      shop.save = (f) => _save.saveNow(f);
+      shop.init().then((_) {
+        final f = _farm;
+        if (f != null) shop.message.value = shop.onFarmReady(f) ?? shop.message.value;
+      });
       // After the farm is on screen: the consent form needs a frame.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         AdsService.instance.init();
@@ -127,6 +150,8 @@ class _BootState extends State<_Boot> {
   /// Swaps in the farm restored from the cloud.
   Future<void> _replace(Farm f) async {
     _save.active = f;
+    // an older save from the cloud: give back paid packs it is missing
+    PurchaseService.instance.onFarmReady(f);
     await _save.saveNow(f, keepStamp: true);
     if (mounted) {
       setState(() {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'analytics.dart';
 
@@ -50,6 +51,28 @@ class AdsService with WidgetsBindingObserver {
   static const interstitialEvery = 3;
 
   final ValueNotifier<bool> rewardedReady = ValueNotifier(false);
+
+  /// Gói bỏ quảng cáo (1.6.0): no interstitial or App Open ads. Rewarded
+  /// ads stay, since the player chooses to watch them.
+  final ValueNotifier<bool> adFree = ValueNotifier(false);
+  static const _adFreeKey = 'ad_free';
+
+  Future<void> loadAdFree() async {
+    try {
+      adFree.value = (await SharedPreferences.getInstance()).getBool(_adFreeKey) ?? false;
+    } catch (_) {}
+  }
+
+  void setAdFree(bool on) {
+    adFree.value = on;
+    SharedPreferences.getInstance().then((p) => p.setBool(_adFreeKey, on)).catchError((_) => false);
+    if (on) {
+      _interstitial?.dispose();
+      _interstitial = null;
+      _appOpen?.dispose();
+      _appOpen = null;
+    }
+  }
   final ValueNotifier<bool> privacyOptionsRequired = ValueNotifier(false);
   bool _started = false, _loadingRewarded = false;
   RewardedAd? _rewarded;
@@ -63,6 +86,7 @@ class AdsService with WidgetsBindingObserver {
 
   Future<void> init() async {
     if (!_supported) return;
+    await loadAdFree();
     try {
       await _gatherConsent();
       if (!await ConsentInformation.instance.canRequestAds()) return;
@@ -187,6 +211,7 @@ class AdsService with WidgetsBindingObserver {
   // ------------------------------------------------------------ interstitial
 
   void _loadInterstitial() {
+    if (adFree.value) return;
     if (!_started || _interstitial != null) return;
     InterstitialAd.load(
       adUnitId: interstitialUnit,
@@ -201,6 +226,7 @@ class AdsService with WidgetsBindingObserver {
   /// Called after an order is delivered (a natural pause in play).
   void onOrderDelivered(int playerLevel) {
     _orders++;
+    if (adFree.value) return;
     if (!_started || playerLevel < interstitialLevel || _orders % interstitialEvery != 0) return;
     final ad = _interstitial;
     if (ad == null) {
@@ -232,7 +258,7 @@ class AdsService with WidgetsBindingObserver {
   // ------------------------------------------------------------ app open
 
   void _loadAppOpen() {
-    if (!_started || _appOpen != null || appOpenUnit.isEmpty) return;
+    if (!_started || _appOpen != null || appOpenUnit.isEmpty || adFree.value) return;
     AppOpenAd.load(
       adUnitId: appOpenUnit,
       request: const AdRequest(),
@@ -265,6 +291,7 @@ class AdsService with WidgetsBindingObserver {
 
   void _maybeShowAppOpen({bool cold = false}) {
     final ad = _appOpen;
+    if (adFree.value) return;
     if (!_started || ad == null || _showing) {
       _loadAppOpen();
       return;

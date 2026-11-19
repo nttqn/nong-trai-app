@@ -77,12 +77,46 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         c.translate(-foot.dx, -foot.dy);
         if (!sprite(o.type)) _deco(c, iso, o.type, x, y, foot, t, o.id);
         c.restore();
+      } else if (o.type == 'ham_chua') {
+        // its own art when there is some (PROMPTS.md batch 14), else the
+        // brick warehouse's, else a laterite-stone cellar drawn in code
+        if (!sprite('ham_chua') && !sprite('nha_kho_1')) _cellar(c, iso, x, y);
       } else if (!sprite(o.type)) {
         _deco(c, iso, o.type, x, y, foot, t, o.id);
       }
     case BKind.obstacle:
       if (!sprite(o.type)) _obstacle(c, o.type, foot, o.id);
   }
+}
+
+/// Code-drawn Hầm chứa: a low laterite-stone cellar half sunk in a grassy
+/// mound, a dark arched door on the front and a tiled hood over it.
+void _cellar(Canvas c, Iso iso, double x, double y) {
+  const stone = Color(0xFFB5652F), mound = Color(0xFF7FAE4A);
+  fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), const Color(0xFFC9B48A));
+  wallBox(c, iso, x + .2, y + .2, 1.6, 1.6, 0, 22, stone);
+  // grass on the roof, a rounded mound
+  fillPoly(c, diamond(iso, x + .15, y + .15, 1.7, 1.7, 22), mound);
+  oval(c, iso.p(x + 1, y + 1, 30), 30, 12, shade(mound, .1));
+  // laterite blocks
+  for (var i = 1; i < 4; i++) {
+    line(c, iso.p(x + .2, y + 1.8, i * 5.5), iso.p(x + 1.8, y + 1.8, i * 5.5), shade(stone, -.25), .8);
+    line(c, iso.p(x + 1.8, y + .2, i * 5.5), iso.p(x + 1.8, y + 1.8, i * 5.5), shade(stone, -.25), .8);
+  }
+  // the arched door on the lower-left face
+  final d0 = iso.p(x + .75, y + 1.8, 0), d1 = iso.p(x + 1.25, y + 1.8, 0);
+  final top = iso.p(x + 1, y + 1.8, 17);
+  final door = Path()
+    ..moveTo(d0.dx, d0.dy)
+    ..lineTo(d0.dx, d0.dy - 10)
+    ..quadraticBezierTo(top.dx, top.dy - 4, d1.dx, d1.dy - 10)
+    ..lineTo(d1.dx, d1.dy)
+    ..close();
+  pathFill(c, door, const Color(0xFF3B2A1C));
+  pathStroke(c, door, const Color(0xFF7A4A24), 1.5);
+  // a few jars and sacks by the door
+  oval(c, iso.p(x + .5, y + 2.05, 4), 4, 5, const Color(0xFF8D5A3A));
+  oval(c, iso.p(x + 1.55, y + 2.05, 4), 5, 4, const Color(0xFFE8D9A8));
 }
 
 /// Code-drawn warehouse: wooden barn, brick walls from level 1, a bigger

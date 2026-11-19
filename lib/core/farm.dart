@@ -13,6 +13,7 @@ import 'weather.dart';
 
 part 'farm_more.dart';
 part 'farm_season.dart';
+part 'farm_paid.dart';
 
 typedef NowFn = int Function();
 int wallClock() => DateTime.now().millisecondsSinceEpoch;
@@ -123,6 +124,12 @@ class Farm {
   final Map<String, int> yard = {};
   int yardDry = 0, yardT = 0, yardWet = -1, yardLost = 0;
   bool yardCover = false;
+
+  /// Paid packs (farm_paid.dart): Gói khởi đầu taken, Hầm chứa unlocked,
+  /// Thẻ Nhà Nông's last day (day key, 0 = never), its free Xong ngay used
+  /// today, Vé Xong ngay held, and storage given by packs.
+  bool starterTaken = false, hamChua = false;
+  int cardUntil = 0, cardUseDay = 0, cardUsed = 0, tickets = 0, paidStorage = 0;
   /// Ký ức làng quê: 1 = opened, not read yet; 2 = read (gift taken).
   final Map<String, int> mem = {};
   /// Memories opened while playing, for the "ký ức mới" card (not saved).
@@ -325,7 +332,8 @@ class Farm {
   double get _treeSpeed => _all;
   double get _fishSpeed => _all;
   double get xpBonus => _pb('cong_lang') + _pb('truong');
-  double get orderBonus => _pb('duong_be_tong') + _pb('nha_van_hoa') + extraHouseCount * extraHouseOrderBonus;
+  double get orderBonus =>
+      _pb('duong_be_tong') + _pb('nha_van_hoa') + extraHouseCount * extraHouseOrderBonus + (cardActive ? cardOrderBonus : 0);
   double get marketBonus => _pb('cho_que');
 
   /// The next upgrade of a finished project, or null at the top.
@@ -424,6 +432,8 @@ class Farm {
 
   int get storageCap =>
       houseLevels[houseLevel].storage +
+      paidStorage +
+      (objs.any((o) => o.type == 'ham_chua') ? hamChuaStorage : 0) +
       extraHouses.fold<int>(0, (s, o) => s + extraHouseCap(o)) +
       objs.where((o) => o.def.kind == BKind.storage).fold(0, (s, o) => s + warehouseLevels[o.level].storage);
 
@@ -526,6 +536,7 @@ class Farm {
     if (festivalDecos.contains(type)) {
       return giftCount(type) > 0 ? null : 'Quà lễ hội: giao đủ đơn lễ hội để nhận';
     }
+    if (type == 'ham_chua' && !hamChua) return 'Mở bằng gói Hầm chứa trong Cửa hàng';
     if (level < d.level) return 'Cần đạt cấp ${d.level}';
     if (d.unique && (projects.contains(type) || objs.any((o) => o.type == type))) {
       return 'Đã xây rồi';
@@ -586,6 +597,7 @@ class Farm {
     final k = o.def.kind;
     if (k == BKind.storage) return stored <= storageCap - warehouseLevels[o.level].storage;
     if (o.type == 'san_phoi' && yard.isNotEmpty) return false; // grain on it
+    if (o.type == 'ham_chua') return false; // a paid building stays
     return k == BKind.paddy || k == BKind.bed || k == BKind.tree || k == BKind.deco;
   }
 
@@ -1278,6 +1290,11 @@ class Farm {
         if (moonKey.isNotEmpty) 'moon': moonKey,
         if (festKey.isNotEmpty) 'fest': {'k': festKey, 'o': [for (final o in fest) o.toJson()]},
         if (giftDeco.isNotEmpty) 'gift': giftDeco,
+        if (starterTaken || hamChua || cardUntil != 0 || tickets != 0 || paidStorage != 0)
+          'paid': {
+            's': starterTaken ? 1 : 0, 'h': hamChua ? 1 : 0, 'c': cardUntil, 'cd': cardUseDay, 'cu': cardUsed,
+            't': tickets, 'st': paidStorage,
+          },
         if (mem.isNotEmpty) 'mem': mem,
         if (yard.isNotEmpty)
           'yard': {'g': yard, 'd': yardDry, 't': yardT, 'w': yardWet, 'l': yardLost, 'c': yardCover},
@@ -1356,6 +1373,16 @@ class Farm {
         f.fest.addAll([for (final o in (fe['o'] as List? ?? const [])) Order.fromJson(Map<String, dynamic>.from(o))]);
       }
       f.giftDeco.addAll(Map<String, int>.from(j['gift'] ?? const {}));
+      final pd = j['paid'] as Map?;
+      if (pd != null) {
+        f.starterTaken = pd['s'] == 1;
+        f.hamChua = pd['h'] == 1;
+        f.cardUntil = (pd['c'] as num?)?.toInt() ?? 0;
+        f.cardUseDay = (pd['cd'] as num?)?.toInt() ?? 0;
+        f.cardUsed = (pd['cu'] as num?)?.toInt() ?? 0;
+        f.tickets = (pd['t'] as num?)?.toInt() ?? 0;
+        f.paidStorage = (pd['st'] as num?)?.toInt() ?? 0;
+      }
       f.mem.addAll(Map<String, int>.from(j['mem'] ?? const {}));
       final y = j['yard'] as Map?;
       if (y != null) {

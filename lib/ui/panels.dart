@@ -132,7 +132,16 @@ class ObjPanel extends StatelessWidget {
   Widget _speedUp() => ValueListenableBuilder<bool>(
         valueListenable: AdsService.instance.rewardedReady,
         builder: (_, ready, _) {
-          if (!ready || farm.speedUpMs(o) < 30 * 1000) return const SizedBox.shrink();
+          if (farm.speedUpMs(o) < 30 * 1000) return const SizedBox.shrink();
+          // Thẻ Nhà Nông's free uses, then Vé Xong ngay: no ad
+          final free = farm.cardSpeedUpsLeft + farm.tickets;
+          if (free > 0) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: PillButton('⚡ Xong ngay ($free)', dense: true, color: gold, onTap: () => _do(farm.speedUpPaid(o))),
+            );
+          }
+          if (!ready) return const SizedBox.shrink();
           return Padding(
             padding: const EdgeInsets.only(left: 6),
             child: PillButton('📺 Xong ngay', dense: true, color: gold, onTap: () async {
