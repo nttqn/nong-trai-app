@@ -67,6 +67,12 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.8.0, ≤ 500 ký tự)
+Sự kiện tuần: mỗi tuần một chủ đề (được mùa, chăn nuôi, trái cây, ao cá, làng nghề, giao hàng), 5 mốc quà, bảng xếp hạng tuần, mốc cuối tặng đồ trang trí riêng.
+Câu cá ngoài sông: chạm vào dòng sông, canh phao rồi giật cần.
+Nút 🧺 Thu hết và 🌱 Gieo lại: một chạm thu hoạch cả trang trại, gieo lại giống cũ, cho chuồng ăn.
+9 đồ trang trí mới: hàng rào tre, ngõ gạch, cổng ngõ, giàn hoa giấy, cột đèn, ao sen, mai vàng, hòn non bộ...
+
 ## Có gì mới (bản 1.7.0, ≤ 500 ký tự)
 Hầm chứa đá ong nay nâng cấp được bằng xu: 500 chỗ (cấp 10), 1000 chỗ (cấp 20), 3000 chỗ (cấp 30). Bà con đã mua Hầm chứa chạm vào hầm để nâng cấp.
 Cho phép phá bỏ ao cá và chuồng trại (gà, vịt, lợn, trâu, bò, dê, ong, tằm) để sắp xếp lại nông trại.
@@ -92,6 +98,12 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.8.0, en-US)
+Weekly events: a new theme every week (harvest, livestock, fruit, fish, crafts, deliveries) with 5 reward milestones, a weekly leaderboard and an exclusive decoration at the top.
+River fishing: tap the river, watch the float and strike.
+New 🧺 Harvest all and 🌱 Replant buttons: one tap to collect the whole farm, sow the same crops again and feed the pens.
+9 new decorations: bamboo fences, brick paths, gates, bougainvillea arches, lamp posts, lotus ponds, apricot blossom trees and more.
 
 ## What's new (1.7.0, en-US)
 The Laterite Cellar can now be upgraded with coins: 500 storage (level 10), 1000 (level 20), 3000 (level 30). Tap your cellar to upgrade it.

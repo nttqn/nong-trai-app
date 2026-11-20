@@ -74,6 +74,12 @@ class _BootState extends State<_Boot> {
           if (q['yard'] == 'dry') f.yardDry = FarmSeason.yardNeedMs;
           if (q['yard'] == 'empty') f.yard.clear();
           if (q['fest'] != null) demoFestivalDecos(f);
+          if (q['decos'] != null) demoNewDecos(f);
+          // ?weekpts=N: points in this week's event
+          if (q['weekpts'] != null) {
+            f.rollWeek();
+            f.weekPts = int.parse(q['weekpts']!);
+          }
           // ?paid=1: every pack bought, the Hầm chứa placed near (fx, fy)
           if (q['paid'] != null) {
             f.grantPaid(skuStarter);

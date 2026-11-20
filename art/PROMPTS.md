@@ -437,3 +437,27 @@ Hiện game vẽ người bằng code. Nếu muốn đồng bộ với tranh, t�
 | Tên file | Lời nhắc riêng |
 |---|---|
 | `ham_chua` | A Vietnamese countryside storage cellar on a 2x2 tile base: low thick walls of reddish-brown laterite stone blocks half sunk into a grassy earth mound, an arched wooden door with iron studs on the lower-left face, a small curved terracotta tile hood over the door, big clay jars (chum) and rice sacks stacked beside the door, a bit of moss on the stones. Cosy and sturdy, a little special-looking (premium building). |
+
+## Đợt 15 (bản 1.8) — đồ trang trí mới và quà sự kiện tuần
+
+Chưa có ảnh thì game vẽ tạm bằng code. Nên làm trước những thứ người chơi hay đặt nhiều: `hang_rao`, `duong_gach`, `cong_ngo`, `gian_hoa`, `cot_den`.
+
+> `hang_rao` và `duong_gach` sẽ được đặt **nối nhau thành hàng**, nên phải **vừa khít đúng 1 ô**, không thò ra ngoài hình thoi. `duong_gach` là **mặt phẳng sát đất**, không có chiều cao. `hang_rao` chạy dọc theo **cạnh từ trên-trái xuống dưới-phải** của ô (song song cạnh dưới bên phải của hình thoi), nằm ở giữa ô.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `hang_rao` | A short section of Vietnamese woven bamboo fence (one tile long), running from upper-left to lower-right across the middle of the tile, thin bamboo posts and two horizontal rails with split bamboo woven between, about knee high, standing directly on the ground: no base tile. |
+| `duong_gach` | One square tile of old red clay brick paving seen as a flat isometric diamond: bricks in a staggered pattern with pale mortar lines, a little moss between some bricks. Completely flat, ground level, fills the diamond exactly. |
+| `chong_tre` | A Vietnamese bamboo daybed (chõng tre) with four short legs, a blue ceramic teapot and two small cups on it, standing directly on the ground: no base tile. |
+| `cong_ngo` | A small Vietnamese village house gate (cổng ngõ): two cream plaster pillars with a little curved red terracotta tile roof on top, old wooden double doors between them, facing the lower-left, standing directly on the ground: no base tile. |
+| `gian_hoa` | An arched wooden trellis covered with bright magenta bougainvillea (hoa giấy) flowers and green leaves, standing directly on the ground: no base tile. |
+| `cot_den` | A slim old village street lamp post: grey metal pole with a curved arm and a small warm-yellow glass lamp hanging from it, standing directly on the ground: no base tile. Tall and narrow. |
+| `ao_sen` | A small square lotus pond on a 2x2 tile base: a low grey stone rim, clear blue-green water, round lotus leaves and three pink lotus flowers. Ground-level, nothing tall. |
+| `cay_mai` | A Vietnamese yellow apricot blossom tree (cây mai vàng) in a brown glazed ceramic pot, small and bushy, branches covered with bright yellow five-petal flowers, standing directly on the ground: no base tile. |
+| `hon_non_bo` | A Vietnamese rockery (hòn non bộ) in a low oval stone basin of water: a tall craggy grey rock mountain with a tiny banyan tree on its peak, a thin trickle of waterfall, a little pagoda figurine, standing directly on the ground: no base tile. |
+| `bo_lua` | A big golden sheaf of ripe rice stalks tied in the middle with a red cloth band, standing upright directly on the ground: no base tile. |
+| `o_ga` | A round straw nest with a plump brown mother hen sitting on it, two white eggs peeking out at the front, directly on the ground: no base tile. |
+| `gian_bau` | A small square bamboo trellis (giàn) on four posts with green gourd vines on top and several pale green bottle gourds hanging down under it, standing directly on the ground: no base tile. |
+| `thuyen_nan` | A Vietnamese round woven bamboo basket boat (thuyền thúng / thuyền nan) resting on the grass, dark brown with a tar coating, a wooden paddle leaning on it: no base tile. |
+| `binh_gom` | A tall Bát Tràng blue-and-white ceramic vase with painted patterns and a bunch of red and yellow flowers in it, standing directly on the ground: no base tile. |
+| `xe_bo` | A Vietnamese ox cart, two tiles long: a wooden cart with two big spoked wheels loaded with jute rice sacks, pulled by a brown ox with curved horns facing the lower-right, standing directly on the ground: no base tile. |

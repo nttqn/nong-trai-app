@@ -10,10 +10,13 @@ import 'defs.dart';
 import 'memories.dart';
 import 'quests.dart';
 import 'weather.dart';
+import 'weekly.dart';
 
 part 'farm_more.dart';
 part 'farm_season.dart';
 part 'farm_paid.dart';
+part 'farm_week.dart';
+part 'farm_river.dart';
 
 typedef NowFn = int Function();
 int wallClock() => DateTime.now().millisecondsSinceEpoch;
@@ -35,6 +38,8 @@ class Obj {
   int count = 0; // animals in a pen
   int level = 0; // house level
   int stolen = 0; // taken by neighbours from the current harvest
+  /// The crop/fish last put in (Gieo lại sows it again).
+  String? last;
   List<Job> jobs = [];
   Obj(this.id, this.type, this.x, this.y);
 
@@ -51,6 +56,7 @@ class Obj {
         if (count != 0) 'n': count,
         if (level != 0) 'l': level,
         if (stolen != 0) 'st': stolen,
+        if (last != null) 'lc': last,
         if (jobs.isNotEmpty) 'j': [for (final j in jobs) j.toJson()],
       };
   factory Obj.fromJson(Map<String, dynamic> j) => Obj(j['i'], j['t'], j['x'], j['y'])
@@ -60,6 +66,7 @@ class Obj {
     ..count = j['n'] ?? 0
     ..level = j['l'] ?? 0
     ..stolen = j['st'] ?? 0
+    ..last = j['lc'] is String ? j['lc'] : null
     ..jobs = [for (final e in (j['j'] as List? ?? [])) Job.fromJson(e)];
 }
 
@@ -130,6 +137,13 @@ class Farm {
   /// today, Vé Xong ngay held, and storage given by packs.
   bool starterTaken = false, hamChua = false;
   int cardUntil = 0, cardUseDay = 0, cardUsed = 0, tickets = 0, paidStorage = 0;
+  /// Sự kiện tuần (farm_week.dart): the week (its Monday's day key),
+  /// points made in it and milestones claimed. [weekCarried]: milestones
+  /// of last week given automatically at the roll-over (not saved; the
+  /// event sheet says so once).
+  int weekKey = 0, weekPts = 0, weekClaimed = 0, weekCarried = 0;
+  /// Câu cá (farm_river.dart): the day, casts used and ads watched.
+  int riverDay = 0, riverUsed = 0, riverAds = 0;
   /// Ký ức làng quê: 1 = opened, not read yet; 2 = read (gift taken).
   final Map<String, int> mem = {};
   /// Memories opened while playing, for the "ký ức mới" card (not saved).
@@ -536,6 +550,9 @@ class Farm {
     if (festivalDecos.contains(type)) {
       return giftCount(type) > 0 ? null : 'Quà lễ hội: giao đủ đơn lễ hội để nhận';
     }
+    if (eventDecos.contains(type)) {
+      return giftCount(type) > 0 ? null : 'Quà sự kiện tuần: đạt mốc cuối để nhận';
+    }
     if (type == 'ham_chua' && !hamChua) return 'Mở bằng gói Hầm chứa trong Cửa hàng';
     if (level < d.level) return 'Cần đạt cấp ${d.level}';
     if (d.unique && (projects.contains(type) || objs.any((o) => o.type == type))) {
@@ -561,7 +578,7 @@ class Farm {
     if (d.w > 0 && !canPlace(type, x, y)) return 'Không đặt được ở đây';
     coins -= buildCost(type);
     _spend(d.goods);
-    if (festivalDecos.contains(type)) giftDeco[type] = giftCount(type) - 1;
+    if (isGiftDeco(type)) giftDeco[type] = giftCount(type) - 1;
     if (d.kind == BKind.project) {
       projects.add(type);
       _stat('project:$type');
@@ -604,8 +621,8 @@ class Farm {
 
   void remove(Obj o) {
     objs.remove(o);
-    // a festival gift goes back to the bag, to put somewhere else
-    if (festivalDecos.contains(o.type)) giftDeco[o.type] = giftCount(o.type) + 1;
+    // a festival or event gift goes back to the bag, to put somewhere else
+    if (isGiftDeco(o.type)) giftDeco[o.type] = giftCount(o.type) + 1;
     _snd('remove');
     _changed();
   }
@@ -683,6 +700,7 @@ class Farm {
     if (coins < c.seed) return 'Không đủ xu mua giống';
     coins -= c.seed;
     f.crop = cropId;
+    f.last = cropId;
     f.start = now();
     f.end = f.start + cropMs(c);
     _stat('plant:$cropId');
@@ -704,6 +722,8 @@ class Farm {
     addXp(c.xp);
     _fx(f, '+$n ${item(c.product).icon}', item: c.product);
     if (c.plot == Plot.paddy) _spreadGrain(c.product, n);
+    _weekAdd(WeekKind.field, n);
+    f.last = f.crop;
     f.crop = null;
     f.start = f.end = 0;
     f.stolen = 0;
@@ -734,6 +754,7 @@ class Farm {
     _snd('pick');
     addXp(t.xp);
     _fx(o, '+$n ${item(t.product).icon}', item: t.product);
+    _weekAdd(WeekKind.fruit, n);
     o.stolen = 0;
     o.start = now();
     o.end = o.start + _dur(t.seconds, _treeSpeed);
@@ -780,6 +801,7 @@ class Farm {
     _snd(a.id);
     addXp(a.xp * pen.count);
     _fx(pen, '+$n ${item(a.product).icon}', item: a.product);
+    _weekAdd(WeekKind.animal, n);
     pen.start = pen.end = 0;
     pen.stolen = 0;
     _changed();
@@ -794,6 +816,7 @@ class Farm {
     if (coins < f.fry) return 'Không đủ xu mua giống';
     coins -= f.fry;
     pond.crop = fishId;
+    pond.last = fishId;
     pond.start = now();
     pond.end = pond.start + fishMs(f);
     _stat('stock:$fishId');
@@ -811,6 +834,7 @@ class Farm {
     _snd('splash');
     addXp(f.xp);
     _fx(pond, '+$n ${item(f.product).icon}', item: f.product);
+    _weekAdd(WeekKind.fish, n);
     pond.crop = null;
     pond.start = pond.end = 0;
     pond.stolen = 0;
@@ -850,6 +874,7 @@ class Farm {
       _gain(r.product, r.out);
       addXp(r.xp);
       _fx(fac, '+${r.out} ${item(r.product).icon}', item: r.product);
+      _weekAdd(WeekKind.craft, r.out);
       got++;
     }
     if (got > 0) {
@@ -1035,6 +1060,88 @@ class Farm {
         _ => null,
       };
 
+  // ---------------------------------------------------------------- do it all
+  /// Things that one tap of Thu hết would take in: ripe fields, trees,
+  /// pens and ponds, finished workshop batches and dry grain on the yard.
+  bool _ripe(Obj o) => switch (o.def.kind) {
+        BKind.paddy || BKind.bed || BKind.tree || BKind.pen || BKind.pond => readyProduct(o) != null,
+        BKind.factory => readyJobs(o) > 0,
+        BKind.deco => o.type == 'san_phoi' && yardDone,
+        _ => false,
+      };
+
+  int get readyCount => objs.where(_ripe).length;
+
+  /// Thu hết: takes in everything ripe, nearest the house first. Stops at
+  /// a full storage. Returns how many places gave something, and why it
+  /// stopped early (null when it got everything).
+  (int, String?) harvestAll() {
+    var n = 0;
+    final h = house;
+    final hx = h?.x ?? 6, hy = h?.y ?? 6;
+    final todo = objs.where(_ripe).toList()
+      ..sort((a, b) => ((a.x - hx).abs() + (a.y - hy).abs()).compareTo((b.x - hx).abs() + (b.y - hy).abs()));
+    for (final o in todo) {
+      final err = o.def.kind == BKind.factory
+          ? collectJobs(o)
+          : o.type == 'san_phoi'
+              ? collectYard()
+              : harvestAny(o);
+      if (err != null) {
+        if (n > 0) _stat('harvest_all');
+        return (n, err);
+      }
+      n++;
+    }
+    if (n > 0) {
+      _stat('harvest_all');
+      _ev('harvest_all', {'n': n, 'level': level});
+    }
+    return (n, null);
+  }
+
+  /// What Gieo lại would do: empty plots and ponds with a last crop/fish
+  /// still allowed, and idle pens with animals.
+  bool _redo(Obj o) => switch (o.def.kind) {
+        BKind.paddy || BKind.bed =>
+          o.crop == null && o.last != null && crops[o.last] != null && crops[o.last]!.level <= level &&
+              cropFits(o, crops[o.last]!),
+        BKind.pond => o.crop == null && o.last != null && fishes[o.last] != null && fishes[o.last]!.level <= level,
+        BKind.pen => o.count > 0 && o.end == 0,
+        _ => false,
+      };
+
+  int get redoCount => objs.where(_redo).length;
+
+  /// Gieo lại: sows each empty plot with what grew there last, restocks the
+  /// ponds and feeds the pens. Returns (sown, stocked, fed) and the first
+  /// thing that ran out (seed money or feed).
+  (int, int, int, String?) redoAll() {
+    var sown = 0, stocked = 0, fed = 0;
+    String? err;
+    for (final o in objs.where(_redo).toList()) {
+      final k = o.def.kind;
+      final e = k == BKind.pen ? feed(o) : k == BKind.pond ? stock(o, o.last!) : plant(o, o.last!);
+      if (e != null) {
+        // out of seed money or feed: say so, but keep doing what still can
+        err ??= e;
+        continue;
+      }
+      if (k == BKind.pen) {
+        fed++;
+      } else if (k == BKind.pond) {
+        stocked++;
+      } else {
+        sown++;
+      }
+    }
+    if (sown + stocked + fed > 0) {
+      _stat('redo_all');
+      _ev('redo_all', {'n': sown + stocked + fed, 'level': level});
+    }
+    return (sown, stocked, fed, err);
+  }
+
   static const helpLimit = 10, stealLimit = 3;
 
   /// Per-day counts of what this player did at each neighbour.
@@ -1182,6 +1289,7 @@ class Farm {
     addXp(o.xp);
     o.waitUntil = -1;
     _stat('daily');
+    _weekAdd(WeekKind.order, 3);
     _snd('cash');
     _ev('daily_delivered', {'count': stats['daily']!, 'level': level});
     if (dailyAllDone) {
@@ -1197,6 +1305,7 @@ class Farm {
   void tickOrders() {
     rollDaily();
     rollFestival();
+    if (weekOpen) rollWeek();
     settleYard();
     checkMemories();
     final t = now();
@@ -1224,12 +1333,22 @@ class Farm {
     coins += o.coins;
     addXp(o.xp);
     _stat('order');
+    _weekAdd(WeekKind.order, 1);
     _ev('order_delivered', {'count': stats['order']!, 'level': level});
     _snd('cash');
     final i = orders.indexOf(o);
     orders[i] = Order(nextId++, '', const {}, 0, 0, waitUntil: now() + 20 * 1000);
     _changed();
     return null;
+  }
+
+  /// A waiting order slot fills right away (rewarded ad).
+  void callOrder(Order o) {
+    final i = orders.indexOf(o);
+    if (i < 0 || o.waitUntil <= 0) return;
+    orders[i] = _makeOrder(math.Random(seed * 31 + nextId + now()));
+    _stat('call_order');
+    _changed();
   }
 
   void discard(Order o) {
@@ -1297,6 +1416,8 @@ class Farm {
             't': tickets, 'st': paidStorage,
           },
         if (mem.isNotEmpty) 'mem': mem,
+        if (weekKey != 0) 'week': [weekKey, weekPts, weekClaimed],
+        if (riverDay != 0) 'river': [riverDay, riverUsed, riverAds],
         if (yard.isNotEmpty)
           'yard': {'g': yard, 'd': yardDry, 't': yardT, 'w': yardWet, 'l': yardLost, 'c': yardCover},
       };
@@ -1385,6 +1506,18 @@ class Farm {
         f.paidStorage = (pd['st'] as num?)?.toInt() ?? 0;
       }
       f.mem.addAll(Map<String, int>.from(j['mem'] ?? const {}));
+      final wk = j['week'] as List?;
+      if (wk != null && wk.length == 3) {
+        f.weekKey = (wk[0] as num).toInt();
+        f.weekPts = (wk[1] as num).toInt();
+        f.weekClaimed = (wk[2] as num).toInt();
+      }
+      final rv = j['river'] as List?;
+      if (rv != null && rv.length == 3) {
+        f.riverDay = (rv[0] as num).toInt();
+        f.riverUsed = (rv[1] as num).toInt();
+        f.riverAds = (rv[2] as num).toInt();
+      }
       final y = j['yard'] as Map?;
       if (y != null) {
         f.yard.addAll(Map<String, int>.from(y['g'] ?? const {}));

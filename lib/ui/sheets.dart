@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 
 import '../core/calendar.dart' show festivalDecos;
+import '../core/weekly.dart' show eventDecos, isGiftDeco;
+import '../services/ads.dart';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import '../render/farm_painter.dart';
@@ -26,7 +28,8 @@ class _ShopSheetState extends State<ShopSheet> {
     ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'nha_tam', 'ao']),
     ('Nhà cửa', ['nha_phu', 'nha_kho', 'ham_chua']),
     ('Chế biến', [ 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che', 'khung_cui', 'xuong_mut']),
-    ('Trang trí', ['tre', 'rom_dong', 'chum', 'bu_nhin', 'cho', 'hoa_dao', 'cay_da']),
+    ('Trang trí', ['hang_rao', 'duong_gach', 'tre', 'rom_dong', 'chum', 'bu_nhin', 'cho', 'chong_tre', 'cong_ngo', 'hoa_dao',
+      'gian_hoa', 'cay_da', 'cot_den', 'ao_sen', 'cay_mai', 'hon_non_bo']),
   ];
 
   @override
@@ -56,9 +59,9 @@ class _ShopSheetState extends State<ShopSheet> {
                 crossAxisSpacing: 10,
                 children: [
                   for (final id in t.$2) _card(id),
-                  // festival gifts waiting to be placed
+                  // festival and weekly-event gifts waiting to be placed
                   if (t.$1 == 'Trang trí')
-                    for (final id in festivalDecos)
+                    for (final id in [...festivalDecos, ...eventDecos])
                       if (f.giftCount(id) > 0) _card(id),
                 ],
               ),
@@ -99,8 +102,8 @@ class _ShopSheetState extends State<ShopSheet> {
           else if (id == 'ham_chua')
             Text(f.canBuy(id) == null ? '+$hamChuaStorage chỗ chứa' : 'Đã xây · ${f.hamChuaCap}',
                 style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: greenDark))
-          else if (festivalDecos.contains(id))
-            Text('🎁 Quà lễ hội ×${f.giftCount(id)}',
+          else if (isGiftDeco(id))
+            Text('🎁 ${festivalDecos.contains(id) ? 'Quà lễ hội' : 'Quà sự kiện'} ×${f.giftCount(id)}',
                 style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFFC62828)))
           else if (locked)
             Text('🔒 Cấp ${id == 'nha_phu' ? extraHouseLevels[f.extraHouseCount.clamp(0, extraHouseLevels.length - 1)] : d.level}',
@@ -367,8 +370,24 @@ class _OrdersSheetState extends State<OrdersSheet> {
                 if (mounted) setState(() {});
               });
             }
-            return Text('🚲 Đơn mới sẽ tới sau ${fmtTime(left)}',
-                style: const TextStyle(color: brownLight, fontWeight: FontWeight.w700));
+            return Row(children: [
+              Expanded(
+                child: Text('🚲 Đơn mới sẽ tới sau ${fmtTime(left)}',
+                    style: const TextStyle(color: brownLight, fontWeight: FontWeight.w700)),
+              ),
+              // a rewarded ad brings the next customer right away
+              ValueListenableBuilder<bool>(
+                valueListenable: AdsService.instance.rewardedReady,
+                builder: (_, ready, _) => ready && left > 5000
+                    ? PillButton('📺 Gọi ngay', dense: true, color: gold, onTap: () async {
+                        if (await AdsService.instance.showRewarded('call_order')) {
+                          f.callOrder(o);
+                          if (mounted) setState(() {});
+                        }
+                      })
+                    : const SizedBox.shrink(),
+              ),
+            ]);
           },
         ),
       );

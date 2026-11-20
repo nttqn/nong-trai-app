@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/farm.dart';
 import 'cloud.dart';
 import 'neighbors.dart';
+import 'week_board.dart';
 
 enum LbBoard { level, orders, village }
 
@@ -149,6 +150,7 @@ class Leaderboard extends ChangeNotifier {
     notifyListeners();
     if (v) {
       await withdraw();
+      await WeekBoard.instance.withdraw(f.weekKey);
     } else {
       await submit(f, force: true);
     }

@@ -1,8 +1,11 @@
 // Dev-only farms for screenshots (web builds, ?demo=N).
 
+import 'dart:math' as math;
+
 import 'calendar.dart';
 import 'defs.dart';
 import 'farm.dart';
+import 'weekly.dart';
 
 Farm demoFarm(int stage, {int house = -1}) {
   final f = Farm.fresh(seed: 11);
@@ -194,6 +197,22 @@ Farm demoFarm(int stage, {int house = -1}) {
 void demoFestivalDecos(Farm f) {
   for (final d in festivalDecos) {
     f.giftDeco[d] = 1;
+    for (var i = 0; i < mapSize * mapSize; i++) {
+      final x = 1 + i % 14, y = 12 + i ~/ 14;
+      if (f.canPlace(d, x, y) && f.build(d, x, y) == null) break;
+    }
+  }
+  f.fx.clear();
+}
+
+/// The 1.8.0 decorations (sold and weekly-event gifts) placed together
+/// (?decos on web demos), for checking their drawings.
+void demoNewDecos(Farm f) {
+  const sold = ['hang_rao', 'duong_gach', 'chong_tre', 'cong_ngo', 'gian_hoa', 'cot_den', 'ao_sen', 'cay_mai', 'hon_non_bo'];
+  f.level = math.max(f.level, 20);
+  f.coins += 100000;
+  for (final d in [...sold, ...eventDecos]) {
+    if (eventDecos.contains(d)) f.giftDeco[d] = 1;
     for (var i = 0; i < mapSize * mapSize; i++) {
       final x = 1 + i % 14, y = 12 + i ~/ 14;
       if (f.canPlace(d, x, y) && f.build(d, x, y) == null) break;

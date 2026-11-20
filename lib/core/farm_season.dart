@@ -92,6 +92,7 @@ extension FarmSeason on Farm {
     addXp(o.xp);
     o.waitUntil = -1;
     _stat('fest');
+    _weekAdd(WeekKind.order, 3);
     _snd('cash');
     if (festAllDone) {
       coins += festAllBonus;

@@ -10,6 +10,7 @@ import '../core/daynight.dart';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import 'animals.dart';
+import 'decos.dart';
 import 'ground.dart' show hash2;
 import 'iso.dart';
 import 'plants.dart';
@@ -1018,6 +1019,8 @@ void _deco(Canvas c, Iso iso, String type, double x, double y, Offset f, double 
       drawBamboo(c, f, .55, seed: seed, t: t);
     case 'cay_da':
       drawBanyan(c, f, t);
+    default:
+      drawMoreDeco(c, iso, type, x, y, f, t, seed);
   }
 }
 

@@ -39,6 +39,8 @@ import '../services/neighbors.dart';
 import 'paid_sheet.dart';
 import 'panels.dart';
 import 'quest_sheet.dart';
+import 'river_sheet.dart';
+import 'week_sheet.dart';
 import 'sheets.dart';
 import 'widgets.dart';
 
@@ -100,6 +102,10 @@ class _FarmScreenState extends State<FarmScreen>
             _openChat();
           case 'paid':
             _openPaidShop();
+          case 'week':
+            _openWeek();
+          case 'river':
+            _openRiver();
         }
       });
     }
@@ -579,6 +585,11 @@ class _FarmScreenState extends State<FarmScreen>
       }
       setState(() => _plantCrop = null);
     }
+    // the river along the top of the map: go fishing
+    if (o == null && gy <= 1 && gy >= -1 && gx >= 0 && gx < mapSize) {
+      _openRiver();
+      return;
+    }
     if (o == null) {
       if (gx >= 0 && gy >= 0 && gx < mapSize && gy < mapSize &&
           !farm.owned(gx, gy) && Farm.terrain(gx, gy) != 'water') {
@@ -841,6 +852,9 @@ class _FarmScreenState extends State<FarmScreen>
             '• Nâng cấp nhà để kho chứa được nhiều hơn. Mua thêm đất bằng biển "Mua đất".\n'
             '• Thời tiết (góc trên) đổi 3 giờ một lần: gieo lúc mưa thì cây lớn nhanh, nắng hạn thì chậm nếu thiếu trạm bơm, giếng.\n'
             '• Từ cấp 7 có chợ phiên: bày hàng thừa lên sạp (🛒 trong Kho) cho người chơi khác mua.\n'
+            '• 🧺 Thu hết: một chạm lấy mọi thứ đã chín, đã xong. 🌱 Gieo lại: gieo đúng giống cũ vào ô trống, thả lại cá, cho chuồng ăn.\n'
+            '• Sự kiện tuần (từ cấp 3, nút cạnh 🛍️): mỗi tuần một chủ đề, đủ điểm thì nhận quà, mốc cuối tặng đồ trang trí riêng. Thứ Hai đổi chủ đề.\n'
+            '• 🎣 Câu cá (từ cấp 3): chạm vào dòng sông. Phao chìm thì giật cần, rồi chạm khi kim nằm trong vạch xanh.\n'
             '• Kéo hai ngón để phóng to/thu nhỏ bản đồ.\n'
             '• Đăng nhập Google để lưu nông trại lên mây, đổi máy không mất.',
             style: TextStyle(color: brown, height: 1.45),
@@ -983,6 +997,7 @@ class _FarmScreenState extends State<FarmScreen>
                       padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
                       child: LotPanel(farm, _lotSel!, _report, () => _select(null)),
                     ),
+                  if (!placing && _sel == null && _lotSel == null && _plantCrop == null && !farm.tutActive) _doAllRow(),
                   placing ? _placeBar() : _bottomBar(),
                 ]),
               ),
@@ -1141,13 +1156,26 @@ class _FarmScreenState extends State<FarmScreen>
         // Cửa hàng: on its own under the map button, so the rows above
         // keep their room
         const SizedBox(height: 4),
-        Align(
-          alignment: Alignment.centerRight,
-          child: GestureDetector(
+        Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          if (farm.weekOpen) ...[
+            GestureDetector(
+              onTap: _openWeek,
+              child: _badged(_chip(Text(farm.weekTheme.icon, style: const TextStyle(fontSize: 19))), farm.weekReady),
+            ),
+            const SizedBox(width: 6),
+          ],
+          if (farm.level >= FarmRiver.riverLevel) ...[
+            GestureDetector(
+              onTap: _openRiver,
+              child: _badged(_chip(const Text('🎣', style: TextStyle(fontSize: 19))), farm.riverCasts),
+            ),
+            const SizedBox(width: 6),
+          ],
+          GestureDetector(
             onTap: _openPaidShop,
             child: _chip(const Text('🛍️', style: TextStyle(fontSize: 19))),
           ),
-        ),
+        ]),
       ]),
     );
   }
@@ -1254,6 +1282,62 @@ class _FarmScreenState extends State<FarmScreen>
       _say(m, error: m.startsWith('Giao dịch lỗi') || m.startsWith('Giao dịch không') || m.startsWith('Không'));
     }
     setState(() {});
+  }
+
+  void _openWeek() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => WeekSheet(farm, _report), height: .86).then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  void _openRiver() {
+    if (farm.level < FarmRiver.riverLevel) {
+      _report('Câu cá ngoài sông mở ở cấp ${FarmRiver.riverLevel}');
+      return;
+    }
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => RiverSheet(farm, _report), height: .8).then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  /// Thu hết / Gieo lại: one tap for everything ripe, one to sow, stock
+  /// and feed again what was there before.
+  Widget _doAllRow() {
+    final ripe = farm.readyCount, redo = farm.redoCount;
+    if (ripe == 0 && redo == 0) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        if (redo > 0)
+          PillButton('🌱 Gieo lại ($redo)', color: const Color(0xFF6D9B2F), onTap: () {
+            final (sown, stocked, fed, err) = farm.redoAll();
+            final parts = [
+              if (sown > 0) 'gieo $sown ô',
+              if (stocked > 0) 'thả $stocked ao',
+              if (fed > 0) 'cho ăn $fed chuồng',
+            ];
+            if (parts.isEmpty) {
+              _report(err ?? 'Chưa có gì để gieo lại');
+            } else {
+              _say('Đã ${parts.join(', ')}${err != null ? ' · $err' : ''}', error: err != null);
+            }
+          }),
+        if (redo > 0 && ripe > 0) const SizedBox(width: 8),
+        if (ripe > 0)
+          PillButton('🧺 Thu hết ($ripe)', color: gold, onTap: () {
+            final (n, err) = farm.harvestAll();
+            if (n == 0) {
+              _report(err);
+            } else {
+              _say('Đã thu $n chỗ${err != null ? ' · $err' : ''}', error: err != null);
+            }
+          }),
+      ]),
+    );
   }
 
   void _openPaidShop() {

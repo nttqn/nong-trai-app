@@ -80,6 +80,9 @@ void drawNightLights(Canvas c, Iso iso, Farm farm, Iterable<Obj> shown, double t
             _glow(c, mid, 46, const Color(0xFFFFC107), .28 * n, flat: .5);
           case 'cay_neu':
             _glow(c, mid - const Offset(0, 60), 26, const Color(0xFFFFE082), .35 * n * flick);
+          case 'cot_den':
+            _glow(c, mid + const Offset(9, -42), 30, const Color(0xFFFFF1C9), .55 * n);
+            _glow(c, mid, 56, lamp, .30 * n, flat: .5);
         }
       default:
     }
