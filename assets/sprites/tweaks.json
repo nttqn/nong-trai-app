@@ -92,13 +92,10 @@
   "cay_cau_qua": {
     "scale": 1.05
   },
-  "nguoi_xe_dap": {
-    "flip": true
-  },
-  "nguoi_chan_vit": {
-    "flip": true
-  },
   "nguoi_cuoc_dat": {
+    "flip": true
+  },
+  "nguoi_ganh": {
     "flip": true
   }
 }

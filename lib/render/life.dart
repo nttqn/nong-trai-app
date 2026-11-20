@@ -275,7 +275,7 @@ void _carrier(Canvas c, Offset f, double ph, bool down, Color shirt, bool rice) 
 
 /// A girl on a bicycle with a basket of flowers.
 void _cyclist(Canvas c, Offset f, double t, bool down, Color shirt) {
-  if (Sprites.has('nguoi_xe_dap')) return _sprite(c, f, 'nguoi_xe_dap', 30, t * 9, down, bob: .3);
+  if (Sprites.has('nguoi_xe_dap')) return _sprite(c, f, 'nguoi_xe_dap', 30, t * 9, down, bob: .3, skew: .3);
   shadow(c, f, 14, 2.6, .18);
   _local(c, f, down, () {
     const r = 4.6, rear = Offset(-7.5, -4.6), fr = Offset(7.5, -4.6);
@@ -434,11 +434,16 @@ void _kiteKid(Canvas c, Offset f, double t, double ph, bool down, Color shirt) {
 
 /// A painted person sprite (faces lower-left like the animals), with a
 /// walking bob since it is a single frame.
-void _sprite(Canvas c, Offset f, String key, double w, double ph, bool down, {double bob = 1}) {
+/// [down]: walking down the road (screen left), where a sprite drawn
+/// facing left needs no flip (tweaks.json flips the ones drawn facing right).
+void _sprite(Canvas c, Offset f, String key, double w, double ph, bool down, {double bob = 1, double skew = 0}) {
   shadow(c, f, w * .32, w * .08, .18);
   final s = math.sin(ph);
   c.save();
   c.translate(f.dx, f.dy - s.abs() * 1.2 * bob);
+  // a side-on bicycle leans along the road: the road climbs to the right
+  // on screen, so whichever way it goes the right wheel sits higher
+  if (skew != 0) c.skew(0, -skew);
   c.rotate(s * .04 * bob);
   Sprites.at(c, key, Offset.zero, w, flipX: !down);
   c.restore();
