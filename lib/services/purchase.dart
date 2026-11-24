@@ -51,8 +51,18 @@ class PurchaseService {
   static final PurchaseService instance = PurchaseService._();
 
   /// The store the player pays through, for the shop's wording.
-  static String get storeName =>
-      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS ? 'App Store' : 'Google Play';
+  /// On web, ?store=ios gives the App Store wording for iOS screenshots.
+  static String get storeName => kIsWeb
+      ? (Uri.base.queryParameters['store'] == 'ios' ? 'App Store' : 'Google Play')
+      : (defaultTargetPlatform == TargetPlatform.iOS ? 'App Store' : 'Google Play');
+
+  /// App Store product IDs are unique across the whole developer account and
+  /// Võ Lâm Quyết Đấu already holds bo_quang_cao, so iOS uses an mlc_ prefix;
+  /// Google Play keeps the bare IDs. The rest of the game only sees bare SKUs.
+  static const _iosPrefix = 'mlc_';
+  static bool get _ios => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+  static String storeId(String sku) => _ios ? '$_iosPrefix$sku' : sku;
+  static String skuOf(String id) => id.startsWith(_iosPrefix) ? id.substring(_iosPrefix.length) : id;
 
   static bool get _supported =>
       !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
@@ -100,9 +110,9 @@ class PurchaseService {
       _sub = iap.purchaseStream.listen(_onPurchases, onError: (Object e) => debugPrint('iap stream: $e'));
       available = await iap.isAvailable();
       if (!available) return;
-      final r = await iap.queryProductDetails(allSkus);
+      final r = await iap.queryProductDetails(allSkus.map(storeId).toSet());
       for (final d in r.productDetails) {
-        products[d.id] = d;
+        products[skuOf(d.id)] = d;
       }
       changed.value++;
       // brings one-time packs back after a reinstall or on a new phone
@@ -244,7 +254,7 @@ class PurchaseService {
           if (why == null) {
             await _deliver(p);
           } else {
-            Analytics.instance.log('iap_bad', {'sku': p.productID, 'why': why});
+            Analytics.instance.log('iap_bad', {'sku': skuOf(p.productID), 'why': why});
             message.value = 'Giao dịch không hợp lệ: $storeName không xác nhận giao dịch này.';
           }
       }
@@ -260,7 +270,7 @@ class PurchaseService {
   }
 
   Future<void> _deliver(PurchaseDetails p) async {
-    final sku = p.productID;
+    final sku = skuOf(p.productID);
     final fresh = p.status == PurchaseStatus.purchased;
     final id = p.purchaseID ?? base64Encode(utf8.encode(p.verificationData.serverVerificationData)).substring(0, 40);
     // one-time packs come back on every start: applying them is harmless

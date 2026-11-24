@@ -1,16 +1,24 @@
 # Play Console product icons (512x512, 32-bit PNG, no text) for the 4 IAP packs,
 # composed from the game's own art in art_src/.
 #   powershell -NoProfile -File tool/iap_icons.ps1   (run from the project root)
+# App Store (1024x1024, files named by the iOS mlc_ product IDs, store/iap-ios/):
+#   powershell -NoProfile -File tool/iap_icons.ps1 -Size 1024
+param([int]$Size = 512)
 Add-Type -AssemblyName System.Drawing
 $ErrorActionPreference = 'Stop'
-$S = 512
-$out = Join-Path (Get-Location) 'store/iap'
+$S = 512 # drawing units; scaled by $K to the output size
+$K = $Size / 512
+$ios = $Size -ne 512
+$sub = if ($ios) { 'store/iap-ios' } else { 'store/iap' }
+$pre = if ($ios) { 'mlc_' } else { '' }
+$out = Join-Path (Get-Location) $sub
 New-Item -ItemType Directory -Force $out | Out-Null
 
 function New-Canvas {
-  $b = New-Object System.Drawing.Bitmap $S, $S, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+  $b = New-Object System.Drawing.Bitmap $Size, $Size, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
   $g = [System.Drawing.Graphics]::FromImage($b)
   $g.SmoothingMode = 'AntiAlias'; $g.InterpolationMode = 'HighQualityBicubic'; $g.PixelOffsetMode = 'HighQuality'
+  $g.ScaleTransform($K, $K)
   # warm field-light background: radial cream -> soft gold
   $path = New-Object System.Drawing.Drawing2D.GraphicsPath
   $path.AddEllipse(-160, -170, $S + 320, $S + 340)
@@ -37,7 +45,7 @@ function Draw-Art($g, $name, $cx, $bottom, $maxW, $maxH) {
   $im.Dispose()
 }
 
-function Save($pair, $name) { $pair[1].Dispose(); $pair[0].Save("$out/$name.png", [System.Drawing.Imaging.ImageFormat]::Png); $pair[0].Dispose(); "store/iap/$name.png" }
+function Save($pair, $name) { $pair[1].Dispose(); $pair[0].Save("$out/$pre$name.png", [System.Drawing.Imaging.ImageFormat]::Png); $pair[0].Dispose(); "$sub/$pre$name.png" }
 
 # 1. Gói khởi đầu: lantern arbor + lotus pot behind a gift basket
 $c = New-Canvas
@@ -69,7 +77,7 @@ $g.FillEllipse((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::Fr
 $g.FillEllipse((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 150, 160, 152))), 104, -104, 32, 208)
 $g.FillRectangle((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 92, 100, 96))), -110, -44, 76, 88)
 $g.DrawRectangle((New-Object System.Drawing.Pen ([System.Drawing.Color]::FromArgb(255, 60, 68, 64)), 6), -110, -44, 76, 88)
-$g.ResetTransform()
+$g.ResetTransform(); $g.ScaleTransform($K, $K)
 # red prohibition ring
 $rp = New-Object System.Drawing.Pen ([System.Drawing.Color]::FromArgb(255, 214, 48, 40)), 34
 $g.DrawEllipse($rp, 76, 70, 360, 360)

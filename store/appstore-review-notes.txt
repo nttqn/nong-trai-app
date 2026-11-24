@@ -1,0 +1,57 @@
+Mùa Lúa Chín - Notes for App Review
+
+No account or demo login is needed. The whole game plays offline: open the
+app and the guide quests walk you through planting, harvesting and
+delivering orders. Signing in is optional and only
+used for cloud save and the online features (neighbours, market, chat,
+leaderboards).
+
+About the game
+Mùa Lúa Chín ("Ripe Rice Season") is an original, relaxing farm game set in a
+village of northern Vietnam. All buildings, crops, animals, villagers,
+scenery and music were made for this game; nothing is licensed or reskinned
+from another title. Content includes:
+- Rice paddies, vegetable beds, orchards, pens, fish ponds, silkworms and
+  village craft workshops (rice mill, rice-cake kitchen, loom house...).
+- The game follows the real Vietnamese lunar calendar: 24 solar terms, crop
+  seasons, weather, moon phases and 7 traditional festivals on their lunar
+  dates, plus a rice-drying yard that must be covered before rain.
+- Village projects (well, gate, road, school, clinic, communal house), a
+  painted "Village Memories" album, weekly events and river fishing with a
+  weekly fishing leaderboard.
+The interface is in Vietnamese; the game's primary audience is Vietnam.
+
+Sign-in, data and account deletion
+- Sign in with Apple and Google Sign-In are offered side by side (the ☰ menu
+  button > "Lưu trữ đám mây" / Cloud save).
+- Account deletion is in the app: menu > Lưu trữ đám mây > "Xóa tài khoản và
+  dữ liệu trên mây" (Delete account and cloud data). It deletes the cloud
+  save, the village on the region map, market stalls, leaderboard rows and
+  the sign-in account.
+- Signed-in players are shown to others only by the farm name they choose
+  (no email or account name). "Ẩn tôi khỏi bảng" (Hide me) in the
+  leaderboard screen removes their rows.
+
+World chat (Kênh Thế Giới)
+- Only signed-in players can post. Messages are filtered for profanity, a
+  short cooldown limits flooding, and messages are deleted after 3 days.
+- Tap any message from another player to Report it or Block its sender. Reports
+  are reviewed by the developer, and offending accounts are muted.
+
+In-app purchases (shop button on the farm screen, or ☰ menu > "Cửa hàng,
+khôi phục giao dịch" / Shop, restore purchases)
+- Starter Pack, Laterite Cellar and Remove Ads are non-consumable; the
+  30-day Farmer Card is consumable. "Khôi phục giao dịch" (Restore
+  Purchases) is at the bottom of the Shop.
+
+Ads
+- Google AdMob. Rewarded ads are always the player's choice (finish a crop
+  or workshop now, double level-up coins). An interstitial may follow every
+  third delivered order from level 4, at most once every 5 minutes, and an
+  App Open ad may show at launch or when returning after 30 minutes away
+  (from level 3). Remove Ads turns both off.
+- App Tracking Transparency is requested before the first ad request. Ads
+  still work, non-personalised, if the player declines.
+
+Privacy policy: https://nttqn.github.io/nong-trai-app/privacy.html
+Support: https://nttqn.github.io/nong-trai-app/support.html (trungsmail@gmail.com)
