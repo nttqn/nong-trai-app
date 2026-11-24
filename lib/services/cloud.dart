@@ -60,17 +60,24 @@ class CloudSave extends ChangeNotifier {
 
   /// The iOS app of Firebase project nong-trai-26f99, copied from its
   /// GoogleService-Info.plist and passed explicitly so the plist does not
-  /// have to be in the Xcode target. Null until that app is registered:
-  /// iOS then plays offline only.
-  static const String _iosClientId = '';
-  static const FirebaseOptions? _iosOptions = null;
+  /// have to be in the Xcode target.
+  static const String _iosClientId = '898577851357-kiioala7r1v7kku5cua7lrfv3q807u9l.apps.googleusercontent.com';
+  static const _iosOptions = FirebaseOptions(
+    apiKey: 'AIzaSyDHgRT2lFOarqhO_QogH6n1uvsyQebiU-Y',
+    appId: '1:898577851357:ios:3735e90fe1b7f4d2df8c34',
+    messagingSenderId: '898577851357',
+    projectId: 'nong-trai-26f99',
+    storageBucket: 'nong-trai-26f99.firebasestorage.app',
+    databaseURL: 'https://nong-trai-26f99-default-rtdb.asia-southeast1.firebasedatabase.app',
+    iosBundleId: 'com.trungsmail.nongtrai',
+    iosClientId: _iosClientId,
+  );
 
   bool get isApplePlatform => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
   Future<void> init() async {
     if (kIsWeb) return;
     try {
-      if (isApplePlatform && _iosOptions == null) throw StateError('no iOS Firebase app yet');
       // Android reads google-services.json through Gradle; throws when the
       // game was built without it.
       await Firebase.initializeApp(options: isApplePlatform ? _iosOptions : null).timeout(const Duration(seconds: 8));
