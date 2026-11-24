@@ -61,3 +61,11 @@ tool/promo/seg/
 tool/promo/out/
 tool/promo/voice/*.mp3
 store/video/*.mp4
+
+# iOS signing exports (delete after saving the GitHub secrets)
+ios-dist-p12-base64.txt
+ios-profile-base64.txt
+appstore-api-key-p8-base64.txt
+*.mobileprovision
+*.p12
+*.p8
