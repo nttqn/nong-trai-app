@@ -67,6 +67,13 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.10.0, ≤ 500 ký tự)
+📦 Kho rộng hơn: Nhà con cháu rẻ hơn một nửa, chứa bằng nhà chính (ít nhất 100 chỗ), thêm 8% xu mỗi đơn. Nhà kho nâng lên Kho bê tông (350) và Kho tổng (600).
+🏯 Nhà chính nâng lên Nhà thờ họ ba gian (cấp 32): 700 chỗ chứa.
+🏆 Bảng xếp hạng xem được hết, nút 📍 Vị trí của tôi.
+🔄 Báo khi có bản mới, cập nhật ngay trong game.
+🌙 Mặt trăng không còn bị nút che. Lưu đám mây nhẹ hơn.
+
 ## Có gì mới (bản 1.9.0, ≤ 500 ký tự)
 🎣 Câu cá thả ga: hết lượt chính vẫn câu tiếp được, cá bán ngay tại bờ.
 🏆 Đua top câu cá: mỗi con cá được điểm, cá càng khó càng nhiều điểm, bảng xếp hạng mới mỗi tuần.
@@ -107,6 +114,13 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.10.0, en-US)
+📦 More storage: Nhà con cháu costs half as much, holds as much as the main house (at least 100) and adds 8% coins per order. Warehouses upgrade to a concrete store (350) and a depot (600).
+🏯 The main house can become a three-bay ancestral house (level 32): 700 storage.
+🏆 See the whole leaderboard, plus a 📍 My place button.
+🔄 New versions are announced and installed in-game.
+🌙 The moon is no longer hidden by buttons. Lighter cloud saves.
 
 ## What's new (1.9.0, en-US)
 🎣 Fish as much as you like: after the daily casts you can keep fishing, the catch is sold on the bank.
