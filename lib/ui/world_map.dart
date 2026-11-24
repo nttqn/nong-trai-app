@@ -10,6 +10,7 @@ import '../core/achievements.dart';
 import '../core/demo.dart';
 import '../core/farm.dart';
 import '../services/cloud.dart';
+import 'cloud_tile.dart' show signInPick;
 import '../services/neighbors.dart';
 import '../services/sound.dart';
 import 'market_ui.dart';
@@ -120,9 +121,9 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
             return _note('Bản đồ cần kết nối máy chủ, bản này chưa bật.');
           }
           if (!_demo && cs.user == null) {
-            return _note('Đăng nhập Google để ghé thăm hàng xóm và để làng của bạn hiện trên bản đồ.',
-                action: PillButton(cs.busy ? 'Đang đăng nhập…' : 'Đăng nhập Google', onTap: cs.busy ? null : () async {
-                  if (await cs.signInGoogle()) _load();
+            return _note('Đăng nhập để ghé thăm hàng xóm và để làng của bạn hiện trên bản đồ.',
+                action: PillButton(cs.busy ? 'Đang đăng nhập…' : 'Đăng nhập', onTap: cs.busy ? null : () async {
+                  if (await signInPick(context)) _load();
                 }));
           }
           if (_error != null) return _note(_error!);

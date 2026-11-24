@@ -43,7 +43,7 @@ class Market {
   /// Puts [qty] [id] on a free stall for [price] xu. Null when done.
   Future<String?> list(Farm f, String id, int qty, int price, String myName) async {
     final uid = _nb.myUid;
-    if (!available || uid == null) return 'Cần đăng nhập Google để bán ở chợ phiên';
+    if (!available || uid == null) return 'Cần đăng nhập để bán ở chợ phiên';
     final err = f.canListStall(id, qty, price);
     if (err != null) return err;
     final slot = f.freeStallSlot!;
@@ -118,7 +118,7 @@ class Market {
   /// Buys a stall. Null when done, else why not.
   Future<String?> buy(Farm f, StallOffer s, String myName) async {
     final me = _nb.myUid;
-    if (!available || me == null) return 'Cần đăng nhập Google';
+    if (!available || me == null) return 'Cần đăng nhập';
     final err = f.canBuyStall(s.qty, s.price);
     if (err != null) return err;
     final ref = _col.doc(s.docId);

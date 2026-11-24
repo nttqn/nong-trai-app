@@ -10,6 +10,7 @@ import '../core/chat.dart';
 import '../core/farm.dart';
 import '../services/chat.dart';
 import '../services/cloud.dart';
+import 'cloud_tile.dart' show signInPick;
 import 'leaderboard_sheet.dart';
 import 'widgets.dart';
 
@@ -273,10 +274,10 @@ class _ChatSheetState extends State<ChatSheet> {
     if (!chat.canSend) {
       return Row(children: [
         const Expanded(
-          child: Text('Đăng nhập Google để gửi tin (dùng chung tài khoản lưu đám mây).',
+          child: Text('Đăng nhập để gửi tin (dùng chung tài khoản lưu đám mây).',
               style: TextStyle(color: brown, fontSize: 12.5)),
         ),
-        PillButton(cs.busy ? '…' : 'Đăng nhập', dense: true, onTap: cs.busy ? null : cs.signInGoogle),
+        PillButton(cs.busy ? '…' : 'Đăng nhập', dense: true, onTap: cs.busy ? null : () => signInPick(context)),
       ]);
     }
     if (chat.banned) {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../core/farm.dart';
 import '../services/cloud.dart';
+import 'cloud_tile.dart' show signInPick;
 import '../services/leaderboard.dart';
 import 'widgets.dart';
 
@@ -212,10 +213,10 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
     } else if (cs.user == null) {
       body = Row(children: [
         const Expanded(
-          child: Text('Đăng nhập Google để nông trại của bạn có tên trên bảng.',
+          child: Text('Đăng nhập để nông trại của bạn có tên trên bảng.',
               style: TextStyle(color: brown, fontSize: 12.5)),
         ),
-        PillButton(cs.busy ? '…' : 'Đăng nhập', dense: true, onTap: cs.busy ? null : cs.signInGoogle),
+        PillButton(cs.busy ? '…' : 'Đăng nhập', dense: true, onTap: cs.busy ? null : () => signInPick(context)),
       ]);
     } else if (farm.name.isEmpty) {
       body = Row(children: [

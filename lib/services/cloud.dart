@@ -58,12 +58,22 @@ class CloudSave extends ChangeNotifier {
   AppLifecycleListener? _lifecycle;
   SharedPreferences? _prefs;
 
+  /// The iOS app of Firebase project nong-trai-26f99, copied from its
+  /// GoogleService-Info.plist and passed explicitly so the plist does not
+  /// have to be in the Xcode target. Null until that app is registered:
+  /// iOS then plays offline only.
+  static const String _iosClientId = '';
+  static const FirebaseOptions? _iosOptions = null;
+
+  bool get isApplePlatform => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
   Future<void> init() async {
     if (kIsWeb) return;
     try {
+      if (isApplePlatform && _iosOptions == null) throw StateError('no iOS Firebase app yet');
       // Android reads google-services.json through Gradle; throws when the
       // game was built without it.
-      await Firebase.initializeApp().timeout(const Duration(seconds: 8));
+      await Firebase.initializeApp(options: isApplePlatform ? _iosOptions : null).timeout(const Duration(seconds: 8));
       available = true;
     } catch (e) {
       debugPrint('cloud save off: $e');
@@ -92,30 +102,39 @@ class CloudSave extends ChangeNotifier {
 
   Future<void> _initGoogle() async {
     if (_googleReady) return;
-    await GoogleSignIn.instance.initialize();
+    await GoogleSignIn.instance.initialize(clientId: isApplePlatform && _iosClientId.isNotEmpty ? _iosClientId : null);
     _googleReady = true;
   }
 
-  Future<bool> signInGoogle() async {
+  Future<bool> signInGoogle() => _signIn('google', () async {
+        try {
+          await _initGoogle();
+          final account = await GoogleSignIn.instance.authenticate();
+          final idToken = account.authentication.idToken;
+          if (idToken == null) throw StateError('no id token');
+          await FirebaseAuth.instance.signInWithCredential(GoogleAuthProvider.credential(idToken: idToken));
+        } on GoogleSignInException catch (e) {
+          if (e.code == GoogleSignInExceptionCode.canceled || isApplePlatform) rethrow;
+          // Credential Manager fails on some phones: use the browser flow.
+          _logFail('gsi_${e.code.name}', e.description);
+          await FirebaseAuth.instance.signInWithProvider(GoogleAuthProvider());
+        }
+      });
+
+  /// Sign in with Apple, offered beside Google on iOS (App Store 4.8).
+  Future<bool> signInApple() => _signIn('apple', () async {
+        await FirebaseAuth.instance.signInWithProvider(AppleAuthProvider()..addScope('email'));
+      });
+
+  Future<bool> _signIn(String method, Future<void> Function() how) async {
     if (!available || busy) return false;
     busy = true;
     message = null;
     notifyListeners();
     try {
-      try {
-        await _initGoogle();
-        final account = await GoogleSignIn.instance.authenticate();
-        final idToken = account.authentication.idToken;
-        if (idToken == null) throw StateError('no id token');
-        await FirebaseAuth.instance.signInWithCredential(GoogleAuthProvider.credential(idToken: idToken));
-      } on GoogleSignInException catch (e) {
-        if (e.code == GoogleSignInExceptionCode.canceled) rethrow;
-        // Credential Manager fails on some phones: use the browser flow.
-        _logFail('gsi_${e.code.name}', e.description);
-        await FirebaseAuth.instance.signInWithProvider(GoogleAuthProvider());
-      }
+      await how();
       user = FirebaseAuth.instance.currentUser;
-      Analytics.instance.log('login', {'method': 'google'});
+      Analytics.instance.log('login', {'method': method});
       busy = false;
       await sync();
       return user != null;
@@ -346,9 +365,13 @@ class CloudSave extends ChangeNotifier {
         await u.delete();
       } on FirebaseAuthException catch (e) {
         if (e.code != 'requires-recent-login') rethrow;
-        await _initGoogle();
-        final account = await GoogleSignIn.instance.authenticate();
-        await u.reauthenticateWithCredential(GoogleAuthProvider.credential(idToken: account.authentication.idToken));
+        if (u.providerData.any((p) => p.providerId == 'apple.com')) {
+          await u.reauthenticateWithProvider(AppleAuthProvider());
+        } else {
+          await _initGoogle();
+          final account = await GoogleSignIn.instance.authenticate();
+          await u.reauthenticateWithCredential(GoogleAuthProvider.credential(idToken: account.authentication.idToken));
+        }
         await u.delete();
       }
       if (_googleReady) await GoogleSignIn.instance.signOut();

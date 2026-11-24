@@ -64,7 +64,7 @@ class PaidShopSheet extends StatelessWidget {
                 sku: skuNoAds,
                 icon: '🚫',
                 title: 'Bỏ quảng cáo',
-                tag: 'Mua 1 lần, dùng cho cả tài khoản Google Play',
+                tag: 'Mua 1 lần, dùng cho cả tài khoản ${PurchaseService.storeName}',
                 lines: const [
                   'Tắt quảng cáo xen giữa sau khi giao đơn và khi mở game',
                   'Quảng cáo có thưởng vẫn còn, bạn tự chọn xem hay không',
@@ -92,9 +92,9 @@ class PaidShopSheet extends StatelessWidget {
                 PillButton('Lịch sử nạp', dense: true, color: brownLight, onTap: () => _history(context)),
               ]),
               const SizedBox(height: 10),
-              const Text(
-                'Thanh toán qua Google Play. Gói mua 1 lần được khôi phục khi cài lại game hoặc đổi máy '
-                '(cùng tài khoản Google Play). Đăng nhập Google trong ☰ để lưu nông trại lên mây.',
+              Text(
+                'Thanh toán qua ${PurchaseService.storeName}. Gói mua 1 lần được khôi phục khi cài lại game hoặc đổi máy '
+                '(cùng tài khoản ${PurchaseService.storeName}). Đăng nhập trong ☰ để lưu nông trại lên mây.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: brownLight, fontSize: 11.5),
               ),
@@ -168,7 +168,7 @@ class _Pack extends StatelessWidget {
                   : ValueListenableBuilder<bool>(
                       valueListenable: shop.busy,
                       builder: (_, busy, _) => PillButton(
-                        price ?? (shop.available ? 'Chưa mở bán' : 'Không kết nối được Google Play'),
+                        price ?? (shop.available ? 'Chưa mở bán' : 'Không kết nối được ${PurchaseService.storeName}'),
                         dense: true,
                         color: gold,
                         onTap: price == null || busy ? null : () => shop.buy(sku),

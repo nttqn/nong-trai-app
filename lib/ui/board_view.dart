@@ -48,7 +48,7 @@ class RankPrizeList extends StatelessWidget {
             ]),
           ),
         const SizedBox(height: 4),
-        const Text('Cần đăng nhập Google và đặt tên nông trại để được xếp hạng.',
+        const Text('Cần đăng nhập và đặt tên nông trại để được xếp hạng.',
             style: TextStyle(fontSize: 11.5, color: brownLight)),
       ]),
     );
@@ -114,7 +114,7 @@ class _BoardListState extends State<BoardList> {
     final cs = CloudSave.instance;
     final pts = b.weekOf(f) == f.weekNow ? b.ptsOf(f) : 0;
     final hint = cs.user == null
-        ? 'Đăng nhập Google (☰ → Lưu trữ đám mây) để lên bảng xếp hạng.'
+        ? 'Đăng nhập (☰ → Lưu trữ đám mây) để lên bảng xếp hạng.'
         : f.name.isEmpty
             ? 'Đặt tên nông trại để lên bảng xếp hạng.'
             : Leaderboard.instance.hidden

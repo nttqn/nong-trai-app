@@ -1,4 +1,4 @@
-// "Lưu trữ đám mây" block in the ☰ menu: Google sign-in, sync status,
+// "Lưu trữ đám mây" block in the ☰ menu: Google (and on iOS Apple) sign-in, sync status,
 // sign-out, account deletion (Play policy), and the ad privacy choices.
 
 import 'package:flutter/material.dart';
@@ -6,6 +6,32 @@ import 'package:flutter/material.dart';
 import '../services/ads.dart';
 import '../services/cloud.dart';
 import 'widgets.dart';
+
+/// A sheet's "Đăng nhập" button: Google directly, or on iOS a choice of
+/// Google and Apple.
+Future<bool> signInPick(BuildContext context) async {
+  final cs = CloudSave.instance;
+  if (!cs.isApplePlatform) return cs.signInGoogle();
+  final apple = await showDialog<bool>(
+    context: context,
+    builder: (d) => AlertDialog(
+      backgroundColor: cream,
+      title: const Text('Đăng nhập'),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        PillButton('Đăng nhập Google',
+            leading: const Text('G', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+            onTap: () => Navigator.pop(d, false)),
+        const SizedBox(height: 8),
+        PillButton('Đăng nhập Apple',
+            color: const Color(0xFF222222),
+            leading: const Icon(Icons.apple, color: Colors.white, size: 18),
+            onTap: () => Navigator.pop(d, true)),
+      ]),
+    ),
+  );
+  if (apple == null) return false;
+  return apple ? cs.signInApple() : cs.signInGoogle();
+}
 
 class CloudTile extends StatelessWidget {
   const CloudTile({super.key});
@@ -29,6 +55,13 @@ class CloudTile extends StatelessWidget {
             PillButton(cs.busy ? 'Đang đăng nhập…' : 'Đăng nhập Google',
                 leading: const Text('G', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
                 onTap: cs.busy ? null : cs.signInGoogle),
+            if (cs.isApplePlatform) ...[
+              const SizedBox(height: 6),
+              PillButton(cs.busy ? 'Đang đăng nhập…' : 'Đăng nhập Apple',
+                  color: const Color(0xFF222222),
+                  leading: const Icon(Icons.apple, color: Colors.white, size: 18),
+                  onTap: cs.busy ? null : cs.signInApple),
+            ],
           ]);
         } else {
           final t = cs.lastSync;

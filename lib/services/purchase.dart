@@ -50,6 +50,10 @@ class PurchaseService {
   PurchaseService._();
   static final PurchaseService instance = PurchaseService._();
 
+  /// The store the player pays through, for the shop's wording.
+  static String get storeName =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS ? 'App Store' : 'Google Play';
+
   static bool get _supported =>
       !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
 
@@ -167,11 +171,16 @@ class PurchaseService {
   /// ☰ → Khôi phục giao dịch: asks Play again for the one-time packs.
   Future<String> restoreNow() async {
     if (!_supported) return 'Chỉ khôi phục được trên điện thoại.';
-    if (!available) return 'Không kết nối được Google Play. Kiểm tra mạng và tài khoản rồi thử lại.';
+    if (!available) return 'Không kết nối được $storeName. Kiểm tra mạng và tài khoản rồi thử lại.';
     try {
       await InAppPurchase.instance.restorePurchases();
     } catch (e) {
       debugPrint('restore: $e');
+    }
+    // App Store sends owned one-time packs back through the purchase
+    // stream, where they are applied.
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return 'Đã gửi yêu cầu khôi phục tới App Store. Gói đã mua sẽ vào nông trại trong giây lát.';
     }
     try {
       final add = InAppPurchase.instance.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
@@ -236,7 +245,7 @@ class PurchaseService {
             await _deliver(p);
           } else {
             Analytics.instance.log('iap_bad', {'sku': p.productID, 'why': why});
-            message.value = 'Giao dịch không hợp lệ: Google Play không xác nhận giao dịch này.';
+            message.value = 'Giao dịch không hợp lệ: $storeName không xác nhận giao dịch này.';
           }
       }
       if (p.pendingCompletePurchase) {

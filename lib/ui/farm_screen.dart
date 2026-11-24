@@ -206,7 +206,7 @@ class _FarmScreenState extends State<FarmScreen>
         title: const Text('Chưa đọc được nông trại cũ', style: TextStyle(fontWeight: FontWeight.w900, color: brown)),
         content: SelectableText(
             'Bản lưu cũ vẫn được cất giữ an toàn trên máy, bản cập nhật sau sẽ tự lấy lại. '
-            'Nếu đã đăng nhập Google, hãy chọn "Bản trên mây" khi được hỏi.\n\nMã lỗi (gửi cho nhà phát triển):\n$err',
+            'Nếu đã đăng nhập, hãy chọn "Bản trên mây" khi được hỏi.\n\nMã lỗi (gửi cho nhà phát triển):\n$err',
             style: const TextStyle(color: brown)),
         actions: [TextButton(onPressed: () => Navigator.pop(d), child: const Text('Đã hiểu'))],
       ),
