@@ -43,8 +43,12 @@ class Neighbors extends ChangeNotifier {
 
   String? _sent;
 
-  /// Called with every cloud upload: the public copy of this farm.
-  Future<void> publish(Farm f) async {
+  DateTime? _sentAt;
+
+  /// Called with every cloud upload: the public copy of this farm, at most
+  /// every [Leaderboard.quiet] unless [force]d (1.10.0: crops change it on
+  /// every upload, which was a write each time).
+  Future<void> publish(Farm f, {bool force = false}) async {
     final uid = myUid;
     if (!available || uid == null) return;
     // no name yet: just don't publish (an unnamed fresh farm used to
@@ -59,12 +63,17 @@ class Neighbors extends ChangeNotifier {
       }
       return;
     }
+    final at = _sentAt;
+    if (!force && _sent != null && _sent != '' && at != null && DateTime.now().difference(at) < Leaderboard.quiet) {
+      return;
+    }
     final snap = villageSnapshot(f);
     final key = snap.toString();
     if (key == _sent) return;
     try {
       await _villages.doc(uid).set({...snap, 'updated': FieldValue.serverTimestamp()}).timeout(const Duration(seconds: 12));
       _sent = key;
+      _sentAt = DateTime.now();
     } catch (e) {
       debugPrint('village publish failed: $e');
     }

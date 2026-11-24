@@ -104,7 +104,7 @@ class _BoardListState extends State<BoardList> {
     final req = ++_req;
     try {
       final prizes = settle ? await RankPrizes.instance.settle(f) : const <String>[];
-      if (settle) await b.submit(f);
+      if (settle) await b.submit(f, force: true);
       final week = f.weekNow, pts = _pts;
       final (rows, next) = await b.top(week);
       int? rank;

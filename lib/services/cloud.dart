@@ -230,7 +230,7 @@ class CloudSave extends ChangeNotifier {
         final cur = current?.call();
         if (cur != null) {
           Neighbors.instance.setMyName(cur.name);
-          unawaited(Neighbors.instance.publish(cur));
+          unawaited(Neighbors.instance.publish(cur, force: true));
           unawaited(Neighbors.instance.pull(cur, force: true));
           unawaited(RankPrizes.instance.settle(cur));
         }
@@ -296,12 +296,14 @@ class CloudSave extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// After every local save: upload at most every three minutes, and when
-  /// the app goes to the background.
+  /// After every local save: upload at most every ten minutes (1.10.0, was
+  /// three: with the boards and the village each upload cost up to five
+  /// writes, and the free daily quota ran out on 2026-11-24), and when the
+  /// app goes to the background ([flush] from the farm screen).
   void queueUpload() {
     if (!available || user == null || conflict != null || !_mine) return;
     _dirty = true;
-    _debounce ??= Timer(const Duration(minutes: 3), flush);
+    _debounce ??= Timer(const Duration(minutes: 10), flush);
   }
 
   Future<void> flush() async {

@@ -78,6 +78,10 @@ class Leaderboard extends ChangeNotifier {
   static final Leaderboard instance = Leaderboard._();
 
   static const _hiddenKey = 'lb_hidden';
+
+  /// How long small changes (XP, weekly points, the village's crops) wait
+  /// before they are written again.
+  static const quiet = Duration(minutes: 30);
   bool hidden = false;
   String? _sent;
 
@@ -104,16 +108,27 @@ class Leaderboard extends ChangeNotifier {
     }
   }
 
-  /// Writes this farm's row when something on it changed (or [force]).
+  String? _sentMain;
+  DateTime? _sentAt;
+
+  /// Writes this farm's row when something on it changed. XP alone (the
+  /// `score` tie-break, which moves all the time) waits [quiet] unless
+  /// [force]d (the player opening the board); a row identical to the one
+  /// sent is never sent again (1.10.0: the free daily quota ran out).
   Future<void> submit(Farm f, {bool force = false}) async {
     final uid = myUid;
     if (!_cloud.available || uid == null || hidden || f.name.trim().isEmpty) return;
     final row = lbRow(f);
     final key = row.toString();
-    if (!force && key == _sent) return;
+    if (key == _sent) return;
+    final main = (Map.of(row)..remove('score')).toString();
+    final at = _sentAt;
+    if (!force && main == _sentMain && at != null && DateTime.now().difference(at) < quiet) return;
     try {
       await _col.doc(uid).set({...row, 'updated': FieldValue.serverTimestamp()}).timeout(const Duration(seconds: 10));
       _sent = key;
+      _sentMain = main;
+      _sentAt = DateTime.now();
     } catch (e) {
       debugPrint('leaderboard submit failed: $e');
     }
@@ -169,7 +184,8 @@ class Leaderboard extends ChangeNotifier {
   /// Removes this player's row (hiding, wiping, deleting the account).
   Future<void> withdraw() async {
     final uid = myUid;
-    _sent = null;
+    _sent = _sentMain = null;
+    _sentAt = null;
     if (!_cloud.available || uid == null) return;
     try {
       await _col.doc(uid).delete().timeout(const Duration(seconds: 10));
@@ -191,6 +207,6 @@ class Leaderboard extends ChangeNotifier {
     } else {
       await submit(f, force: true);
     }
-    await Neighbors.instance.publish(f);
+    await Neighbors.instance.publish(f, force: true);
   }
 }

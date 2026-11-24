@@ -186,8 +186,12 @@ class _FarmScreenState extends State<FarmScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState s) {
     if (s == AppLifecycleState.paused || s == AppLifecycleState.inactive) {
-      widget.save.saveNow(farm);
-      if (s == AppLifecycleState.paused) NotifyService.instance.scheduleFor(farm);
+      final saved = widget.save.saveNow(farm);
+      if (s == AppLifecycleState.paused) {
+        NotifyService.instance.scheduleFor(farm);
+        // uploads wait up to ten minutes; leaving the game sends what's due
+        saved.then((_) => CloudSave.instance.flush());
+      }
     } else if (s == AppLifecycleState.resumed) {
       NotifyService.instance.cancelAll();
       Neighbors.instance.pull(farm);

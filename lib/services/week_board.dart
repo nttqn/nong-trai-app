@@ -50,13 +50,19 @@ class WeekBoard {
 
   bool get canSubmit => _cloud.available && myUid != null && !Leaderboard.instance.hidden;
 
-  /// Writes this week's points when they changed.
-  Future<void> submit(Farm f) async {
+  int _sentWeek = 0;
+  DateTime? _sentAt;
+
+  /// Writes this week's points when they changed: at most every
+  /// [Leaderboard.quiet] within a week unless [force]d (the board opened).
+  Future<void> submit(Farm f, {bool force = false}) async {
     final uid = myUid;
     final week = _week(f), pts = _pts(f);
     if (!canSubmit || uid == null || f.name.trim().isEmpty || pts <= 0 || week != f.weekNow) return;
     final key = '$week|$pts|${f.level}|${f.name}';
     if (key == _sent) return;
+    final at = _sentAt;
+    if (!force && week == _sentWeek && at != null && DateTime.now().difference(at) < Leaderboard.quiet) return;
     try {
       await _rows(week).doc(uid).set({
         'name': f.name.length > 24 ? f.name.substring(0, 24) : f.name,
@@ -65,6 +71,8 @@ class WeekBoard {
         'updated': FieldValue.serverTimestamp(),
       }).timeout(const Duration(seconds: 10));
       _sent = key;
+      _sentWeek = week;
+      _sentAt = DateTime.now();
     } catch (e) {
       debugPrint('$collection board submit failed: $e');
     }
@@ -121,6 +129,7 @@ class WeekBoard {
   Future<void> withdraw(int week) async {
     final uid = myUid;
     _sent = null;
+    _sentAt = null;
     if (!_cloud.available || uid == null || week == 0) return;
     try {
       await _rows(week).doc(uid).delete().timeout(const Duration(seconds: 10));
