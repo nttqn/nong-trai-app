@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,6 +29,14 @@ class SoundService {
   final ValueNotifier<bool> musicOn = ValueNotifier<bool>(true);
 
   final Map<String, _Pool> _pools = {};
+
+  /// Android: effects on our own SoundPool, played from a background thread
+  /// (MainActivity's Sfx.kt). audioplayers' low-latency players stopped and
+  /// resumed SoundPool on the main thread for every effect, where SoundPool's
+  /// lock can make it wait: "Input dispatching timed out" ANRs (Kiếm Hiệp
+  /// had the same, fixed the same way). audioplayers stays the fallback.
+  static const _sfx = MethodChannel('nt/sfx');
+  final Set<String> _native = {};
   final Map<String, DateTime> _last = {};
   AudioPlayer? _music;
   int _track = 0;
@@ -76,6 +85,16 @@ class SoundService {
     });
     _applyMusic();
     for (final f in sfxFiles) {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        try {
+          final uri = await AudioCache.instance.load('audio/$f.wav').timeout(const Duration(seconds: 5));
+          await _sfx.invokeMethod<void>('load', {'n': f, 'p': uri.toFilePath()});
+          _native.add(f);
+          continue;
+        } catch (e) {
+          debugPrint('native sfx $f failed: $e');
+        }
+      }
       try {
         _pools[f] = await _Pool.create('audio/$f.wav', f == 'tap' || f == 'plant' ? 3 : 2)
             .timeout(const Duration(seconds: 5));
@@ -128,12 +147,16 @@ class SoundService {
     // Browsers refuse audio before the first tap; effects follow taps, so
     // this is where blocked music gets going.
     if (kIsWeb) _applyMusic();
-    if (!sfxOn.value) return;
+    if (!sfxOn.value || !_foreground) return;
     final now = DateTime.now();
     final last = _last[name];
     // Rapid repeats (planting a row in plant mode) collapse a little.
     if (last != null && now.difference(last).inMilliseconds < 60) return;
     _last[name] = now;
+    if (_native.contains(name)) {
+      _sfx.invokeMethod<void>('play', {'n': name, 'v': volume}).catchError((Object _) {});
+      return;
+    }
     _pools[name]?.start(volume);
   }
 

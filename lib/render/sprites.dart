@@ -60,20 +60,32 @@ class Sprites {
 
   /// Loads every sprite in the asset bundle. Never throws.
   static Future<void> load() async {
+    Future<void> one(String f) async {
+      try {
+        final data = await rootBundle.load(f);
+        final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+        final frame = await codec.getNextFrame();
+        final key = f.substring('assets/sprites/'.length, f.length - 4);
+        _img[key] = frame.image;
+        final m = await _maskOf(frame.image);
+        if (m != null) _mask[key] = m;
+      } catch (_) {}
+    }
+
     try {
       final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
-      final files = manifest.listAssets().where((a) => a.startsWith('assets/sprites/') && a.endsWith('.png'));
-      await Future.wait(files.map((f) async {
-        try {
-          final data = await rootBundle.load(f);
-          final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-          final frame = await codec.getNextFrame();
-          final key = f.substring('assets/sprites/'.length, f.length - 4);
-          _img[key] = frame.image;
-          final m = await _maskOf(frame.image);
-          if (m != null) _mask[key] = m;
-        } catch (_) {}
-      }));
+      final files = manifest.listAssets().where((a) => a.startsWith('assets/sprites/') && a.endsWith('.png')).toList();
+      // A few at a time: decoding all ~250 at once (and reading each back
+      // from the GPU for its tap mask) swamped weak phones' GPU and memory
+      // at start-up — "GPU not responding" ANRs in Play Console.
+      var next = 0;
+      Future<void> worker() async {
+        while (next < files.length) {
+          await one(files[next++]);
+        }
+      }
+
+      await Future.wait([for (var i = 0; i < 3; i++) worker()]);
     } catch (_) {}
     try {
       final j = jsonDecode(await rootBundle.loadString('assets/sprites/tweaks.json')) as Map<String, dynamic>;
