@@ -461,3 +461,14 @@ Chưa có ảnh thì game vẽ tạm bằng code. Nên làm trước những th�
 | `thuyen_nan` | A Vietnamese round woven bamboo basket boat (thuyền thúng / thuyền nan) resting on the grass, dark brown with a tar coating, a wooden paddle leaning on it: no base tile. |
 | `binh_gom` | A tall Bát Tràng blue-and-white ceramic vase with painted patterns and a bunch of red and yellow flowers in it, standing directly on the ground: no base tile. |
 | `xe_bo` | A Vietnamese ox cart, two tiles long: a wooden cart with two big spoked wheels loaded with jute rice sacks, pulled by a brown ox with curved horns facing the lower-right, standing directly on the ground: no base tile. |
+
+## Đợt 16 (bản 1.9) — người chèo đò và hai em bé
+
+Một đánh giá 4★ chê người dân vẽ bằng code (nhất là người chèo đò). Ba ảnh này thay nốt những người còn vẽ bằng code. Cách làm như đợt 13 (dán ảnh mẫu, câu mở đầu + **PHONG CÁCH** + lời nhắc riêng). `tre_tha_dieu` và `tre_chay` dùng lời nhắc ở đợt 13.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `thuyen_cheo` | A small Vietnamese wooden river sampan (thuyền ba lá) seen in the same isometric 3/4 view, the boat lying diagonally from upper-left to lower-right, dark brown wood, a few round woven baskets of vegetables and rice in the middle, and a cute chibi Vietnamese boatman in a conical hat (nón lá) and brown clothes standing at the upper-left end, pushing a long bamboo pole down into the water. Boat and boatman only: no water, no base tile. |
+| `tre_tha_dieu` | (xem đợt 13) |
+| `tre_chay` | (xem đợt 13) |
+

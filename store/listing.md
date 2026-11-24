@@ -67,6 +67,12 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.9.0, ≤ 500 ký tự)
+🎣 Câu cá thả ga: hết lượt chính vẫn câu tiếp được, cá bán ngay tại bờ.
+🏆 Đua top câu cá: mỗi con cá được điểm, cá càng khó càng nhiều điểm, bảng xếp hạng mới mỗi tuần.
+🎁 Quà xếp hạng: hết tuần, top 30 sự kiện tuần và đua top câu cá đều nhận xu, kinh nghiệm và Vé Xong ngay.
+Sửa lỗi game thỉnh thoảng bị đứng khi chạm, mở game nhẹ hơn trên máy yếu.
+
 ## Có gì mới (bản 1.8.1, ≤ 500 ký tự)
 Sửa lỗi game thỉnh thoảng bị đứng, không phản hồi khi chạm (đặc biệt lúc mở game và khi có nhiều tiếng động). Âm thanh mượt hơn, mở game nhẹ hơn trên máy yếu.
 
@@ -101,6 +107,12 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.9.0, en-US)
+🎣 Fish as much as you like: after the daily casts you can keep fishing, the catch is sold on the bank.
+🏆 Fishing race: every fish scores, harder fish score more, a new leaderboard every week.
+🎁 Leaderboard prizes: when the week ends, the top 30 of the weekly event and the fishing race get coins, XP and instant-finish tickets.
+Fixed occasional freezes on tap and a lighter start on low-end phones.
 
 ## What's new (1.8.1, en-US)
 Fixed the game occasionally freezing and not responding to taps (mainly at start-up and during busy sound). Smoother sound and a lighter start on low-end phones.

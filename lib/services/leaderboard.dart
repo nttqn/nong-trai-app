@@ -151,6 +151,7 @@ class Leaderboard extends ChangeNotifier {
     if (v) {
       await withdraw();
       await WeekBoard.instance.withdraw(f.weekKey);
+      await WeekBoard.fishing.withdraw(f.fishWeek);
     } else {
       await submit(f, force: true);
     }

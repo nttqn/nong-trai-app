@@ -144,6 +144,17 @@ class Farm {
   int weekKey = 0, weekPts = 0, weekClaimed = 0, weekCarried = 0;
   /// Câu cá (farm_river.dart): the day, casts used and ads watched.
   int riverDay = 0, riverUsed = 0, riverAds = 0;
+  /// Đua top câu cá (1.9.0): the week, its fishing points (every landed
+  /// catch, daily casts or not), and the day + coins of casts past the
+  /// daily ones (capped, farm_river.dart).
+  int fishWeek = 0, fishPts = 0, riverFunDay = 0, riverFunCoins = 0;
+  /// Coins the last fun catch sold for (not saved; the fishing sheet says it).
+  int lastFunCoins = 0;
+  /// Weekly leaderboards whose place prize is still to be looked up
+  /// (services/rank_prizes.dart): [board, week, points], board 0 = the
+  /// weekly event, 1 = fishing. [rankDone]: the last week settled per board.
+  final List<List<int>> rankDue = [];
+  final List<int> rankDone = [0, 0];
   /// Ký ức làng quê: 1 = opened, not read yet; 2 = read (gift taken).
   final Map<String, int> mem = {};
   /// Memories opened while playing, for the "ký ức mới" card (not saved).
@@ -1306,6 +1317,7 @@ class Farm {
     rollDaily();
     rollFestival();
     if (weekOpen) rollWeek();
+    if (level >= FarmRiver.riverLevel) rollFish();
     settleYard();
     checkMemories();
     final t = now();
@@ -1418,6 +1430,8 @@ class Farm {
         if (mem.isNotEmpty) 'mem': mem,
         if (weekKey != 0) 'week': [weekKey, weekPts, weekClaimed],
         if (riverDay != 0) 'river': [riverDay, riverUsed, riverAds],
+        if (fishWeek != 0 || riverFunDay != 0) 'fishw': [fishWeek, fishPts, riverFunDay, riverFunCoins],
+        if (rankDue.isNotEmpty || rankDone[0] != 0 || rankDone[1] != 0) 'rank': {'due': rankDue, 'done': rankDone},
         if (yard.isNotEmpty)
           'yard': {'g': yard, 'd': yardDry, 't': yardT, 'w': yardWet, 'l': yardLost, 'c': yardCover},
       };
@@ -1517,6 +1531,25 @@ class Farm {
         f.riverDay = (rv[0] as num).toInt();
         f.riverUsed = (rv[1] as num).toInt();
         f.riverAds = (rv[2] as num).toInt();
+      }
+      final fw = j['fishw'] as List?;
+      if (fw != null && fw.length >= 4) {
+        f.fishWeek = (fw[0] as num).toInt();
+        f.fishPts = (fw[1] as num).toInt();
+        f.riverFunDay = (fw[2] as num).toInt();
+        f.riverFunCoins = (fw[3] as num).toInt();
+      }
+      final rk = j['rank'] as Map?;
+      if (rk != null) {
+        for (final d in (rk['due'] as List? ?? const [])) {
+          final l = [for (final v in d as List) (v as num).toInt()];
+          if (l.length == 3) f.rankDue.add(l);
+        }
+        final dn = rk['done'] as List?;
+        if (dn != null && dn.length == 2) {
+          f.rankDone[0] = (dn[0] as num).toInt();
+          f.rankDone[1] = (dn[1] as num).toInt();
+        }
       }
       final y = j['yard'] as Map?;
       if (y != null) {

@@ -7,10 +7,8 @@ import '../core/defs.dart';
 import '../core/farm.dart';
 import '../core/weekly.dart';
 import '../render/farm_painter.dart';
-import '../services/cloud.dart';
-import '../services/leaderboard.dart';
 import '../services/week_board.dart';
-import 'leaderboard_sheet.dart' show askFarmName;
+import 'board_view.dart';
 import 'sheets.dart' show Report;
 import 'widgets.dart';
 
@@ -31,9 +29,6 @@ class WeekSheet extends StatefulWidget {
 
 class _WeekSheetState extends State<WeekSheet> {
   Farm get f => widget.farm;
-  List<WeekRow>? _rows;
-  int? _rank;
-  String? _error;
   int _carried = 0;
 
   @override
@@ -42,31 +37,6 @@ class _WeekSheetState extends State<WeekSheet> {
     f.rollWeek();
     _carried = f.weekCarried;
     f.weekCarried = 0;
-    _load();
-  }
-
-  Future<void> _load() async {
-    final cs = CloudSave.instance;
-    if (!cs.available) {
-      setState(() => _error = 'Bảng xếp hạng tuần cần kết nối máy chủ.');
-      return;
-    }
-    try {
-      await WeekBoard.instance.submit(f);
-      final rows = await WeekBoard.instance.top(f.weekNow);
-      int? rank;
-      if (cs.user != null && f.name.isNotEmpty && f.weekPts > 0 && !Leaderboard.instance.hidden) {
-        rank = await WeekBoard.instance.rankOf(f.weekNow, f.weekPts);
-      }
-      if (!mounted) return;
-      setState(() {
-        _rows = rows;
-        _rank = rank;
-        _error = null;
-      });
-    } catch (_) {
-      if (mounted) setState(() => _error = 'Không tải được bảng xếp hạng tuần, thử lại sau.');
-    }
   }
 
   @override
@@ -106,9 +76,11 @@ class _WeekSheetState extends State<WeekSheet> {
           const SizedBox(height: 10),
           for (var i = 0; i < t.targets.length; i++) _milestone(t, i),
           const SizedBox(height: 6),
+          RankPrizeList(f),
+          const SizedBox(height: 10),
           const Text('🏆 Bảng xếp hạng tuần', style: TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15.5)),
           const SizedBox(height: 4),
-          ..._board(),
+          BoardList(f, WeekBoard.instance, firstHint: 'Kiếm điểm đầu tiên để có tên trên bảng.'),
         ]),
       ),
     ]);
@@ -165,61 +137,6 @@ class _WeekSheetState extends State<WeekSheet> {
             widget.report(f.claimWeek(), ok: top ? 'Nhận ${bdef(t.deco).name}! Đặt ở Xây dựng → Trang trí' : 'Đã nhận quà mốc ${i + 1}');
             setState(() {});
           }),
-      ]),
-    );
-  }
-
-  List<Widget> _board() {
-    final cs = CloudSave.instance;
-    final hint = cs.user == null
-        ? 'Đăng nhập Google (☰ → Lưu trữ đám mây) để lên bảng xếp hạng tuần.'
-        : f.name.isEmpty
-            ? 'Đặt tên nông trại để lên bảng xếp hạng tuần.'
-            : Leaderboard.instance.hidden
-                ? 'Bạn đang ẩn tên khỏi bảng xếp hạng.'
-                : f.weekPts == 0
-                    ? 'Kiếm điểm đầu tiên để có tên trên bảng.'
-                    : _rank != null
-                        ? 'Bạn đang đứng thứ $_rank tuần này.'
-                        : null;
-    return [
-      if (hint != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Row(children: [
-            Expanded(child: Text(hint, style: const TextStyle(fontSize: 12.5, color: brownLight, fontWeight: FontWeight.w700))),
-            if (cs.user != null && f.name.isEmpty)
-              PillButton('Đặt tên', dense: true, onTap: () async {
-                if (await askFarmName(context, f)) _load();
-              }),
-          ]),
-        ),
-      if (_error != null)
-        Text(_error!, style: const TextStyle(color: brownLight))
-      else if (_rows == null)
-        const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator()))
-      else if (_rows!.isEmpty)
-        const Text('Chưa ai có điểm tuần này. Hãy là người đầu tiên!', style: TextStyle(color: brownLight))
-      else
-        for (final (i, r) in _rows!.indexed) _row(i + 1, r),
-    ];
-  }
-
-  Widget _row(int place, WeekRow r) {
-    final me = r.uid == WeekBoard.instance.myUid;
-    final medal = place <= 3 ? const ['🥇', '🥈', '🥉'][place - 1] : '$place';
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: cardDeco(color: me ? const Color(0xFFFFF0C9) : Colors.white),
-      child: Row(children: [
-        SizedBox(width: 30, child: Text(medal, style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 15))),
-        Expanded(
-          child: Text(r.name,
-              maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, color: brown)),
-        ),
-        Text('Cấp ${r.level}  ', style: const TextStyle(fontSize: 12, color: brownLight)),
-        Text(fmtNum(r.pts), style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFD84315))),
       ]),
     );
   }

@@ -36,6 +36,7 @@ import 'extras.dart';
 import 'leaderboard_sheet.dart';
 import 'world_map.dart';
 import '../services/neighbors.dart';
+import '../services/rank_prizes.dart';
 import 'paid_sheet.dart';
 import 'panels.dart';
 import 'quest_sheet.dart';
@@ -106,6 +107,8 @@ class _FarmScreenState extends State<FarmScreen>
             _openWeek();
           case 'river':
             _openRiver();
+          case 'fish':
+            showFarmSheet(context, (_) => FishBoardSheet(farm), height: .86);
         }
       });
     }
@@ -121,6 +124,7 @@ class _FarmScreenState extends State<FarmScreen>
     CloudSave.instance.addListener(_onCloud);
     Neighbors.instance.addListener(_onNeighbors);
     PurchaseService.instance.message.addListener(_onPurchaseMessage);
+    RankPrizes.instance.news.addListener(_onRankNews);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onCloud();
       _loadErrorNotice();
@@ -165,6 +169,7 @@ class _FarmScreenState extends State<FarmScreen>
     CloudSave.instance.removeListener(_onCloud);
     Neighbors.instance.removeListener(_onNeighbors);
     PurchaseService.instance.message.removeListener(_onPurchaseMessage);
+    RankPrizes.instance.news.removeListener(_onRankNews);
     _ticker.dispose();
     _hud?.cancel();
     _toastTimer?.cancel();
@@ -180,6 +185,7 @@ class _FarmScreenState extends State<FarmScreen>
     } else if (s == AppLifecycleState.resumed) {
       NotifyService.instance.cancelAll();
       Neighbors.instance.pull(farm);
+      RankPrizes.instance.settle(farm);
       _maybeLoginGift();
     }
   }
@@ -230,6 +236,14 @@ class _FarmScreenState extends State<FarmScreen>
       _say(ok);
     }
     setState(() {});
+  }
+
+  /// A weekly leaderboard place prize was given.
+  void _onRankNews() {
+    final m = RankPrizes.instance.news.value;
+    if (m == null || !mounted) return;
+    RankPrizes.instance.news.value = null;
+    _say(m);
   }
 
   void _say(String s, {bool error = false}) {

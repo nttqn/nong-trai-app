@@ -113,6 +113,13 @@ class _BootState extends State<_Boot> {
               }
             }
           }
+          // ?fun=1: today's daily casts used up, some fishing points
+          if (q['fun'] != null) {
+            f.riverDay = Farm.dayKey(f.now());
+            f.riverUsed = 99;
+            f.rollFish();
+            f.fishPts = 37;
+          }
           if (q['memcard'] != null) {
             f.tickOrders();
             f.mem[q['memcard']!] = 1;

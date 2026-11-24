@@ -126,7 +126,8 @@ void main() {
       for (var i = 0; i < FarmRiver.riverFree; i++) {
         expect(f.cast().$1, isNotNull);
       }
-      expect(f.cast().$2, isNotNull);
+      expect(f.riverFun, isTrue);
+      expect(f.cast().$1!.fun, isTrue, reason: 'past the daily casts the line still goes in (1.9.0)');
       expect(f.riverAdLeft, isTrue);
       for (var i = 0; i < FarmRiver.riverAdMax; i++) {
         f.riverAdGranted();

@@ -682,6 +682,15 @@ void _boat(Canvas c, Iso iso, double t, Rect shown) {
     final w = iso.p(bx - fwd * (.7 + q * 1.2), y);
     ovalStroke(c, w, 6 + q * 10, 2 + q * 3, Color.fromRGBO(255, 255, 255, .35 * (1 - q)), .8);
   }
+  // painted boat and boatman (art batch 16, 1.9.0: a review asked for
+  // nicer villagers, the boatman by name). Lies along the river's
+  // diagonal; a sampan is poled either way, so it is never flipped.
+  if (Sprites.has('thuyen_cheo')) {
+    final a = iso.p(bx - .7, y), b = iso.p(bx + .7, y);
+    final bottom = Offset((a.dx + b.dx) / 2, math.max(a.dy, b.dy) + 2 + rock);
+    Sprites.at(c, 'thuyen_cheo', bottom, (b.dx - a.dx).abs() * 1.25);
+    return;
+  }
   List<Offset> hull(double z, double half, double wide) => [
         iso.p(bx - half, y, z),
         iso.p(bx - half * .65, y - wide, z),

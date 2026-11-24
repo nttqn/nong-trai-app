@@ -13,6 +13,7 @@ import '../core/farm.dart';
 import '../core/sync_plan.dart';
 import 'analytics.dart';
 import 'leaderboard.dart';
+import 'rank_prizes.dart';
 import 'week_board.dart';
 import '../core/weekly.dart' show weekKeyOf;
 import 'market.dart';
@@ -205,6 +206,7 @@ class CloudSave extends ChangeNotifier {
           Neighbors.instance.setMyName(cur.name);
           unawaited(Neighbors.instance.publish(cur));
           unawaited(Neighbors.instance.pull(cur, force: true));
+          unawaited(RankPrizes.instance.settle(cur));
         }
       }
     } catch (e) {
@@ -227,6 +229,7 @@ class CloudSave extends ChangeNotifier {
     await _markSynced(f.savedAt);
     await Leaderboard.instance.submit(f);
     await WeekBoard.instance.submit(f);
+    await WeekBoard.fishing.submit(f);
     Neighbors.instance.setMyName(f.name);
     await Neighbors.instance.publish(f);
   }
@@ -309,6 +312,7 @@ class CloudSave extends ChangeNotifier {
     if (!available || user == null) return;
     await Leaderboard.instance.withdraw();
     await WeekBoard.instance.withdraw(weekKeyOf(DateTime.now().millisecondsSinceEpoch));
+    await WeekBoard.fishing.withdraw(weekKeyOf(DateTime.now().millisecondsSinceEpoch));
     await Neighbors.instance.withdraw();
     await Market.instance.removeAll(user!.uid);
     try {
@@ -334,6 +338,7 @@ class CloudSave extends ChangeNotifier {
     try {
       await Leaderboard.instance.withdraw();
       await WeekBoard.instance.withdraw(weekKeyOf(DateTime.now().millisecondsSinceEpoch));
+      await WeekBoard.fishing.withdraw(weekKeyOf(DateTime.now().millisecondsSinceEpoch));
       await Neighbors.instance.withdraw();
       await Market.instance.removeAll(u.uid);
       await _doc.delete();
