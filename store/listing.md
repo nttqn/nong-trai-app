@@ -67,6 +67,9 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.8.1, ≤ 500 ký tự)
+Sửa lỗi game thỉnh thoảng bị đứng, không phản hồi khi chạm (đặc biệt lúc mở game và khi có nhiều tiếng động). Âm thanh mượt hơn, mở game nhẹ hơn trên máy yếu.
+
 ## Có gì mới (bản 1.8.0, ≤ 500 ký tự)
 Sự kiện tuần: mỗi tuần một chủ đề (được mùa, chăn nuôi, trái cây, ao cá, làng nghề, giao hàng), 5 mốc quà, bảng xếp hạng tuần, mốc cuối tặng đồ trang trí riêng.
 Câu cá ngoài sông: chạm vào dòng sông, canh phao rồi giật cần.
@@ -98,6 +101,9 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.8.1, en-US)
+Fixed the game occasionally freezing and not responding to taps (mainly at start-up and during busy sound). Smoother sound and a lighter start on low-end phones.
 
 ## What's new (1.8.0, en-US)
 Weekly events: a new theme every week (harvest, livestock, fruit, fish, crafts, deliveries) with 5 reward milestones, a weekly leaderboard and an exclusive decoration at the top.
