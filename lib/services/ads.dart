@@ -11,7 +11,8 @@ import 'analytics.dart';
 /// pen or workshop; double level-up coins) and a rare interstitial after
 /// delivering an order, plus an App Open ad when the player comes back.
 ///
-/// Android uses the game's own AdMob units; iOS still uses Google samples
+/// Android uses the game's own AdMob units; iOS its own App Open and Google
+/// samples for rewarded and interstitial
 /// (App ID in android/app/build.gradle.kts). A no-op on web and in tests;
 /// any ad failure just means "no ad", never a blocked game.
 class AdsService with WidgetsBindingObserver {
@@ -25,13 +26,15 @@ class AdsService with WidgetsBindingObserver {
       !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
   static bool get _ios => defaultTargetPlatform == TargetPlatform.iOS;
 
-  // Android: the game's own units. iOS: Google samples (no iOS app yet).
+  // Android: the game's own units. iOS: own App Open; rewarded and
+  // interstitial still Google samples.
   static String get rewardedUnit =>
       _ios ? 'ca-app-pub-3940256099942544/1712485313' : 'ca-app-pub-9078637596840810/6352898077';
   static String get interstitialUnit =>
       _ios ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-9078637596840810/5042851680';
 
-  static String get appOpenUnit => _ios ? '' : 'ca-app-pub-9078637596840810/5039816409';
+  static String get appOpenUnit =>
+      _ios ? 'ca-app-pub-9078637596840810/3039185043' : 'ca-app-pub-9078637596840810/5039816409';
 
   /// App Open: on a cold start (if the ad loads within [appOpenColdWait])
   /// and when coming back after [appOpenAway] in the background; never
