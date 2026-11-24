@@ -49,6 +49,9 @@ final optional = [
   // batch 9: drying yard states and festival gifts
   'san_phoi', 'san_phoi_thoc', 'san_phoi_bat', 'san_phoi_kho',
   'cay_neu', 'den_long', 'cay_du', 'gio_qua', 'chau_sen', 'den_ong_sao', 'coi_gia',
+  // batch 15: decorations and weekly event gifts (1.8.0)
+  'hang_rao', 'duong_gach', 'chong_tre', 'cong_ngo', 'gian_hoa', 'cot_den', 'ao_sen', 'cay_mai', 'hon_non_bo',
+  'bo_lua', 'o_ga', 'gian_bau', 'thuyen_nan', 'binh_gom', 'xe_bo',
 ];
 
 /// Max width by on-map size: about 3x the largest zoom on a 3x phone.
@@ -61,7 +64,7 @@ int maxWidthFor(String key) {
   if (key.startsWith('item_') || key == 'cho_thuc' || key == 'cho_ngu') return 128;
   if (key == 'ho_sen') return 768; // one picture for the whole lake
   if (key.startsWith('cau_') || key.startsWith('san_phoi') || key == 'cay_du') return 400;
-  if (key == 'nha_tam' || key == 'ham_chua') return 400;
+  if (key == 'nha_tam' || key == 'ham_chua' || key == 'ao_sen' || key == 'xe_bo') return 400;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',

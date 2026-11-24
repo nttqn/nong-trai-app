@@ -97,5 +97,38 @@
   },
   "nguoi_ganh": {
     "flip": true
+  },
+  "cot_den": {
+    "scale": 0.42
+  },
+  "binh_gom": {
+    "scale": 0.5
+  },
+  "thuyen_nan": {
+    "scale": 0.7
+  },
+  "bo_lua": {
+    "scale": 0.6
+  },
+  "cay_mai": {
+    "scale": 0.75
+  },
+  "gian_hoa": {
+    "scale": 0.85
+  },
+  "hang_rao": {
+    "scale": 0.9
+  },
+  "hon_non_bo": {
+    "scale": 0.8
+  },
+  "o_ga": {
+    "scale": 0.6
+  },
+  "chong_tre": {
+    "scale": 0.85
+  },
+  "thuyen_cheo": {
+    "scale": 1.15
   }
 }

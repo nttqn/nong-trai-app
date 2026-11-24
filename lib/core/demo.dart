@@ -207,14 +207,15 @@ void demoFestivalDecos(Farm f) {
 
 /// The 1.8.0 decorations (sold and weekly-event gifts) placed together
 /// (?decos on web demos), for checking their drawings.
-void demoNewDecos(Farm f) {
+void demoNewDecos(Farm f, {bool spaced = false}) {
   const sold = ['hang_rao', 'duong_gach', 'chong_tre', 'cong_ngo', 'gian_hoa', 'cot_den', 'ao_sen', 'cay_mai', 'hon_non_bo'];
   f.level = math.max(f.level, 20);
   f.coins += 100000;
   for (final d in [...sold, ...eventDecos]) {
     if (eventDecos.contains(d)) f.giftDeco[d] = 1;
     for (var i = 0; i < mapSize * mapSize; i++) {
-      final x = 1 + i % 14, y = 12 + i ~/ 14;
+      // spaced: one every other tile, for sizing art against each other
+      final x = spaced ? 1 + i % 7 * 2 : 1 + i % 14, y = spaced ? 12 + i ~/ 7 * 2 : 12 + i ~/ 14;
       if (f.canPlace(d, x, y) && f.build(d, x, y) == null) break;
     }
   }
