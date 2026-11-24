@@ -475,7 +475,7 @@ Một đánh giá 4★ chê người dân vẽ bằng code (nhất là người 
 
 ## Đợt 17 (bản 1.10) — nhà thờ họ và hai kho mới
 
-Nhà chính có thêm kiểu thứ 6, nhà kho thêm 2 cấp. Chưa có ảnh thì game dùng tạm ảnh `nha_4` / `nha_kho_2`. Cách làm như đợt 3 (cùng phong cách, cùng góc nhìn).
+Đã có ảnh (2026-11-24). Nhà chính có thêm kiểu thứ 6 (chỉ nhà chính, nhà con cháu dừng ở Biệt thự), nhà kho thêm 2 cấp. Cách làm như đợt 3 (cùng phong cách, cùng góc nhìn).
 
 | Tên file | Lời nhắc riêng |
 |---|---|

@@ -438,10 +438,10 @@ class Farm {
 
   /// An extra house can go one style up, but never past the main house.
   HouseLevel? nextExtraHouse(Obj o) =>
-      o.level + 1 < houseLevels.length && o.level + 1 <= houseLevel ? houseLevels[o.level + 1] : null;
+      o.level < extraHouseMaxLevel && o.level + 1 <= houseLevel ? houseLevels[o.level + 1] : null;
 
   String? upgradeExtraHouse(Obj o) {
-    if (o.level + 1 >= houseLevels.length) return 'Nhà đã nâng cấp tối đa';
+    if (o.level >= extraHouseMaxLevel) return 'Nhà đã nâng cấp tối đa';
     final n = nextExtraHouse(o);
     if (n == null) return 'Nâng cấp nhà chính trước đã';
     if (level < n.level) return 'Cần đạt cấp ${n.level}';

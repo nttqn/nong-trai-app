@@ -45,15 +45,17 @@ void main() {
     expect(f.upgradeExtraHouse(o), isNull);
     expect(o.level, 1);
     expect(f.storageCap, greaterThan(before));
-    // all the way up to nhà thờ họ (1.10): as much as the main house
+    // up to Biệt thự (Nhà thờ họ is the main house's alone): as much as it holds
     while (f.nextHouse != null) {
       expect(f.upgradeHouse(), isNull);
     }
     while (f.nextExtraHouse(o) != null) {
       expect(f.upgradeExtraHouse(o), isNull);
     }
-    expect(o.level, houseLevels.length - 1);
-    expect(f.extraHouseCap(o), houseLevels.last.storage);
+    expect(f.houseLevel, houseLevels.length - 1);
+    expect(o.level, extraHouseMaxLevel);
+    expect(f.upgradeExtraHouse(o), contains('tối đa'));
+    expect(f.extraHouseCap(o), houseLevels[extraHouseMaxLevel].storage);
     // saved and loaded
     final g = Farm.fromJson(f.toJson(), now: () => 1000);
     expect(g.extraHouseCount, 3);

@@ -316,7 +316,7 @@ const buildings = <String, BuildingDef>{
   'cay_vai': BuildingDef('cay_vai', 'Cây vải', BKind.tree, 1, 1, 17, 1300),
   'nha': BuildingDef('nha', 'Nhà', BKind.house, 3, 3, 1, 0, unique: true),
   'nha_phu': BuildingDef('nha_phu', 'Nhà con cháu', BKind.house, 3, 3, 20, 30000, xp: 300,
-      desc: 'Nhà cho con cháu ra ở riêng: chứa thêm bằng một căn nhà chính cùng kiểu (ít nhất 100) và con cháu phụ giao hàng (+8% xu mỗi đơn). Nâng cấp được như nhà chính.'),
+      desc: 'Nhà cho con cháu ra ở riêng: chứa thêm bằng một căn nhà chính cùng kiểu (ít nhất 100) và con cháu phụ giao hàng (+8% xu mỗi đơn). Nâng cấp được tới Biệt thự nhà vườn.'),
   'san_phoi': BuildingDef('san_phoi', 'Sân phơi thóc', BKind.deco, 2, 2, 3, 250, xp: 5, unique: true,
       desc: 'Gặt lúa xong đem thóc ra phơi: khô rồi được thêm 50%. Trời mưa nhớ cất thóc!'),
   // festival decorations (given by lễ hội, see core/calendar.dart)
@@ -533,6 +533,8 @@ const extraHouseBuildCost = [30000, 80000, 180000];
 /// [extraHouseMinStorage]), and adds this share to order coins. Until 1.10
 /// it was half the storage at 60k/180k/450k, and nobody built one.
 const extraHouseStorage = 1.0, extraHouseMinStorage = 100, extraHouseOrderBonus = .08;
+/// Nhà con cháu go up to Biệt thự nhà vườn; Nhà thờ họ is the main house's alone.
+const extraHouseMaxLevel = 4;
 
 /// At most this many warehouses; each one built costs more.
 const warehouseMax = 3;

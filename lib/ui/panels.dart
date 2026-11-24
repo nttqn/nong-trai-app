@@ -467,7 +467,7 @@ class ObjPanel extends StatelessWidget {
 
   Widget _extraHouse() {
     final n = farm.nextExtraHouse(o);
-    final top = o.level + 1 >= houseLevels.length;
+    final top = o.level >= extraHouseMaxLevel;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Chứa thêm ${farm.extraHouseCap(o)} · Kho chung: ${farm.stored}/${farm.storageCap}',
           style: const TextStyle(color: brown, fontWeight: FontWeight.w700)),
