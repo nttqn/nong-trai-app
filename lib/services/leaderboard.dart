@@ -53,6 +53,13 @@ class LbEntry {
   }
 }
 
+/// A page of a board, and where the next one starts (null at the end).
+class LbPage {
+  const LbPage(this.rows, this.next);
+  final List<LbEntry> rows;
+  final Object? next;
+}
+
 /// The row a farm puts on the board.
 Map<String, Object> lbRow(Farm f) => {
       'name': f.name.length > 24 ? f.name.substring(0, 24) : f.name,
@@ -112,11 +119,40 @@ class Leaderboard extends ChangeNotifier {
     }
   }
 
-  Future<List<LbEntry>> top(LbBoard b, {int limit = 50}) async {
-    final snap = await _col.orderBy(b.field, descending: true).limit(limit).get().timeout(const Duration(seconds: 12));
-    return [
-      for (final d in snap.docs) ?LbEntry.fromDoc(d.id, d.data()),
-    ];
+  /// Rows per page of [top].
+  static const int pageSize = 50;
+
+  /// One page of [b] from the top: the first [pageSize] rows, or the ones
+  /// after [after] (the [LbPage.next] of the page before).
+  Future<LbPage> top(LbBoard b, {Object? after, int limit = pageSize}) async {
+    Query<Map<String, dynamic>> q = _col.orderBy(b.field, descending: true);
+    if (after is DocumentSnapshot) q = q.startAfterDocument(after);
+    final snap = await q.limit(limit).get().timeout(const Duration(seconds: 12));
+    return LbPage(
+      [for (final d in snap.docs) ?LbEntry.fromDoc(d.id, d.data())],
+      snap.docs.length == limit ? snap.docs.last : null,
+    );
+  }
+
+  /// The rows around [value] on [b]: up to [span] above it, then it and up
+  /// to [span] below. The caller numbers them from its place.
+  Future<(List<LbEntry> above, List<LbEntry> rest)> around(LbBoard b, int value, {int span = 10}) async {
+    final up = await _col
+        .where(b.field, isGreaterThan: value)
+        .orderBy(b.field)
+        .limit(span)
+        .get()
+        .timeout(const Duration(seconds: 12));
+    final down = await _col
+        .where(b.field, isLessThanOrEqualTo: value)
+        .orderBy(b.field, descending: true)
+        .limit(span + 1)
+        .get()
+        .timeout(const Duration(seconds: 12));
+    return (
+      [for (final d in up.docs.reversed) ?LbEntry.fromDoc(d.id, d.data())],
+      [for (final d in down.docs) ?LbEntry.fromDoc(d.id, d.data())],
+    );
   }
 
   /// 1-based place of [value] on [b] (players strictly ahead + 1).

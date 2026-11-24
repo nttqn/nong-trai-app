@@ -70,9 +70,40 @@ class WeekBoard {
     }
   }
 
-  Future<List<WeekRow>> top(int week, {int limit = 30}) async {
-    final snap = await _rows(week).orderBy('pts', descending: true).limit(limit).get().timeout(const Duration(seconds: 12));
-    return [for (final d in snap.docs) ?WeekRow.fromDoc(d.id, d.data())];
+  /// Rows per page of [top].
+  static const int pageSize = 50;
+
+  /// One page of [week]'s board from the top, or the rows after [after]
+  /// (the `next` of the page before; null at the end).
+  Future<(List<WeekRow> rows, Object? next)> top(int week, {Object? after, int limit = pageSize}) async {
+    Query<Map<String, dynamic>> q = _rows(week).orderBy('pts', descending: true);
+    if (after is DocumentSnapshot) q = q.startAfterDocument(after);
+    final snap = await q.limit(limit).get().timeout(const Duration(seconds: 12));
+    return (
+      [for (final d in snap.docs) ?WeekRow.fromDoc(d.id, d.data())],
+      snap.docs.length == limit ? snap.docs.last : null,
+    );
+  }
+
+  /// The rows around [pts] in [week]: up to [span] above, then it and up to
+  /// [span] below. The caller numbers them from its place.
+  Future<(List<WeekRow> above, List<WeekRow> rest)> around(int week, int pts, {int span = 10}) async {
+    final up = await _rows(week)
+        .where('pts', isGreaterThan: pts)
+        .orderBy('pts')
+        .limit(span)
+        .get()
+        .timeout(const Duration(seconds: 12));
+    final down = await _rows(week)
+        .where('pts', isLessThanOrEqualTo: pts)
+        .orderBy('pts', descending: true)
+        .limit(span + 1)
+        .get()
+        .timeout(const Duration(seconds: 12));
+    return (
+      [for (final d in up.docs.reversed) ?WeekRow.fromDoc(d.id, d.data())],
+      [for (final d in down.docs) ?WeekRow.fromDoc(d.id, d.data())],
+    );
   }
 
   /// 1-based place of [pts] this week.

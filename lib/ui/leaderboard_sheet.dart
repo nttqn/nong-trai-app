@@ -51,6 +51,17 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
   int? _myRank;
   String? _error;
   bool _loading = false;
+  int _req = 0;
+
+  /// Place of the first row: 1 from the top, else where "Vị trí của tôi"
+  /// starts.
+  int _start = 1;
+  bool _around = false;
+
+  /// Where the next page starts; null at the end or around this farm.
+  Object? _next;
+  bool _more = false;
+  final _meKey = GlobalKey();
 
   Farm get farm => widget.farm;
   Leaderboard get lb => Leaderboard.instance;
@@ -86,31 +97,86 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
       setState(() => _error = 'Bảng xếp hạng cần kết nối máy chủ, bản này chưa bật.');
       return;
     }
+    final req = ++_req;
     setState(() {
       _loading = true;
       _error = null;
+      _start = 1;
+      _around = false;
+      _next = null;
     });
     try {
       if (submit) await lb.submit(farm, force: true);
       final b = _board;
-      final rows = await lb.top(b);
+      final page = await lb.top(b);
       int? mine;
-      if (cs.user != null && !lb.hidden && farm.name.isNotEmpty) {
-        mine = await lb.rankOf(b, lbRow(farm)[b.field] as int);
-      }
-      if (!mounted || b != _board) return;
+      if (_onBoard) mine = await lb.rankOf(b, _mine(b));
+      if (!mounted || req != _req) return;
       setState(() {
-        _rows = rows;
+        _rows = page.rows;
+        _next = page.next;
         _myRank = mine;
         _loading = false;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || req != _req) return;
       setState(() {
         _loading = false;
         _error = 'Không tải được bảng xếp hạng, thử lại sau.';
       });
     }
+  }
+
+  bool get _onBoard => cs.user != null && !lb.hidden && farm.name.isNotEmpty;
+  int _mine(LbBoard b) => lbRow(farm)[b.field] as int;
+
+  /// The next [Leaderboard.pageSize] rows under those shown.
+  Future<void> _loadMore() async {
+    final rows = _rows;
+    if (_more || rows == null || _next == null) return;
+    final req = _req;
+    setState(() => _more = true);
+    try {
+      final page = await lb.top(_board, after: _next);
+      if (!mounted || req != _req) return;
+      setState(() {
+        _rows = [...rows, ...page.rows];
+        _next = page.next;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Không tải thêm được, thử lại sau.')));
+      }
+    }
+    if (mounted) setState(() => _more = false);
+  }
+
+  /// Rows around this farm's place, scrolled to it.
+  Future<void> _showMe() async {
+    final place = _myRank;
+    if (place == null || _more) return;
+    final req = ++_req;
+    setState(() => _more = true);
+    try {
+      final (above, rest) = await lb.around(_board, _mine(_board));
+      if (!mounted || req != _req) return;
+      setState(() {
+        _rows = [...above, ...rest];
+        _start = place - above.length;
+        _around = true;
+        _next = null;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final c = _meKey.currentContext;
+        if (c != null) Scrollable.ensureVisible(c, alignment: 0.4);
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Không tải được, thử lại sau.')));
+      }
+    }
+    if (mounted) setState(() => _more = false);
   }
 
   Future<void> _rename() async {
@@ -170,17 +236,28 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
       return const Center(child: Text('Chưa có ai trên bảng. Hãy là người đầu tiên!', style: TextStyle(color: brownLight)));
     }
     final me = cs.user?.uid;
+    final footer = _around || _next != null;
+    // the row standing for this farm when around it: its own, else the
+    // first at or under its value
+    var mineAt = -1;
+    if (_around) {
+      mineAt = rows.indexWhere((e) => e.uid == me);
+      if (mineAt < 0 && _myRank != null) mineAt = (_myRank! - _start).clamp(0, rows.length - 1);
+    }
     return RefreshIndicator(
       color: green,
       onRefresh: () => _load(),
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
-        itemCount: rows.length,
+        itemCount: rows.length + (footer ? 1 : 0),
         itemBuilder: (_, i) {
+          if (i == rows.length) return _moreButton();
           final e = rows[i];
           final mine = e.uid == me;
-          final medal = i < 3 ? const ['🥇', '🥈', '🥉'][i] : '${i + 1}';
+          final place = _start + i;
+          final medal = place <= 3 ? const ['🥇', '🥈', '🥉'][place - 1] : '$place';
           return Container(
+            key: i == mineAt ? _meKey : null,
             margin: const EdgeInsets.only(bottom: 5),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: cardDeco(color: mine ? const Color(0xFFFFF1C4) : Colors.white),
@@ -189,7 +266,10 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
                 width: 34,
                 child: Text(medal,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: i < 3 ? 20 : 14, fontWeight: FontWeight.w900, color: brownLight)),
+                    style: TextStyle(
+                        fontSize: place <= 3 ? 20 : (place >= 1000 ? 11.5 : 14),
+                        fontWeight: FontWeight.w900,
+                        color: brownLight)),
               ),
               const SizedBox(width: 6),
               Expanded(
@@ -205,6 +285,17 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
       ),
     );
   }
+
+  Widget _moreButton() => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Center(
+          child: _more
+              ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: green, strokeWidth: 2.5))
+              : _around
+                  ? PillButton('⬆ Về top', dense: true, color: brownLight, onTap: () => _load())
+                  : PillButton('Xem thêm ${Leaderboard.pageSize}', dense: true, color: brownLight, onTap: _loadMore),
+        ),
+      );
 
   Widget _footer() {
     final Widget body;
@@ -244,6 +335,8 @@ class _LeaderboardSheetState extends State<LeaderboardSheet> {
                 style: const TextStyle(color: brownLight, fontSize: 12.5)),
           ]),
         ),
+        if (_myRank != null && _rows != null && !_around && !lb.hidden)
+          PillButton('📍 Vị trí của tôi', dense: true, onTap: _more ? null : _showMe),
         IconButton(
           tooltip: 'Đổi tên',
           onPressed: _rename,

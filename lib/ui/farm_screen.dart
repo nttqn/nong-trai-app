@@ -75,6 +75,10 @@ class _FarmScreenState extends State<FarmScreen>
   int _lastRev = -1;
   final List<int> _levelUps = [];
   bool _moonHinted = false;
+  // the HUD's real height (rows come and go: event, fishing), so the moon
+  // always hangs below the buttons
+  final _hudKey = GlobalKey();
+  double _hudH = 0;
 
   @override
   void initState() {
@@ -980,7 +984,7 @@ class _FarmScreenState extends State<FarmScreen>
                   child: const SizedBox(width: 52, height: 52),
                 ),
               ),
-            Positioned(left: 0, right: 0, top: 0, child: SafeArea(child: _hudBar())),
+            Positioned(left: 0, right: 0, top: 0, child: SafeArea(key: _hudKey, child: _hudBar())),
             if (_toast != null)
               Positioned(
                 left: 24,
@@ -1035,9 +1039,16 @@ class _FarmScreenState extends State<FarmScreen>
         ),
       );
 
-  /// Where the moon hangs: top right, below the HUD.
-  Offset _moonAt(BuildContext context, Size screen) =>
-      Offset(screen.width - 50, MediaQuery.of(context).padding.top + 172);
+  /// Where the moon hangs: top right, below the HUD's buttons.
+  Offset _moonAt(BuildContext context, Size screen) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final h = _hudKey.currentContext?.size?.height ?? 0;
+      if (h > 0 && (h - _hudH).abs() > .5) setState(() => _hudH = h);
+    });
+    final top = _hudH > 0 ? _hudH : MediaQuery.of(context).padding.top + 210;
+    return Offset(screen.width - 50, top + 40);
+  }
 
   void _tapMoon() {
     final day = moonDayAt(farm.now());
