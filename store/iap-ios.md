@@ -58,5 +58,5 @@ Farmer Card is consumable; buying it again while active adds 30 more days.
 
 1. Paid Apps Agreement + thuế + ngân hàng đã "Active" trong ASC → Business (đã có từ Kiếm Hiệp).
 2. Mỗi sản phẩm: đủ 2 ngôn ngữ + Review Screenshot → trạng thái "Ready to Submit".
-3. Trang version 1.9.0: mục **In-App Purchases and Subscriptions** → chọn cả 4 sản phẩm, nộp cùng build (thiếu là bị 3.1.1).
+3. Trang version 1.10.0: mục **In-App Purchases and Subscriptions** → chọn cả 4 sản phẩm, nộp cùng build (thiếu là bị 3.1.1).
 4. Build iOS phải có commit đổi mã `mlc_`; build cũ hơn sẽ không tìm thấy sản phẩm nào.

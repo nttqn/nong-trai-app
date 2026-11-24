@@ -1,8 +1,8 @@
-# App Store Connect – Mùa Lúa Chín (bản iOS đầu tiên 1.9.0)
+# App Store Connect – Mùa Lúa Chín (bản iOS đầu tiên 1.10.0)
 
 Giới hạn: Tên 30, Phụ đề 30, Văn bản quảng cáo 170, Từ khóa 100 (cách nhau dấu phẩy, không cần dấu cách), Mô tả 4000.
 Không dùng emoji (App Store báo "invalid characters"). Không nhắc Android / Google Play (2.3.10).
-Tên và phụ đề nằm ở App Information (theo từng ngôn ngữ); Mô tả, Từ khóa, Văn bản quảng cáo nằm ở trang phiên bản 1.9.0.
+Tên và phụ đề nằm ở App Information (theo từng ngôn ngữ); Mô tả, Từ khóa, Văn bản quảng cáo nằm ở trang phiên bản 1.10.0.
 Bản đầu tiên không có ô "Có gì mới".
 Thêm ngôn ngữ English (U.S.) ở thanh bên → "Thêm ngôn ngữ"; nếu không tải ảnh riêng, App Store dùng ảnh của tiếng Việt.
 
@@ -50,7 +50,7 @@ Cấy lúa, nuôi trâu, phơi thóc, gói bánh chưng và ăn Tết theo lịc
 ## Từ khóa (≤ 100, 93)
 nông trại,làm nông,trồng trọt,chăn nuôi,làng quê,lịch âm,câu cá,thư giãn,offline,farm,tết,lúa
 
-## Mô tả (≤ 4000, 3776)
+## Mô tả (≤ 4000, 3861)
 Về quê thôi! Cấy lúa, nuôi trâu, phơi thóc, gói bánh chưng và cùng cả xóm xây làng nông thôn mới trong Mùa Lúa Chín, nông trại thư thả mang đậm hồn làng quê Bắc Bộ.
 
 RUỘNG LÚA, VƯỜN RAU, AO CÁ
@@ -85,7 +85,7 @@ LÀNG NGHỀ VÀ CHỢ QUÊ
 - Chợ phiên: bày hàng lên sạp để người chơi khác mua.
 
 XÂY LÀNG NÔNG THÔN MỚI
-- Từ mái tranh vách đất lên nhà ngói, nhà ống, biệt thự nhà vườn; dựng nhà cho con cháu ra ở riêng.
+- Từ mái tranh vách đất lên nhà ngói, nhà ống, biệt thự nhà vườn rồi nhà thờ họ ba gian; dựng nhà cho con cháu ra ở riêng, nâng nhà kho lên kho bê tông, kho tổng để chứa thêm nông sản.
 - Góp công góp của xây giếng làng, cổng làng, đường bê tông, trạm bơm, trường mầm non, trạm y tế, chợ quê, đình làng. Mỗi công trình cho một lợi ích lâu dài.
 - Mua thêm đất, mở rộng tới 36 mảnh; hàng rào tre, ngõ gạch, giàn hoa giấy, ao sen, mai vàng để trang trí.
 
@@ -131,7 +131,7 @@ Plant rice, raise buffalo, dry the harvest and celebrate Tết on the lunar cale
 ## Keywords (≤ 100, 97)
 farm,farming,village,vietnam,rice,harvest,lunar,fishing,relaxing,offline,crops,animals,tet,family
 
-## Description (≤ 4000, 3993)
+## Description (≤ 4000, 3990)
 Head back to the countryside! Plant rice, raise water buffalo, dry the harvest in the sun, wrap Tết rice cakes and build up your village in Mùa Lúa Chín ("Ripe Rice Season"), a relaxing farm game full of the charm of rural northern Vietnam.
 
 PADDIES, GARDENS AND FISH PONDS
@@ -149,7 +149,7 @@ A REAL LUNAR CALENDAR
 
 DRY THE RICE BEFORE IT RAINS
 - Spread the harvested rice on the brick yard to dry for a bonus.
-- Dark clouds coming? Pull the tarp over it before the rain soaks it!
+- Dark clouds coming? Cover it before the rain!
 
 FESTIVALS ALL YEAR
 - Lunar New Year, the first full moon, the spring village festival, Đoan Ngọ, the seventh-month full moon, Mid-Autumn and the New Rice festival arrive on their real lunar dates.
@@ -165,7 +165,7 @@ CRAFTS AND THE VILLAGE MARKET
 - Fill villagers' orders and daily specials; sell spare goods to other players at the market.
 
 BUILD A NEW VILLAGE
-- Upgrade from a thatched hut to a garden villa, and build homes for your grown-up children.
+- Upgrade from a thatched hut to a garden villa and an ancestral house, build homes for your grown-up children and grow your barns into a big depot.
 - Build the village well, gate, concrete road, pump station, kindergarten, clinic, market and communal house, each with a lasting bonus.
 - Buy more land, up to 36 plots, and decorate with bamboo fences, brick paths, bougainvillea, lotus ponds and apricot blossoms.
 
@@ -180,7 +180,7 @@ VILLAGE MEMORIES
 
 A LIVELY VILLAGE
 - Villagers carry baskets on shoulder poles, cycle with flowers, a boy rides a buffalo playing his flute and a duck herder drives his flock down the road.
-- Farmers plant rice and hoe the beds; hens lead their chicks, ducks swim on the lotus lake and boats sail the river.
+- Hens lead their chicks, ducks swim on the lotus lake and boats sail the river.
 
 Plays offline. Optional Sign in with Apple or Google saves your farm to the cloud and lets you meet neighbours.
 
