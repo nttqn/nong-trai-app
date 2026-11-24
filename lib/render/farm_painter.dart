@@ -211,6 +211,9 @@ class FarmPainter extends CustomPainter {
       for (final a in villageLife(farm, iso, t, night: night, rain: rain))
         if (shown.contains(a.at)) a,
     ]..sort((a, b) => a.depth.compareTo(b.depth));
+    for (final o in list) {
+      if (isFlatObj(o) && shown.contains(iso.p(o.x + .5, o.y + .5))) drawObj(c, iso, farm, o, t);
+    }
     var li = 0;
     for (final o in list) {
       final d = depthOf(o);
@@ -218,7 +221,7 @@ class FarmPainter extends CustomPainter {
       while (li < life.length && life[li].depth < d) {
         life[li++].draw(c);
       }
-      if (!shown.contains(iso.p(o.x + o.w / 2, o.y + o.h / 2))) continue;
+      if (isFlatObj(o) || !shown.contains(iso.p(o.x + o.w / 2, o.y + o.h / 2))) continue;
       Sprites.rec = view.drawn[o.id] = [];
       drawObj(c, iso, farm, o, t);
     }

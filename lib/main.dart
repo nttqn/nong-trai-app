@@ -74,7 +74,11 @@ class _BootState extends State<_Boot> {
           if (q['yard'] == 'dry') f.yardDry = FarmSeason.yardNeedMs;
           if (q['yard'] == 'empty') f.yard.clear();
           if (q['fest'] != null) demoFestivalDecos(f);
-          if (q['decos'] != null) demoNewDecos(f, spaced: q['decos'] == '2');
+          if (q['decos'] == '3') {
+            demoBrickYard(f);
+          } else if (q['decos'] != null) {
+            demoNewDecos(f, spaced: q['decos'] == '2');
+          }
           // ?weekpts=N: points in this week's event
           if (q['weekpts'] != null) {
             f.rollWeek();

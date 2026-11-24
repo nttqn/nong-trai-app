@@ -9,6 +9,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../core/farm.dart';
+import '../render/sprites.dart';
 import '../services/ads.dart';
 import '../services/sound.dart';
 import '../services/week_board.dart';
@@ -434,13 +435,19 @@ class _RiverPainter extends CustomPainter {
       );
     }
     if (st == _St.result && s._good && s._bite != null) {
-      _text(
-        c,
-        s._bite!.icon,
-        fl + Offset(0, -10 - math.sin((t - s._stateAt).clamp(0, 1.5) * 2) * 30),
-        46,
-        Colors.white,
-      );
+      final at = fl + Offset(0, -10 - math.sin((t - s._stateAt).clamp(0, 1.5) * 2) * 30);
+      // the item's painted icon (batch 7 art) when there is one, else its emoji
+      final it = s._bite!.item, img = it == null ? null : Sprites.image('item_$it');
+      if (img != null) {
+        c.drawImageRect(
+          img,
+          Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+          Rect.fromCenter(center: at, width: 64, height: 64 * img.height / img.width),
+          Paint()..filterQuality = FilterQuality.medium,
+        );
+      } else {
+        _text(c, s._bite!.icon, at, 46, Colors.white);
+      }
     }
   }
 

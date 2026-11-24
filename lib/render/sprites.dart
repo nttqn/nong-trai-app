@@ -160,6 +160,25 @@ class Sprites {
     return true;
   }
 
+  /// Like [tile] but fills with the middle of the image only (inside its
+  /// painted diamond), so a run of these tiles (Ngõ lát gạch) reads as one
+  /// paved surface instead of separate slabs with their own edges.
+  static bool tileInner(Canvas c, String key, List<Offset> d) {
+    final img = _img[key];
+    if (img == null) return false;
+    final xs = [for (final p in d) p.dx], ys = [for (final p in d) p.dy];
+    xs.sort();
+    ys.sort();
+    final r = Rect.fromLTRB(xs.first, ys.first, xs.last, ys.last).inflate(.6);
+    final w = img.width / 2, h = w * r.height / r.width;
+    final src = Rect.fromCenter(center: Offset(img.width / 2, img.height * .47), width: w, height: h);
+    c.save();
+    c.clipPath(_grown(d), doAntiAlias: false);
+    c.drawImageRect(img, src, r, _paint);
+    c.restore();
+    return true;
+  }
+
   /// [d] pushed out by half a pixel so clipped tiles meet without gaps.
   static Path _grown(List<Offset> d) {
     final cx = (d[1].dx + d[3].dx) / 2, cy = (d[0].dy + d[2].dy) / 2;

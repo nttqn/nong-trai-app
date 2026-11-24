@@ -221,3 +221,22 @@ void demoNewDecos(Farm f, {bool spaced = false}) {
   }
   f.fx.clear();
 }
+
+/// A paved yard (Ngõ lát gạch) around the kennel and other decorations
+/// (?decos=3), for checking that flat tiles join up and cover nothing.
+void demoBrickYard(Farm f) {
+  f.level = math.max(f.level, 20);
+  f.coins += 100000;
+  for (final d in ['cho', 'cot_den', 'chum', 'hon_non_bo']) {
+    for (var i = 0; i < 40; i++) {
+      final x = 3 + i % 4 * 2, y = 13 + i ~/ 4 * 2;
+      if (f.canPlace(d, x, y) && f.build(d, x, y) == null) break;
+    }
+  }
+  for (var y = 12; y < 18; y++) {
+    for (var x = 2; x < 10; x++) {
+      if (f.canPlace('duong_gach', x, y)) f.build('duong_gach', x, y);
+    }
+  }
+  f.fx.clear();
+}

@@ -78,6 +78,8 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         c.translate(-foot.dx, -foot.dy);
         if (!sprite(o.type)) _deco(c, iso, o.type, x, y, foot, t, o.id);
         c.restore();
+      } else if (o.type == 'duong_gach') {
+        drawBrickPath(c, iso, x, y);
       } else if (o.type == 'ham_chua') {
         // its own art when there is some (PROMPTS.md batch 14), else the
         // brick warehouse's, else a laterite-stone cellar drawn in code
@@ -1022,6 +1024,18 @@ void _deco(Canvas c, Iso iso, String type, double x, double y, Offset f, double 
     default:
       drawMoreDeco(c, iso, type, x, y, f, t, seed);
   }
+}
+
+/// Ngõ lát gạch lies flat on the ground: drawn before every standing
+/// object (FarmPainter's flat pass), from the middle of its art so
+/// neighbouring tiles join up, never as a standing sprite that would cover
+/// what is behind it.
+bool isFlatObj(Obj o) => o.type == 'duong_gach';
+
+void drawBrickPath(Canvas c, Iso iso, double x, double y) {
+  final d = diamond(iso, x, y, 1, 1);
+  if (Sprites.tileInner(c, 'duong_gach', d)) return;
+  drawMoreDeco(c, iso, 'duong_gach', x, y, iso.p(x + .5, y + .5), 0, 0);
 }
 
 /// A small wooden kennel (chuồng chó) with a thatched roof.
