@@ -10,6 +10,12 @@ service cloud.firestore {
         && request.resource.data.data.size() < 900000;
     }
 
+    // Cập nhật (1.10.0): config/app.min, the oldest version still allowed
+    // to play, written by hand in the console.
+    match /config/{id} {
+      allow read: if true;
+    }
+
     // Public leaderboard: anyone reads; a signed-in player writes only
     // their own row, with sane values.
     match /leaderboard/{uid} {

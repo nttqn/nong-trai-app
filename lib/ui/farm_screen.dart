@@ -37,6 +37,7 @@ import 'leaderboard_sheet.dart';
 import 'world_map.dart';
 import '../services/neighbors.dart';
 import '../services/rank_prizes.dart';
+import '../services/update.dart';
 import 'paid_sheet.dart';
 import 'panels.dart';
 import 'quest_sheet.dart';
@@ -132,6 +133,7 @@ class _FarmScreenState extends State<FarmScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onCloud();
       _loadErrorNotice();
+      UpdateService.instance.check(context, () => widget.save.saveNow(farm));
       Future.delayed(const Duration(milliseconds: 1500), _maybeLoginGift);
     });
     farm.onSound = (c) => SoundService.instance.play(c);

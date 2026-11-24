@@ -1,0 +1,155 @@
+import 'dart:io' show Platform;
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../app_version.dart';
+import '../core/version.dart';
+import '../ui/widgets.dart';
+import 'analytics.dart';
+import 'cloud.dart';
+
+/// Cập nhật trong game (Android, 1.10.0, as in Kiếm Hiệp): asks Google Play
+/// whether a newer build is out and offers it once a day. The oldest
+/// version still allowed to play is `min` in the Firestore document
+/// `config/app` (written by hand in the console); below it the game is
+/// blocked until the player updates.
+class UpdateService {
+  UpdateService._();
+  static final UpdateService instance = UpdateService._();
+
+  bool _checked = false;
+
+  /// [save] writes the farm before Play restarts the game.
+  Future<void> check(BuildContext context, Future<void> Function() save) async {
+    if (_checked || kIsWeb || !Platform.isAndroid) return;
+    _checked = true;
+    final min = await _minVersion();
+    AppUpdateInfo? info;
+    try {
+      info = await InAppUpdate.checkForUpdate().timeout(const Duration(seconds: 8));
+    } catch (e) {
+      // Not installed from Play (a sideloaded or debug build), or offline.
+      debugPrint('update check: $e');
+    }
+    if (mustUpdate(appVersion, min)) {
+      if (context.mounted) await _block(context, info, save);
+      return;
+    }
+    if (info == null || info.updateAvailability != UpdateAvailability.updateAvailable) return;
+    final prefs = await SharedPreferences.getInstance();
+    final n = DateTime.now();
+    final today = '${n.year}-${n.month}-${n.day}';
+    final plan = updatePlan(
+      available: true,
+      current: appVersion,
+      min: min,
+      snoozedToday: prefs.getString('update_snooze') == today,
+    );
+    if (plan == UpdatePlan.none || !context.mounted) return;
+    if (!info.flexibleUpdateAllowed && !info.immediateUpdateAllowed) return;
+    Analytics.instance.log('update_prompt', {'force': 0});
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: cream,
+        title: const Text('Có bản cập nhật mới'),
+        content: const Text(
+          'Bản mới có thêm tính năng và sửa lỗi. Tải ngầm, vẫn chơi được trong lúc tải; '
+          'xong sẽ khởi động lại game, nông trại được giữ nguyên.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Để mai')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Cập nhật')),
+        ],
+      ),
+    );
+    if (yes != true) {
+      await prefs.setString('update_snooze', today);
+      return;
+    }
+    try {
+      if (info.flexibleUpdateAllowed) {
+        final r = await InAppUpdate.startFlexibleUpdate();
+        if (r != AppUpdateResult.success) return;
+        // Downloaded: save, then let Play install and restart the game.
+        await save();
+        await InAppUpdate.completeFlexibleUpdate();
+      } else {
+        await save();
+        await InAppUpdate.performImmediateUpdate();
+      }
+    } catch (e) {
+      debugPrint('update: $e');
+    }
+  }
+
+  static const _store = MethodChannel('nt/store');
+
+  /// Bắt buộc cập nhật: this version is below `min`, so the farm is covered
+  /// by a dialog that Back and taps outside cannot close. "Cập nhật" runs
+  /// Play's update when Play already knows of it, otherwise opens the
+  /// game's Play page; coming back without updating stays here.
+  Future<void> _block(BuildContext context, AppUpdateInfo? info, Future<void> Function() save) async {
+    Analytics.instance.log('update_prompt', {'force': 1});
+    await save();
+    if (!context.mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          backgroundColor: cream,
+          title: const Text('Cần cập nhật'),
+          content: const Text(
+            'Phiên bản $appVersion đã cũ. Hãy cập nhật bản mới trên Google Play để tiếp tục chơi. '
+            'Nông trại của bạn được giữ nguyên.',
+          ),
+          actions: [
+            TextButton(onPressed: () => _updateNow(info), child: const Text('Cập nhật')),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _updateNow(AppUpdateInfo? first) async {
+    var info = first;
+    try {
+      // Play may have learned of the build since the game started.
+      info = await InAppUpdate.checkForUpdate().timeout(const Duration(seconds: 8));
+    } catch (_) {}
+    if (info != null &&
+        info.updateAvailability == UpdateAvailability.updateAvailable &&
+        info.immediateUpdateAllowed) {
+      try {
+        // Restarts the game when done; closing Play's sheet returns here.
+        await InAppUpdate.performImmediateUpdate();
+        return;
+      } catch (e) {
+        debugPrint('immediate update: $e');
+      }
+    }
+    try {
+      await _store.invokeMethod<bool>('openStore');
+    } catch (e) {
+      debugPrint('open store: $e');
+    }
+  }
+
+  Future<String?> _minVersion() async {
+    if (!CloudSave.instance.available) return null;
+    try {
+      final doc = await FirebaseFirestore.instance.doc('config/app').get().timeout(const Duration(seconds: 6));
+      final v = doc.data()?['min'];
+      return v is String ? v : null;
+    } catch (_) {
+      return null;
+    }
+  }
+}
