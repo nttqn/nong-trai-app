@@ -46,9 +46,13 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         _factory(c, iso, farm, o, t);
       }
     case BKind.house:
-      if (!sprite('nha_${o.level}')) drawHouse(c, iso, x, y, o.level, t);
+      // styles added later (1.10: nhà thờ họ) show the top painted one
+      // until their own art is in (PROMPTS.md đợt 17)
+      if (!sprite('nha_${o.level}') && !(o.level > 4 && sprite('nha_4'))) drawHouse(c, iso, x, y, o.level, t);
     case BKind.storage:
-      if (!sprite('nha_kho_${o.level}') && !sprite('nha_kho')) _warehouse(c, iso, x, y, o.level);
+      if (!sprite('nha_kho_${o.level}') && !(o.level > 2 && sprite('nha_kho_2')) && !sprite('nha_kho')) {
+        _warehouse(c, iso, x, y, o.level);
+      }
     case BKind.project:
       if (!sprite(o.type)) _project(c, iso, o.type, x, y, t);
     case BKind.deco:

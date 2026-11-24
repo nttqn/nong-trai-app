@@ -23,7 +23,8 @@ void main() {
     expect(f.buildCost('nha_phu'), extraHouseBuildCost[0]);
     var p = spot(f, 'nha_phu')!;
     expect(f.build('nha_phu', p.$1, p.$2), isNull);
-    expect(f.storageCap, cap0 + (houseLevels[0].storage * extraHouseStorage).round());
+    // a fresh one (nhà tranh, 60) holds the floor of 100
+    expect(f.storageCap, cap0 + extraHouseMinStorage);
     expect(f.orderBonus, closeTo(bonus0 + extraHouseOrderBonus, 1e-9));
     // the second one waits for level 26 and costs more
     expect(f.canBuy('nha_phu'), contains('26'));
@@ -44,6 +45,15 @@ void main() {
     expect(f.upgradeExtraHouse(o), isNull);
     expect(o.level, 1);
     expect(f.storageCap, greaterThan(before));
+    // all the way up to nhà thờ họ (1.10): as much as the main house
+    while (f.nextHouse != null) {
+      expect(f.upgradeHouse(), isNull);
+    }
+    while (f.nextExtraHouse(o) != null) {
+      expect(f.upgradeExtraHouse(o), isNull);
+    }
+    expect(o.level, houseLevels.length - 1);
+    expect(f.extraHouseCap(o), houseLevels.last.storage);
     // saved and loaded
     final g = Farm.fromJson(f.toJson(), now: () => 1000);
     expect(g.extraHouseCount, 3);

@@ -1,5 +1,7 @@
 // The contextual card shown above the bottom bar for a tapped object.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../core/calendar.dart';
@@ -480,7 +482,7 @@ class ObjPanel extends StatelessWidget {
       else
         Row(children: [
           Expanded(
-            child: Text('Nâng lên ${n.name}\nChứa thêm ${(n.storage * extraHouseStorage).round()} · cần cấp ${n.level}',
+            child: Text('Nâng lên ${n.name}\nChứa thêm ${math.max(extraHouseMinStorage, (n.storage * extraHouseStorage).round())} · cần cấp ${n.level}',
                 style: const TextStyle(fontSize: 12.5, color: brownLight)),
           ),
           PillButton('Nâng cấp',

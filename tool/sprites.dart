@@ -30,6 +30,7 @@ final expected = [
   'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che', 'khung_cui', 'xuong_mut',
   'nha_0', 'nha_1', 'nha_2', 'nha_3', 'nha_4',
   'nha_kho_0', 'nha_kho_1', 'nha_kho_2',
+  // batch 17 (1.10) is listed under [optional]: the game reuses nha_4 / nha_kho_2
   'gieng', 'cong_lang', 'tram_bom', 'tram_dien', 'truong', 'tram_y_te', 'cho_que', 'nha_van_hoa', 'dinh_lang',
   'rom_dong', 'chum', 'bu_nhin', 'cho', 'hoa_dao', 'tre', 'cay_da',
   'bui', 'da', 'goc_cay',
@@ -46,6 +47,8 @@ final optional = [
   'nguoi_ganh', 'nguoi_xe_dap', 'nguoi_chan_vit', 'be_thoi_sao', 'nguoi_cay_lua', 'nguoi_cuoc_dat', 'tre_tha_dieu', 'tre_chay', 'thuyen_cheo',
   // batch 14: paid building
   'ham_chua',
+  // batch 17: nhà thờ họ, kho bê tông, kho tổng
+  'nha_5', 'nha_kho_3', 'nha_kho_4',
   // batch 9: drying yard states and festival gifts
   'san_phoi', 'san_phoi_thoc', 'san_phoi_bat', 'san_phoi_kho',
   'cay_neu', 'den_long', 'cay_du', 'gio_qua', 'chau_sen', 'den_ong_sao', 'coi_gia',

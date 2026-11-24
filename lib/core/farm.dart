@@ -433,7 +433,8 @@ class Farm {
   /// The extra houses (nhà con cháu) built so far.
   Iterable<Obj> get extraHouses => objs.where((o) => o.type == 'nha_phu');
   int get extraHouseCount => extraHouses.length;
-  int extraHouseCap(Obj o) => (houseLevels[o.level].storage * extraHouseStorage).round();
+  int extraHouseCap(Obj o) => math.max(
+      extraHouseMinStorage, (houseLevels[o.level.clamp(0, houseLevels.length - 1)].storage * extraHouseStorage).round());
 
   /// An extra house can go one style up, but never past the main house.
   HouseLevel? nextExtraHouse(Obj o) =>

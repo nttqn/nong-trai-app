@@ -472,3 +472,13 @@ Một đánh giá 4★ chê người dân vẽ bằng code (nhất là người 
 | `tre_tha_dieu` | (xem đợt 13) |
 | `tre_chay` | (xem đợt 13) |
 
+
+## Đợt 17 (bản 1.10) — nhà thờ họ và hai kho mới
+
+Nhà chính có thêm kiểu thứ 6, nhà kho thêm 2 cấp. Chưa có ảnh thì game dùng tạm ảnh `nha_4` / `nha_kho_2`. Cách làm như đợt 3 (cùng phong cách, cùng góc nhìn).
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `nha_5` | A grand traditional Vietnamese three-bay ancestral house (nhà thờ họ ba gian) on a 3x3 tile base: dark ironwood columns, a wide front veranda, a heavy curved dark-red terracotta tile roof with upturned dragon-tail eave corners, carved wooden doors, a stone-paved front yard with two big blue-and-white ceramic planters holding ornamental trees, a small incense altar by the steps. Dignified and old. |
+| `nha_kho_3` | A Vietnamese concrete storehouse (kho bê tông) on a 2x2 tile base: pale grey rendered concrete walls, a flat roof with a low parapet, a big green metal roller-shutter door on the lower-left face, a few jute rice sacks and a hand cart by the door. |
+| `nha_kho_4` | A large Vietnamese village co-operative depot (kho tổng) on a 2x2 tile base: two-storey cream-yellow plastered walls with a plain wooden sign board above a wide double sliding door on the lower-left face, a corrugated red metal roof with a skylight, stacked rice sacks, wooden crates and baskets of produce outside. Bigger than the other warehouses. |
