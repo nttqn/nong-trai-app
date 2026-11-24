@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.6
   in_app_update: ^5.0.0
+  url_launcher: ^6.3.1
   audioplayers: ^6.5.0
   # Pinned: 2.5.0 (2026-10-17, Pigeon JNI rewrite) hangs getInstance() in
   # real-device release builds. 2.4.28 is the last pre-JNI release.

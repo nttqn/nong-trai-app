@@ -1,4 +1,5 @@
-import 'dart:io' show Platform;
+import 'dart:convert';
+import 'dart:io' show HttpClient, Platform;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app_version.dart';
 import '../core/version.dart';
@@ -13,10 +15,12 @@ import '../ui/widgets.dart';
 import 'analytics.dart';
 import 'cloud.dart';
 
-/// Cập nhật trong game (Android, 1.10.0, as in Kiếm Hiệp): asks Google Play
-/// whether a newer build is out and offers it once a day. The oldest
+/// Cập nhật trong game (1.10.0, as in Kiếm Hiệp): asks the store whether a
+/// newer build is out and offers it once a day (Android: Play's in-app
+/// update; iOS: Apple's lookup, then the App Store page). The oldest
 /// version still allowed to play is `min` in the Firestore document
-/// `config/app` (written by hand in the console); below it the game is
+/// `config/app` (written by hand in the console; `minIos` on iPhone when
+/// set); below it the game is
 /// blocked until the player updates.
 class UpdateService {
   UpdateService._();
@@ -26,7 +30,9 @@ class UpdateService {
 
   /// [save] writes the farm before Play restarts the game.
   Future<void> check(BuildContext context, Future<void> Function() save) async {
-    if (_checked || kIsWeb || !Platform.isAndroid) return;
+    if (_checked || kIsWeb) return;
+    if (Platform.isIOS) return _checkIos(context, save);
+    if (!Platform.isAndroid) return;
     _checked = true;
     final min = await _minVersion();
     AppUpdateInfo? info;
@@ -142,11 +148,105 @@ class UpdateService {
     }
   }
 
+  // ------------------------------------------------------------------ iOS
+
+  static const _bundleId = 'com.trungsmail.nongtrai';
+
+  /// iOS has no in-app update: Apple's lookup gives the App Store's version
+  /// and the game's page, which "Cập nhật" opens. The same `min` blocks.
+  Future<void> _checkIos(BuildContext context, Future<void> Function() save) async {
+    _checked = true;
+    final (min, store) = await (_minVersion(), _appStore()).wait;
+    final url = store?.url ?? 'https://apps.apple.com/vn/search?term=${Uri.encodeComponent('Mùa Lúa Chín')}';
+    if (mustUpdate(appVersion, min)) {
+      Analytics.instance.log('update_prompt', {'force': 1});
+      await save();
+      if (!context.mounted) return;
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            backgroundColor: cream,
+            title: const Text('Cần cập nhật'),
+            content: const Text(
+              'Phiên bản $appVersion đã cũ. Hãy cập nhật bản mới trên App Store để tiếp tục chơi. '
+              'Nông trại của bạn được giữ nguyên.',
+            ),
+            actions: [
+              TextButton(onPressed: () => _open(url), child: const Text('Cập nhật')),
+            ],
+          ),
+        ),
+      );
+      return;
+    }
+    if (store == null || compareVersions(store.version, appVersion) <= 0) return;
+    final prefs = await SharedPreferences.getInstance();
+    final n = DateTime.now();
+    final today = '${n.year}-${n.month}-${n.day}';
+    if (prefs.getString('update_snooze') == today || !context.mounted) return;
+    Analytics.instance.log('update_prompt', {'force': 0});
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: cream,
+        title: const Text('Có bản cập nhật mới'),
+        content: Text('Bản ${store.version} đã có trên App Store, với tính năng mới và sửa lỗi. '
+            'Nông trại của bạn được giữ nguyên.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Để mai')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Cập nhật')),
+        ],
+      ),
+    );
+    if (yes == true) {
+      await save();
+      await _open(url);
+    } else {
+      await prefs.setString('update_snooze', today);
+    }
+  }
+
+  Future<void> _open(String url) async {
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('open store: $e');
+    }
+  }
+
+  /// The App Store's version of this game and its page; null when it is not
+  /// listed (yet) or can't be read.
+  Future<({String version, String url})?> _appStore() async {
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 6);
+    try {
+      final req = await client.getUrl(Uri.parse(
+          'https://itunes.apple.com/lookup?bundleId=$_bundleId&country=vn&t=${DateTime.now().millisecondsSinceEpoch}'));
+      final res = await req.close().timeout(const Duration(seconds: 8));
+      final body = await res.transform(utf8.decoder).join().timeout(const Duration(seconds: 8));
+      final results = (jsonDecode(body) as Map)['results'] as List?;
+      if (results == null || results.isEmpty) return null;
+      final r = results.first as Map;
+      final v = r['version'], u = r['trackViewUrl'];
+      if (v is! String || u is! String) return null;
+      return (version: v, url: u);
+    } catch (e) {
+      debugPrint('app store lookup: $e');
+      return null;
+    } finally {
+      client.close(force: true);
+    }
+  }
+
   Future<String?> _minVersion() async {
     if (!CloudSave.instance.available) return null;
     try {
       final doc = await FirebaseFirestore.instance.doc('config/app').get().timeout(const Duration(seconds: 6));
-      final v = doc.data()?['min'];
+      // iOS may have its own floor (`minIos`): App Review often lags Play
+      final d = doc.data();
+      final v = Platform.isIOS && d?['minIos'] is String ? d!['minIos'] : d?['min'];
       return v is String ? v : null;
     } catch (_) {
       return null;
