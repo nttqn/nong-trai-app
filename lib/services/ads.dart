@@ -11,9 +11,8 @@ import 'analytics.dart';
 /// pen or workshop; double level-up coins) and a rare interstitial after
 /// delivering an order, plus an App Open ad when the player comes back.
 ///
-/// Android uses the game's own AdMob units; iOS its own App Open and Google
-/// samples for rewarded and interstitial
-/// (App ID in android/app/build.gradle.kts). A no-op on web and in tests;
+/// The game's own AdMob units on Android and iOS
+/// (App IDs in android/app/build.gradle.kts and ios/Runner/Info.plist). A no-op on web and in tests;
 /// any ad failure just means "no ad", never a blocked game.
 class AdsService with WidgetsBindingObserver {
   AdsService._();
@@ -26,12 +25,11 @@ class AdsService with WidgetsBindingObserver {
       !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
   static bool get _ios => defaultTargetPlatform == TargetPlatform.iOS;
 
-  // Android: the game's own units. iOS: own App Open; rewarded and
-  // interstitial still Google samples.
+  // The game's own units on both platforms.
   static String get rewardedUnit =>
-      _ios ? 'ca-app-pub-3940256099942544/1712485313' : 'ca-app-pub-9078637596840810/6352898077';
+      _ios ? 'ca-app-pub-9078637596840810/2827432051' : 'ca-app-pub-9078637596840810/6352898077';
   static String get interstitialUnit =>
-      _ios ? 'ca-app-pub-3940256099942544/4411468910' : 'ca-app-pub-9078637596840810/5042851680';
+      _ios ? 'ca-app-pub-9078637596840810/5338045321' : 'ca-app-pub-9078637596840810/5042851680';
 
   static String get appOpenUnit =>
       _ios ? 'ca-app-pub-9078637596840810/3039185043' : 'ca-app-pub-9078637596840810/5039816409';
