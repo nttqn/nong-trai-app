@@ -68,11 +68,15 @@ List<Actor> villageLife(Farm farm, Iso iso, double t, {required double night, re
 
 /// Ducks on the lake and the boat on the river: on the water, which nothing
 /// stands on, so drawn right after the ground.
-void drawWaterLife(Canvas c, Iso iso, double t, {required double night}) {
-  if (night > .5) return;
+void drawWaterLife(Canvas c, Iso iso, double t, {required double night, bool docked = false}) {
   final shown = c.getLocalClipBounds().inflate(80);
+  // the trader's boat stays at the landing through the night too
+  if (night > .5) {
+    if (docked) _boat(c, iso, t, shown, docked: true);
+    return;
+  }
   _lakeDucks(c, iso, t, shown);
-  _boat(c, iso, t, shown);
+  _boat(c, iso, t, shown, docked: docked);
 }
 
 // ------------------------------------------------------------- the road
@@ -667,21 +671,23 @@ void _swimDuck(Canvas c, Offset p, double t, bool left, {required bool baby}) {
 }
 
 /// A little sampan poled up and down the river east of the bridge.
-void _boat(Canvas c, Iso iso, double t, Rect shown) {
+void _boat(Canvas c, Iso iso, double t, Rect shown, {bool docked = false}) {
   const x0 = 13.6, x1 = 34.8, y = 1.0;
   final cyc = (t / 150) % 1;
   final k = cyc < .5 ? cyc * 2 : 2 - cyc * 2;
   final e = k * k * (3 - 2 * k);
-  final bx = x0 + (x1 - x0) * e;
-  final fwd = cyc < .5 ? 1.0 : -1.0; // +x = down-right on screen
+  // Thương lái (farm_trader.dart): tied up by the bridge, no wake
+  final bx = docked ? 14.8 : x0 + (x1 - x0) * e;
+  final fwd = docked ? 1.0 : (cyc < .5 ? 1.0 : -1.0); // +x = down-right on screen
   if (!shown.contains(iso.p(bx, y))) return;
-  final rock = math.sin(t * 1.8) * .6;
+  final rock = math.sin(t * (docked ? 1.0 : 1.8)) * (docked ? .3 : .6);
   // wake
-  for (var r = 0; r < 3; r++) {
+  for (var r = 0; r < (docked ? 0 : 3); r++) {
     final q = (t * .6 + r / 3) % 1;
     final w = iso.p(bx - fwd * (.7 + q * 1.2), y);
     ovalStroke(c, w, 6 + q * 10, 2 + q * 3, Color.fromRGBO(255, 255, 255, .35 * (1 - q)), .8);
   }
+  if (docked) _traderSign(c, iso.p(bx, y, 30 + math.sin(t * 3) * 2));
   // painted boat and boatman (art batch 16, 1.9.0: a review asked for
   // nicer villagers, the boatman by name). Lies along the river's
   // diagonal; a sampan is poled either way, so it is never flipped.
@@ -725,4 +731,16 @@ void _boat(Canvas c, Iso iso, double t, Rect shown) {
     _upper(c, const Offset(0, -8), shirt: _shirts[0], front: front, lean: .1 + push * .12, hands: [hand + const Offset(-2, 2), hand]);
     line(c, hand + const Offset(-4, -9), hand + Offset(-1 - push * 7, 14), const Color(0xFFB59A55), 1.2);
   });
+}
+
+/// A bobbing "Thương lái" sign over the docked boat: tap it to trade.
+void _traderSign(Canvas c, Offset at) {
+  final r = RRect.fromRectAndRadius(Rect.fromCenter(center: at, width: 58, height: 18), const Radius.circular(9));
+  c.drawRRect(r, Paint()..color = const Color(0xF0FFF3C4));
+  c.drawRRect(r, Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1.4
+    ..color = const Color(0xFF1E88E5));
+  fillPoly(c, [at + const Offset(-4, 9), at + const Offset(4, 9), at + const Offset(0, 14)], const Color(0xFF1E88E5));
+  text(c, '⛵ Thương lái', at, 8.5, color: const Color(0xFF0D47A1), weight: FontWeight.w900);
 }

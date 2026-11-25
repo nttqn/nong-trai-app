@@ -42,6 +42,7 @@ import 'paid_sheet.dart';
 import 'panels.dart';
 import 'quest_sheet.dart';
 import 'river_sheet.dart';
+import 'trader_sheet.dart';
 import 'week_sheet.dart';
 import 'sheets.dart';
 import 'widgets.dart';
@@ -112,6 +113,8 @@ class _FarmScreenState extends State<FarmScreen>
             _openWeek();
           case 'river':
             _openRiver();
+          case 'trader':
+            _openTrader();
           case 'fish':
             showFarmSheet(context, (_) => FishBoardSheet(farm), height: .86);
         }
@@ -163,6 +166,7 @@ class _FarmScreenState extends State<FarmScreen>
         _moonHinted = true;
         _say('🌕 Đêm rằm trăng sáng! Chạm vào ông trăng để trông trăng nhận quà');
       }
+      _traderNotice();
       _festivalNotice();
       _memoryCard();
       if (mounted) setState(() {});
@@ -608,6 +612,11 @@ class _FarmScreenState extends State<FarmScreen>
         }
       }
       setState(() => _plantCrop = null);
+    }
+    // the trader's boat tied up at the landing east of the bridge
+    if (o == null && gy <= 1 && gy >= -1 && gx >= 13 && gx <= 16 && farm.traderHere) {
+      _openTrader();
+      return;
     }
     // the river along the top of the map: go fishing
     if (o == null && gy <= 1 && gy >= -1 && gx >= 0 && gx < mapSize) {
@@ -1195,6 +1204,13 @@ class _FarmScreenState extends State<FarmScreen>
             ),
             const SizedBox(width: 6),
           ],
+          if (farm.traderHere) ...[
+            GestureDetector(
+              onTap: _openTrader,
+              child: _badged(_chip(const Text('⛵', style: TextStyle(fontSize: 19))), farm.traderReady),
+            ),
+            const SizedBox(width: 6),
+          ],
           if (farm.level >= FarmRiver.riverLevel) ...[
             GestureDetector(
               onTap: _openRiver,
@@ -1319,6 +1335,23 @@ class _FarmScreenState extends State<FarmScreen>
     SoundService.instance.play('tap');
     _select(null);
     showFarmSheet(context, (_) => WeekSheet(farm, _report), height: .86).then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  // once per visit: the trader's boat has tied up
+  int _traderSaid = 0;
+  void _traderNotice() {
+    if (!farm.traderHere || farm.traderVisitNow == _traderSaid || farm.tutStep != null) return;
+    if (kIsWeb && Uri.base.queryParameters['shot'] != null) return;
+    _traderSaid = farm.traderVisitNow;
+    _say('⛵ Thương lái đã cập bến! Chạm vào ghe để bán hàng giá cao');
+  }
+
+  void _openTrader() {
+    SoundService.instance.play('tap');
+    _select(null);
+    showFarmSheet(context, (_) => TraderSheet(farm, _report), height: .72).then((_) {
       if (mounted) setState(() {});
     });
   }

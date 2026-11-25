@@ -187,7 +187,7 @@ class FarmPainter extends CustomPainter {
     drawWaterAnim(c, iso, t);
     final night = nightOf(farm);
     final rain = weatherAt(farm.now()) == Weather.rain;
-    drawWaterLife(c, iso, t, night: night);
+    drawWaterLife(c, iso, t, night: night, docked: farm.traderHere);
     drawStreetLamps(c, iso, farm, night);
 
     // selection footprint under the object

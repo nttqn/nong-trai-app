@@ -17,6 +17,7 @@ part 'farm_season.dart';
 part 'farm_paid.dart';
 part 'farm_week.dart';
 part 'farm_river.dart';
+part 'farm_trader.dart';
 
 typedef NowFn = int Function();
 int wallClock() => DateTime.now().millisecondsSinceEpoch;
@@ -148,6 +149,10 @@ class Farm {
   /// catch, daily casts or not), and the day + coins of casts past the
   /// daily ones (capped, farm_river.dart).
   int fishWeek = 0, fishPts = 0, riverFunDay = 0, riverFunCoins = 0;
+  /// Thương lái (farm_trader.dart): the visit its lines are for, and the
+  /// lines (waitUntil -1 = sold).
+  int traderVisit = 0;
+  final List<Order> trader = [];
   /// Coins the last fun catch sold for (not saved; the fishing sheet says it).
   int lastFunCoins = 0;
   /// Weekly leaderboards whose place prize is still to be looked up
@@ -1319,6 +1324,7 @@ class Farm {
     rollFestival();
     if (weekOpen) rollWeek();
     if (level >= FarmRiver.riverLevel) rollFish();
+    rollTrader();
     settleYard();
     checkMemories();
     final t = now();
@@ -1432,6 +1438,7 @@ class Farm {
         if (weekKey != 0) 'week': [weekKey, weekPts, weekClaimed],
         if (riverDay != 0) 'river': [riverDay, riverUsed, riverAds],
         if (fishWeek != 0 || riverFunDay != 0) 'fishw': [fishWeek, fishPts, riverFunDay, riverFunCoins],
+        if (traderVisit != 0) 'trader': {'v': traderVisit, 'o': [for (final o in trader) o.toJson()]},
         if (rankDue.isNotEmpty || rankDone[0] != 0 || rankDone[1] != 0) 'rank': {'due': rankDue, 'done': rankDone},
         if (yard.isNotEmpty)
           'yard': {'g': yard, 'd': yardDry, 't': yardT, 'w': yardWet, 'l': yardLost, 'c': yardCover},
@@ -1539,6 +1546,11 @@ class Farm {
         f.fishPts = (fw[1] as num).toInt();
         f.riverFunDay = (fw[2] as num).toInt();
         f.riverFunCoins = (fw[3] as num).toInt();
+      }
+      final tr = j['trader'] as Map?;
+      if (tr != null) {
+        f.traderVisit = (tr['v'] as num?)?.toInt() ?? 0;
+        f.trader.addAll([for (final o in (tr['o'] as List? ?? const [])) Order.fromJson(Map<String, dynamic>.from(o))]);
       }
       final rk = j['rank'] as Map?;
       if (rk != null) {
