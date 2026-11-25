@@ -7,6 +7,7 @@ import '../core/farm.dart';
 import '../core/daynight.dart';
 import '../core/weather.dart';
 import '../services/ads.dart';
+import '../services/share.dart';
 import 'sheets.dart' show Report;
 import 'widgets.dart';
 
@@ -191,6 +192,25 @@ class _AchievementsSheetState extends State<AchievementsSheet> {
               const SizedBox(width: 6),
               Text('${'★' * tier}${'☆' * (a.tiers.length - tier)}',
                   style: const TextStyle(color: Color(0xFFF2A900), fontSize: 14)),
+              // khoe: a tier is won
+              if (tier > 0)
+                Builder(
+                  builder: (bc) => GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => ShareService.instance.share(
+                      kind: 'ach',
+                      origin: bc,
+                      headline: '🏅 ${a.title} ${'★' * tier}',
+                      detail: '${a.what}: ${fmtNum(v)} · Nông trại cấp ${f.level}',
+                      text: 'Mình vừa đạt thành tựu "${a.title}" ${'★' * tier} trong Mùa Lúa Chín 🌾 '
+                          'Về quê làm ruộng cùng mình nhé!',
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      child: Icon(Icons.share_rounded, size: 18, color: Color(0xFF1E88E5)),
+                    ),
+                  ),
+                ),
             ]),
             Text('${a.what}: ${fmtNum(v)}/${fmtNum(target)}',
                 style: const TextStyle(color: brownLight, fontSize: 12.5, fontWeight: FontWeight.w600)),

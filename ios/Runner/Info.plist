@@ -380,6 +380,8 @@
 			<string>zq492l623r.skadnetwork</string>
 		</dict>
 	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Lưu ảnh nông trại bạn muốn khoe với bạn bè vào thư viện ảnh.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Cho phép để nhận quảng cáo phù hợp hơn với bạn. Nông trại vẫn chơi đầy đủ dù bạn chọn gì.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

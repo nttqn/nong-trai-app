@@ -28,6 +28,9 @@ class UpdateService {
 
   bool _checked = false;
 
+  /// The game's App Store page once the lookup found it (share links).
+  String? appStoreUrl;
+
   /// [save] writes the farm before Play restarts the game.
   Future<void> check(BuildContext context, Future<void> Function() save) async {
     if (_checked || kIsWeb) return;
@@ -157,6 +160,7 @@ class UpdateService {
   Future<void> _checkIos(BuildContext context, Future<void> Function() save) async {
     _checked = true;
     final (min, store) = await (_minVersion(), _appStore()).wait;
+    if (store != null) appStoreUrl = store.url;
     final url = store?.url ?? 'https://apps.apple.com/vn/search?term=${Uri.encodeComponent('Mùa Lúa Chín')}';
     if (mustUpdate(appVersion, min)) {
       Analytics.instance.log('update_prompt', {'force': 1});

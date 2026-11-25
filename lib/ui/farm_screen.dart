@@ -43,6 +43,7 @@ import 'panels.dart';
 import 'quest_sheet.dart';
 import 'river_sheet.dart';
 import 'trader_sheet.dart';
+import '../services/share.dart';
 import 'week_sheet.dart';
 import 'sheets.dart';
 import 'widgets.dart';
@@ -316,6 +317,18 @@ class _FarmScreenState extends State<FarmScreen>
                           if (await AdsService.instance.showRewarded('levelup_double')) farm.bonusCoins(20 * l);
                         })
                     : const SizedBox.shrink(),
+              ),
+              Builder(
+                builder: (bc) => PillButton('📤 Khoe',
+                    color: const Color(0xFF1E88E5),
+                    onTap: () => ShareService.instance.share(
+                          kind: 'level',
+                          origin: bc,
+                          headline: '🎉 Lên cấp $l!',
+                          detail: farm.name.isEmpty ? 'Nông trại của mình' : 'Nông trại ${farm.name}',
+                          text: 'Nông trại của mình vừa lên cấp $l trong Mùa Lúa Chín 🌾 '
+                              'Trồng lúa, nuôi gà, câu cá, đón hội làng. Vào chơi cùng mình nhé!',
+                        )),
               ),
               PillButton('Tuyệt vời!', onTap: () => Navigator.pop(c)),
             ]),
@@ -801,6 +814,17 @@ class _FarmScreenState extends State<FarmScreen>
     showFarmSheet(
       context,
       (c) => ListView(padding: const EdgeInsets.all(8), children: [
+        Builder(
+          builder: (bc) => ListTile(
+            dense: true,
+            leading: const Text('📨', style: TextStyle(fontSize: 22)),
+            title: const Text('Mời bạn bè cùng chơi', style: TextStyle(color: brown, fontWeight: FontWeight.w900)),
+            subtitle: const Text('Gửi ảnh nông trại của bạn kèm link tải game',
+                style: TextStyle(color: brownLight, fontSize: 12)),
+            trailing: const Icon(Icons.share_rounded, color: Color(0xFF1E88E5)),
+            onTap: () => _invite(bc),
+          ),
+        ),
         const SheetHeader('Lưu trữ đám mây'),
         const CloudTile(),
         ListTile(
@@ -888,6 +912,8 @@ class _FarmScreenState extends State<FarmScreen>
             '• 🧺 Thu hết: một chạm lấy mọi thứ đã chín, đã xong. 🌱 Gieo lại: gieo đúng giống cũ vào ô trống, thả lại cá, cho chuồng ăn.\n'
             '• Sự kiện tuần (từ cấp 3, nút cạnh 🛍️): mỗi tuần một chủ đề, đủ điểm thì nhận quà, mốc cuối tặng đồ trang trí riêng. Thứ Hai đổi chủ đề.\n'
             '• 🎣 Câu cá (từ cấp 3): chạm vào dòng sông. Phao chìm thì giật cần, rồi chạm khi kim nằm trong vạch xanh.\n'
+            '• ⛵ Thương lái (từ cấp 5): giờ chẵn ghe cập bến đầu cầu, neo một tiếng, mua hàng giá cao hơn chợ. Chạm vào ghe để bán.\n'
+            '• 📨 Mời bạn bè (đầu menu này), 📤 Khoe khi lên cấp, nút chia sẻ ở thành tựu: gửi ảnh nông trại kèm link tải game.\n'
             '• Kéo hai ngón để phóng to/thu nhỏ bản đồ.\n'
             '• Đăng nhập Google để lưu nông trại lên mây, đổi máy không mất.',
             style: TextStyle(color: brown, height: 1.45),
@@ -960,7 +986,10 @@ class _FarmScreenState extends State<FarmScreen>
           _placeCamera(_screen);
           return Stack(children: [
             Positioned.fill(
-              child: InteractiveViewer(
+              // what a shared picture shows (services/share.dart)
+              child: RepaintBoundary(
+                key: ShareService.instance.shotKey,
+                child: InteractiveViewer(
                 transformationController: _tc,
                 constrained: false,
                 minScale: .4,
@@ -980,6 +1009,7 @@ class _FarmScreenState extends State<FarmScreen>
                     ),
                   ),
                 ),
+              ),
               ),
             ),
             // the night sky over the top of the screen; tap the moon to see
@@ -1354,6 +1384,18 @@ class _FarmScreenState extends State<FarmScreen>
     showFarmSheet(context, (_) => TraderSheet(farm, _report), height: .72).then((_) {
       if (mounted) setState(() {});
     });
+  }
+
+  void _invite(BuildContext origin) {
+    final name = farm.name.isEmpty ? '' : ' Nông trại của mình tên là "${farm.name}".';
+    ShareService.instance.share(
+      kind: 'invite',
+      origin: origin,
+      headline: farm.name.isEmpty ? 'Về quê làm ruộng cùng mình!' : 'Nông trại ${farm.name}',
+      detail: 'Cấp ${farm.level} · ${fmtNum(farm.coins)} xu',
+      text: 'Về quê làm ruộng cùng mình trong Mùa Lúa Chín 🌾 Trồng lúa, nuôi gà vịt, câu cá, '
+          'đón Tết làng và thăm nông trại hàng xóm.$name',
+    );
   }
 
   void _openRiver() {
