@@ -67,6 +67,9 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.11.0, ≤ 500 ký tự)
+⛵ Thương lái chèo ghe: cứ mỗi giờ chẵn (0h, 2h, 4h…), ghe thương lái cập bến đầu cầu và neo lại một tiếng. Thương lái hỏi mua 3 món hàng ngon, trả giá cao hơn ngoài chợ, bán món nào cũng được. Chạm vào ghe hoặc nút ⛵ để bán. Mở từ cấp 5. Cảm ơn bạn Bảy Vương bé đã góp ý!
+
 ## Có gì mới (bản 1.10.0, ≤ 500 ký tự)
 📦 Kho rộng hơn: Nhà con cháu rẻ hơn một nửa, chứa bằng nhà chính (ít nhất 100 chỗ), thêm 8% xu mỗi đơn. Nhà kho nâng lên Kho bê tông (350) và Kho tổng (600).
 🏯 Nhà chính nâng lên Nhà thờ họ ba gian (cấp 32): 700 chỗ chứa.
@@ -114,6 +117,9 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.11.0, en-US)
+⛵ The trader's boat: every even hour (0:00, 2:00, 4:00…) a trader ties up at the landing by the bridge for an hour and asks for 3 of your finer goods, paying more than the market. Sell any of them; tap the boat or the ⛵ button. Unlocks at level 5.
 
 ## What's new (1.10.0, en-US)
 📦 More storage: Nhà con cháu costs half as much, holds as much as the main house (at least 100) and adds 8% coins per order. Warehouses upgrade to a concrete store (350) and a depot (600).
