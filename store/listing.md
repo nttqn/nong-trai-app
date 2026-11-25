@@ -68,8 +68,8 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 Hỗ trợ: trungsmail@gmail.com
 
 ## Có gì mới (bản 1.11.0, ≤ 500 ký tự)
-⛵ Thương lái chèo ghe: cứ mỗi giờ chẵn (0h, 2h, 4h…), ghe thương lái cập bến đầu cầu và neo lại một tiếng. Thương lái hỏi mua 3 món hàng ngon, trả giá cao hơn ngoài chợ, bán món nào cũng được. Chạm vào ghe hoặc nút ⛵ để bán. Mở từ cấp 5. Cảm ơn bạn Bảy Vương bé đã góp ý!
-📤 Khoe với bạn bè: lên cấp hay đạt thành tựu thì gửi ảnh nông trại kèm link tải game. Mời bạn cùng chơi ngay trong menu ☰.
+⛵ Thương lái chèo ghe: cứ mỗi giờ chẵn (0h, 2h, 4h…), ghe thương lái cập bến đầu cầu và neo lại một tiếng. Thương lái mua 3 món hàng ngon, trả giá cao hơn chợ. Chạm vào ghe hoặc nút ⛵ để bán. Mở từ cấp 5. Cảm ơn bạn Bảy Vương bé đã góp ý!
+📤 Khoe với bạn bè: lên cấp hay đạt thành tựu thì gửi ảnh nông trại kèm link tải game. Mời bạn cùng chơi ngay trong menu.
 
 ## Có gì mới (bản 1.10.0, ≤ 500 ký tự)
 📦 Kho rộng hơn: Nhà con cháu rẻ hơn một nửa, chứa bằng nhà chính (ít nhất 100 chỗ), thêm 8% xu mỗi đơn. Nhà kho nâng lên Kho bê tông (350) và Kho tổng (600).
