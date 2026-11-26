@@ -11,6 +11,7 @@ import '../core/weather.dart';
 import 'animals.dart';
 import 'ground.dart';
 import 'iso.dart';
+import 'chatter.dart';
 import 'life.dart';
 import 'night.dart';
 import 'sprites.dart';
@@ -38,6 +39,8 @@ class ViewState {
   /// Sprites each object was drawn with last frame (object id → where).
   final Map<int, List<SpriteHit>> drawn = {};
   final List<FloatFx> floats = [];
+  /// How far the map is zoomed (speech bubbles keep one size on screen).
+  double zoom = 1;
 }
 
 class GroundCache {
@@ -187,6 +190,7 @@ class FarmPainter extends CustomPainter {
     drawWaterAnim(c, iso, t);
     final night = nightOf(farm);
     final rain = weatherAt(farm.now()) == Weather.rain;
+    chatterFrame(farm);
     drawWaterLife(c, iso, t, night: night, docked: farm.traderHere);
     drawStreetLamps(c, iso, farm, night);
 
@@ -246,6 +250,8 @@ class FarmPainter extends CustomPainter {
       if (!rain) drawFireflies(c, iso, onScreen, t, glow);
     }
 
+    // villagers talking: over the night tint so it can be read
+    drawChatter(c, view.zoom);
     _ghost(c, iso, t);
     if (!view.visiting) _lotSigns(c, iso);
     _readyBubbles(c, iso, t, list);

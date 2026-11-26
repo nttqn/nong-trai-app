@@ -68,8 +68,9 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 Hỗ trợ: trungsmail@gmail.com
 
 ## Có gì mới (bản 1.11.0, ≤ 500 ký tự)
-⛵ Thương lái chèo ghe: cứ mỗi giờ chẵn (0h, 2h, 4h…), ghe thương lái cập bến đầu cầu và neo lại một tiếng. Thương lái mua 3 món hàng ngon, trả giá cao hơn chợ. Chạm vào ghe hoặc nút ⛵ để bán. Mở từ cấp 5. Cảm ơn bạn Bảy Vương bé đã góp ý!
-📤 Khoe với bạn bè: lên cấp hay đạt thành tựu thì gửi ảnh nông trại kèm link tải game. Mời bạn cùng chơi ngay trong menu.
+⛵ Thương lái: mỗi giờ chẵn (0h, 2h, 4h…) ghe cập bến đầu cầu một tiếng, mua 3 món hàng ngon giá cao hơn chợ. Chạm vào ghe để bán. Mở từ cấp 5. Cảm ơn bạn Bảy Vương bé!
+💬 Làng rộn tiếng nói: bà con, trẻ nhỏ trò chuyện theo thời tiết, mùa màng.
+📤 Khoe ảnh nông trại khi lên cấp, đạt thành tựu; mời bạn cùng chơi trong menu.
 
 ## Có gì mới (bản 1.10.0, ≤ 500 ký tự)
 📦 Kho rộng hơn: Nhà con cháu rẻ hơn một nửa, chứa bằng nhà chính (ít nhất 100 chỗ), thêm 8% xu mỗi đơn. Nhà kho nâng lên Kho bê tông (350) và Kho tổng (600).
@@ -121,6 +122,7 @@ Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, l
 
 ## What's new (1.11.0, en-US)
 ⛵ The trader's boat: every even hour (0:00, 2:00, 4:00…) a trader ties up at the landing by the bridge for an hour and asks for 3 of your finer goods, paying more than the market. Sell any of them; tap the boat or the ⛵ button. Unlocks at level 5.
+💬 A livelier village: farmers, kids and the boatman chat about the weather, ripe fields and the trader's boat.
 📤 Show off: share a picture of your farm when you level up or earn an achievement, or invite friends from the menu.
 
 ## What's new (1.10.0, en-US)

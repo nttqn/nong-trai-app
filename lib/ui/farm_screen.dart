@@ -87,6 +87,7 @@ class _FarmScreenState extends State<FarmScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _tc.addListener(() => _view.zoom = _tc.value.getMaxScaleOnAxis());
     // store screenshots on web: ?sheet=calendar|album|orders|shop|storage|map|chat
     // (?chat=demo fills the chat with sample lines instead of Firebase)
     if (kIsWeb && Uri.base.queryParameters['chat'] == 'demo') ChatService.instance.debugMessages = _demoChat();

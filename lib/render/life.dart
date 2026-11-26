@@ -18,6 +18,7 @@ import 'dart:ui';
 import '../core/defs.dart';
 import '../core/farm.dart';
 import 'animals.dart';
+import 'chatter.dart';
 import 'ground.dart' show hash2;
 import 'iso.dart';
 import 'sprites.dart';
@@ -120,21 +121,24 @@ void _road(List<Actor> out, Iso iso, double t, bool rain) {
     final ph = t * 2 * math.pi * (kind == _Walker.dieu ? 2.6 : 1.7) + lane;
     final shirt = _shirts[(hash2(seed, 4) * _shirts.length).floor() % _shirts.length];
     final dir = down ? 1.0 : -1.0; // grid y step
-    void add(double y, void Function(Canvas c, Offset f) paint, {double dx = 0}) {
+    void add(double y, void Function(Canvas c, Offset f) paint, {double dx = 0, Speaker? who, double head = 44, int key = 0}) {
       final f = iso.p(gx + dx, y);
-      out.add(Actor(_depthAt(gx + dx, y), f, (c) => _faded(c, f, fade, () => paint(c, f))));
+      out.add(Actor(_depthAt(gx + dx, y), f, (c) {
+        _faded(c, f, fade, () => paint(c, f));
+        if (who != null && fade >= 1) say(who, seed * 4 + key, f - Offset(0, head), t);
+      }));
     }
 
     switch (kind) {
       case _Walker.ganh:
         final rice = hash2(seed, 5) < .5;
-        add(gy, (c, f) => _carrier(c, f, ph, down, shirt, rice));
+        add(gy, (c, f) => _carrier(c, f, ph, down, shirt, rice), who: Speaker.carrier, head: 48);
       case _Walker.xeDap:
-        add(gy, (c, f) => _cyclist(c, f, t, down, shirt));
+        add(gy, (c, f) => _cyclist(c, f, t, down, shirt), who: Speaker.cyclist, head: 44);
       case _Walker.trau:
-        add(gy, (c, f) => _buffaloBoy(c, f, t, ph, down));
+        add(gy, (c, f) => _buffaloBoy(c, f, t, ph, down), who: Speaker.buffaloBoy, head: 56);
       case _Walker.vit:
-        add(gy, (c, f) => _herder(c, f, t, ph, down, shirt));
+        add(gy, (c, f) => _herder(c, f, t, ph, down, shirt), who: Speaker.herder, head: 46);
         for (var i = 0; i < 6; i++) {
           final ahead = .55 + (i ~/ 2) * .38 + hash2(seed, 10 + i) * .2;
           final side = ((i % 2) - .5) * .32 + (hash2(seed, 20 + i) - .5) * .12;
@@ -145,7 +149,7 @@ void _road(List<Actor> out, Iso iso, double t, bool rain) {
         add(gy, (c, f) => _kiteKid(c, f, t, ph, down, shirt));
         final lag = .55 + math.sin(t * .9 + lane) * .12;
         add(gy - dir * lag, (c, f) => _kid(c, f, ph + 1.4, down, down, _shirts[(lane + 2) % _shirts.length], wave: true),
-            dx: down ? .18 : -.18);
+            dx: down ? .18 : -.18, who: Speaker.kid, head: 36, key: 1);
     }
   }
 }
@@ -480,6 +484,7 @@ void _fieldWorkers(List<Actor> out, Farm farm, Iso iso, double t) {
     final front = math.sin(u * .23 + w) > -.6;
     out.add(Actor(depthOf2(o) + .01, f, (c) {
       _faded(c, f, fade, () => paddy ? _planter(c, f, t, shirt, front) : _hoer(c, f, t, shirt, front));
+      if (fade >= 1) say(Speaker.farmer, 9000 + slot * 3 + w, f - const Offset(0, 40), t);
     }));
   }
 }
@@ -611,6 +616,7 @@ void _hens(List<Actor> out, Farm farm, Iso iso, double t) {
     c.rotate(peck ? (flip ? .25 : -.25) : step * .06);
     if (!Sprites.at(c, 'ga', Offset.zero, 15, flipX: flip)) drawAnimal(c, 'ga', Offset.zero, flip ? 1 : -1, t, 0);
     c.restore();
+    say(Speaker.hen, 7, hf - const Offset(0, 20), t);
   }));
   for (var i = 0; i < 4; i++) {
     final a = i * 1.6 + math.sin(t * .6 + i) * .5;
@@ -688,6 +694,11 @@ void _boat(Canvas c, Iso iso, double t, Rect shown, {bool docked = false}) {
     ovalStroke(c, w, 6 + q * 10, 2 + q * 3, Color.fromRGBO(255, 255, 255, .35 * (1 - q)), .8);
   }
   if (docked) _traderSign(c, iso.p(bx, y, 30 + math.sin(t * 3) * 2));
+  if (docked) {
+    say(Speaker.trader, 1, iso.p(bx, y, 30) - const Offset(0, 14), t);
+  } else {
+    say(Speaker.boatman, 2, iso.p(bx, y, 3.6) - const Offset(0, 30), t);
+  }
   // painted boat and boatman (art batch 16, 1.9.0: a review asked for
   // nicer villagers, the boatman by name). Lies along the river's
   // diagonal; a sampan is poled either way, so it is never flipped.

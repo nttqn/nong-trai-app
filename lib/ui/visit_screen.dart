@@ -49,6 +49,7 @@ class _VisitScreenState extends State<VisitScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
+    _tc.addListener(() => _view.zoom = _tc.value.getMaxScaleOnAxis());
     _ticker = createTicker((e) {
       _clock.value = e.inMicroseconds / 1e6;
       if (nb.fx.isNotEmpty) {
