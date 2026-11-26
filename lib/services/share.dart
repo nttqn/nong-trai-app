@@ -28,7 +28,7 @@ class ShareService {
   static String get storeUrl {
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
       return UpdateService.instance.appStoreUrl ??
-          'https://apps.apple.com/vn/search?term=${Uri.encodeComponent('Mùa Lúa Chín')}';
+          'https://apps.apple.com/app/id6838682662';
     }
     return _playUrl;
   }

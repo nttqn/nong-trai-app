@@ -161,7 +161,7 @@ class UpdateService {
     _checked = true;
     final (min, store) = await (_minVersion(), _appStore()).wait;
     if (store != null) appStoreUrl = store.url;
-    final url = store?.url ?? 'https://apps.apple.com/vn/search?term=${Uri.encodeComponent('Mùa Lúa Chín')}';
+    final url = store?.url ?? 'https://apps.apple.com/app/id6838682662';
     if (mustUpdate(appVersion, min)) {
       Analytics.instance.log('update_prompt', {'force': 1});
       await save();
