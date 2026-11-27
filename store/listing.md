@@ -67,6 +67,16 @@ Game miễn phí, chơi trọn vẹn không cần nạp. Có quảng cáo; nhi�
 
 Hỗ trợ: trungsmail@gmail.com
 
+## Có gì mới (bản 1.12.0, ≤ 500 ký tự)
+🏛️ Thêm 6 công trình nông thôn mới từ cấp 20:
+💧 Trạm cấp nước sạch: ao cá nhanh hơn
+🌱 Trạm khuyến nông: cây ăn quả ra quả nhanh hơn
+💡 Đèn đường năng lượng mặt trời: đêm sáng đèn, dễ bắt kẻ hái trộm
+🏪 Hợp tác xã: thương lái trả giá cao hơn
+⚽ Sân thể thao thôn: đơn đặc biệt thưởng thêm xu
+📮 Bưu điện văn hóa xã: thêm sạp chợ phiên, bán chợ được giá
+🏅 Danh hiệu làng mới: Nông thôn mới thông minh, Làng quê đáng sống.
+
 ## Có gì mới (bản 1.11.0, ≤ 500 ký tự)
 ⛵ Thương lái: mỗi giờ chẵn (0h, 2h, 4h…) ghe cập bến đầu cầu một tiếng, mua 3 món hàng ngon giá cao hơn chợ. Chạm vào ghe để bán. Mở từ cấp 5. Cảm ơn bạn Bảy Vương bé!
 💬 Làng rộn tiếng nói: bà con, trẻ nhỏ trò chuyện theo thời tiết, mùa màng.
@@ -119,6 +129,16 @@ Cảnh đêm dịu mắt hơn: làng không còn tối sẫm, vẫn giữ trăng
 
 ## Có gì mới (bản 1.0.0)
 Phiên bản đầu tiên: ruộng lúa, vườn rau, chuồng trại, ao cá, làng nghề, công trình nông thôn mới, hàng xóm và chợ phiên. Lịch âm với mùa vụ và 7 lễ hội, sân phơi thóc, album Ký ức làng quê.
+
+## What's new (1.12.0, en-US)
+🏛️ 6 new village projects from level 20:
+💧 Clean-water station: fish ponds grow faster
+🌱 Farm extension office: fruit trees bear sooner
+💡 Solar street lamps: the road lights up at night, thieves get caught more often
+🏪 Co-operative: the trader pays more
+⚽ Village sports ground: daily special orders pay more
+📮 Commune post office: one more market stall, better market prices
+🏅 New village titles for the most developed villages.
 
 ## What's new (1.11.0, en-US)
 ⛵ The trader's boat: every even hour (0:00, 2:00, 4:00…) a trader ties up at the landing by the bridge for an hour and asks for 3 of your finer goods, paying more than the market. Sell any of them; tap the boat or the ⛵ button. Unlocks at level 5.

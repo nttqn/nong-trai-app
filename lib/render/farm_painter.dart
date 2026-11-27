@@ -584,7 +584,10 @@ class ObjPreviewPainter extends CustomPainter {
     c.translate(size.width / 2, size.height - 4);
     c.scale(s);
     final iso = Iso(Offset(-(w - h) * Iso.hw / 2, -(w + h) * Iso.hh));
-    if (type == 'duong_be_tong') {
+    if (type == 'den_duong') {
+      fillPoly(c, diamond(iso, 0, 0, 1, 1), concrete);
+      drawSolarLamp(c, iso.p(.5, .5), 0);
+    } else if (type == 'duong_be_tong') {
       for (var i = 0; i < 3; i++) {
         fillPoly(c, diamond(iso, 0, i - 1.0, 1, 1), concrete);
       }

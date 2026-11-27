@@ -73,7 +73,7 @@ extension FarmTrader on Farm {
       final base = p < 10 ? 8 : p < 30 ? 6 : p < 90 ? 4 : p < 200 ? 3 : 2;
       final q = base + rng.nextInt(base);
       final value = p * q;
-      final pay = (value * (1.9 + rng.nextDouble() * .4) * (1 + orderBonus)).round();
+      final pay = (value * (1.9 + rng.nextDouble() * .4) * (1 + orderBonus + traderBonus)).round();
       trader.add(Order(nextId++, 'Thương lái', {id: q}, pay, math.max(3, (value / 6).round())));
     }
     _changed();

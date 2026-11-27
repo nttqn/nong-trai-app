@@ -794,7 +794,114 @@ void _project(Canvas c, Iso iso, String type, double x, double y, double t) {
         final k = (t * .4 + i / 2) % 1;
         circle(c, pot + Offset(math.sin(k * 7) * 3, -10 - k * 18), 1.5 + k * 3, Color.fromRGBO(220, 220, 220, .5 * (1 - k)));
       }
+    // ---- second wave; placeholders until art đợt 18 is in
+    case 'tram_nuoc':
+      fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), const Color(0xFFC5CBC6));
+      // pump house
+      wallBox(c, iso, x + .2, y + .9, 1.0, .9, 0, 20, const Color(0xFFE3F2FD));
+      leftWallRect(c, iso, x + .45, y + 1.8, x + .8, 0, 14, const Color(0xFF64B5F6), frame: const Color(0xFF1E88E5));
+      gableRoof(c, iso, x + .2, y + .9, 1.0, .9, 20, 8, RoofStyle.tin, gableWall: const Color(0xFFE3F2FD));
+      // water tower on four legs
+      final tw = iso.p(x + 1.35, y + .6);
+      shadow(c, tw, 14, 6);
+      for (final (dx, dy) in [(-9.0, 0.0), (9.0, 0.0), (-5.0, -4.0), (5.0, 4.0)]) {
+        line(c, tw + Offset(dx, dy), tw + Offset(dx * .6, -44 + dy * .5), const Color(0xFF90A4AE), 2);
+      }
+      oval(c, tw + const Offset(0, -46), 13, 5.5, const Color(0xFF1976D2));
+      c.drawRect(Rect.fromLTWH(tw.dx - 13, tw.dy - 66, 26, 20), Paint()..color = const Color(0xFF2196F3));
+      oval(c, tw + const Offset(0, -66), 13, 5.5, const Color(0xFF64B5F6));
+      text(c, '💧', tw + const Offset(0, -56), 8);
+      final drop = (t * .8) % 1;
+      circle(c, iso.p(x + .3, y + 1.85, 4 - drop * 4), 1.5, const Color(0xFFBBDEFB));
+    case 'khuyen_nong':
+      fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), const Color(0xFFD6CBB0));
+      // demonstration plot in front: rows of seedlings
+      fillPoly(c, diamond(iso, x + .1, y + 1.15, 1.8, .75), const Color(0xFF8D6E4C));
+      for (var i = 0; i < 6; i++) {
+        for (var j = 0; j < 2; j++) {
+          circle(c, iso.p(x + .3 + i * .28, y + 1.35 + j * .35, 3), 2.4, const Color(0xFF7CB342));
+        }
+      }
+      wallBox(c, iso, x + .2, y + .15, 1.6, .85, 0, 22, const Color(0xFFF1F8E9));
+      leftWallRect(c, iso, x + .4, y + 1.0, x + .75, 0, 14, doorCol);
+      leftWallRect(c, iso, x + 1.0, y + 1.0, x + 1.5, 7, 16, windowCol, frame: const Color(0xFF558B2F));
+      hipRoof(c, iso, x + .2, y + .15, 1.6, .85, 22, 10, RoofStyle.tile);
+      _sign(c, iso.p(x + 1.0, y + 1.0, 27), 'KHUYẾN NÔNG', const Color(0xFFFFFFFF), const Color(0xFF2E7D32));
+    case 'htx':
+      fillPoly(c, diamond(iso, x + .05, y + .05, 2.9, 1.9), const Color(0xFFCFC6B2));
+      // long warehouse with a sliding door, office at the end
+      wallBox(c, iso, x + .2, y + .2, 1.8, 1.3, 0, 26, const Color(0xFFEDE3CF));
+      leftWallRect(c, iso, x + .5, y + 1.5, x + 1.4, 0, 18, const Color(0xFF8D6E63), frame: const Color(0xFF5D4037));
+      gableRoof(c, iso, x + .2, y + .2, 1.8, 1.3, 26, 12, RoofStyle.tin, gableWall: const Color(0xFFEDE3CF));
+      wallBox(c, iso, x + 2.05, y + .5, .8, 1.0, 0, 22, const Color(0xFFFFF3D6));
+      leftWallRect(c, iso, x + 2.25, y + 1.5, x + 2.6, 0, 14, doorCol);
+      hipRoof(c, iso, x + 2.05, y + .5, .8, 1.0, 22, 9, RoofStyle.tile);
+      // sacks of rice by the door
+      for (var i = 0; i < 3; i++) {
+        oval(c, iso.p(x + .5 + i * .3, y + 1.75, 4), 5, 4, const Color(0xFFF5E6C4));
+      }
+      _sign(c, iso.p(x + 1.1, y + 1.5, 23), 'HỢP TÁC XÃ', const Color(0xFFFFEB3B), const Color(0xFFC62828));
+    case 'san_bong':
+      // pitch with white lines, two goals, a little stand
+      fillPoly(c, diamond(iso, x + .05, y + .05, 2.9, 2.9), const Color(0xFF43A047));
+      for (var i = 0; i < 6; i++) {
+        if (i.isOdd) fillPoly(c, diamond(iso, x + .2 + i * .43, y + .2, .43, 2.6), const Color(0xFF4CAF50));
+      }
+      const white = Color(0xEEFFFFFF);
+      final l = [iso.p(x + .2, y + .2), iso.p(x + 2.8, y + .2), iso.p(x + 2.8, y + 2.8), iso.p(x + .2, y + 2.8)];
+      for (var i = 0; i < 4; i++) {
+        line(c, l[i], l[(i + 1) % 4], white, 1.2);
+      }
+      line(c, iso.p(x + 1.5, y + .2), iso.p(x + 1.5, y + 2.8), white, 1);
+      final mid = iso.p(x + 1.5, y + 1.5);
+      c.drawOval(Rect.fromCenter(center: mid, width: 30, height: 15), Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = white);
+      for (final gx in [.2, 2.8]) {
+        final p0 = iso.p(x + gx, y + 1.15), p1 = iso.p(x + gx, y + 1.85);
+        line(c, p0, p0 - const Offset(0, 12), white, 1.6);
+        line(c, p1, p1 - const Offset(0, 12), white, 1.6);
+        line(c, p0 - const Offset(0, 12), p1 - const Offset(0, 12), white, 1.6);
+      }
+      // ball rolling about the centre
+      final bt = t * .7;
+      circle(c, mid + Offset(math.sin(bt) * 14, math.sin(bt * 2) * 4 - 2), 2.2, const Color(0xFFFFFFFF));
+      // flag
+      final pole = iso.p(x + .3, y + 2.75);
+      line(c, pole, pole - const Offset(0, 34), const Color(0xFFBDBDBD), 1.4);
+      final wave = math.sin(t * 3) * 1.2;
+      final flag = Path()
+        ..moveTo(pole.dx, pole.dy - 34)
+        ..quadraticBezierTo(pole.dx + 6, pole.dy - 34 + wave, pole.dx + 12, pole.dy - 33)
+        ..lineTo(pole.dx + 12, pole.dy - 26)
+        ..quadraticBezierTo(pole.dx + 6, pole.dy - 27 + wave, pole.dx, pole.dy - 27)
+        ..close();
+      pathFill(c, flag, const Color(0xFFDA251D));
+      _star(c, pole + Offset(6, -30 + wave * .5), 2, const Color(0xFFFFEB3B));
+    case 'buu_dien':
+      fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), const Color(0xFFD5CFC2));
+      wallBox(c, iso, x + .2, y + .2, 1.6, 1.2, 0, 28, const Color(0xFFFFE082));
+      leftWallRect(c, iso, x + .7, y + 1.4, x + 1.2, 0, 18, const Color(0xFF90CAF9), frame: const Color(0xFF1565C0));
+      rightWallRect(c, iso, x + 1.8, y + .45, y + 1.0, 10, 20, windowCol, frame: const Color(0xFF1565C0));
+      hipRoof(c, iso, x + .2, y + .2, 1.6, 1.2, 28, 11, RoofStyle.tile);
+      _sign(c, iso.p(x + 1.0, y + 1.4, 24), 'BƯU ĐIỆN', const Color(0xFFFFFFFF), const Color(0xFF1565C0));
+      // yellow post box by the door
+      final pb = iso.p(x + .4, y + 1.75);
+      c.drawRect(Rect.fromLTWH(pb.dx - 3.5, pb.dy - 14, 7, 14), Paint()..color = const Color(0xFFF9A825));
+      c.drawRect(Rect.fromLTWH(pb.dx - 2.5, pb.dy - 11, 5, 1.4), Paint()..color = const Color(0xFF5D4037));
   }
+}
+
+/// A sign painted along a left (front) wall.
+void _sign(Canvas c, Offset at, String s, Color fg, Color bg) {
+  final tp = textPainter(s, 5.5, color: fg, weight: FontWeight.w900);
+  c.save();
+  c.translate(at.dx, at.dy);
+  c.transform(Float64List.fromList([1, .5, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]));
+  c.drawRect(Rect.fromCenter(center: Offset.zero, width: tp.width + 6, height: tp.height + 2), Paint()..color = bg);
+  tp.paint(c, Offset(-tp.width / 2, -tp.height / 2));
+  c.restore();
 }
 
 void _star(Canvas c, Offset p, double r, Color col) {

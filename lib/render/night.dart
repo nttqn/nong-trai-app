@@ -68,7 +68,7 @@ void drawNightLights(Canvas c, Iso iso, Farm farm, Iterable<Obj> shown, double t
           _glow(c, iso.p(x + 1, y + 1.8), 55, const Color(0xFFFF9E40), .34 * n * flick, flat: .55);
           _glow(c, iso.p(x + 1, y + 1.4, 20), 34, const Color(0xFFFFB060), .26 * n * flick);
         }
-      case BKind.project when const {'dinh_lang', 'nha_van_hoa', 'tram_y_te', 'truong', 'cho_que'}.contains(o.type):
+      case BKind.project when const {'dinh_lang', 'nha_van_hoa', 'tram_y_te', 'truong', 'cho_que', 'khuyen_nong', 'htx', 'buu_dien'}.contains(o.type):
         _glow(c, iso.p(x + o.w * .6, y + o.h + .2), 60, lamp, .26 * n, flat: .5);
       case BKind.deco:
         switch (o.type) {
@@ -87,6 +87,14 @@ void drawNightLights(Canvas c, Iso iso, Farm farm, Iterable<Obj> shown, double t
       default:
     }
   }
+  // solar lamps (Đèn đường năng lượng mặt trời) down the other side
+  if (farm.has('den_duong')) {
+    for (var y = 1; y < mapSize; y += 4) {
+      final f = iso.p(Farm.roadX + .12, y + .5);
+      _glow(c, f - const Offset(0, 30), 24, const Color(0xFFF4FAFF), .55 * n);
+      _glow(c, f, 44, const Color(0xFFEFF6FF), .28 * n, flat: .5);
+    }
+  }
   // street lamps along the village road once there is electricity
   if (electric) {
     for (var y = 3; y < mapSize; y += 5) {
@@ -100,6 +108,11 @@ void drawNightLights(Canvas c, Iso iso, Farm farm, Iterable<Obj> shown, double t
 /// Lamp posts beside the village road (drawn before the night tint, so
 /// they stand there by day too) once the transformer station is built.
 void drawStreetLamps(Canvas c, Iso iso, Farm farm, double n) {
+  if (farm.has('den_duong')) {
+    for (var y = 1; y < mapSize; y += 4) {
+      drawSolarLamp(c, iso.p(Farm.roadX + .12, y + .5), n);
+    }
+  }
   if (!farm.objs.any((o) => o.type == 'tram_dien')) return;
   for (var y = 3; y < mapSize; y += 5) {
     final f = iso.p(Farm.roadX + .88, y + .5);
@@ -364,4 +377,18 @@ Color nightShade(Color base, Farm farm) {
   if (n < .01) return base;
   final k = Color.lerp(const Color(0xFFFFFFFF), _nightBlue, tintOf(n) * (.8 - .14 * moonLitOf(farm)))!;
   return Color.from(alpha: 1, red: base.r * k.r, green: base.g * k.g, blue: base.b * k.b);
+}
+
+/// One solar street lamp standing at [f]: a pole, a tilted panel on top
+/// and a white LED head that lights up after dark ([n] 0 day .. 1 night).
+void drawSolarLamp(Canvas c, Offset f, double n) {
+  shadow(c, f, 3, 1.5);
+  line(c, f, f - const Offset(0, 30), const Color(0xFFB0B7BE), 1.8);
+  // panel
+  fillPoly(c, [f + const Offset(-7, -33), f + const Offset(3, -38), f + const Offset(7, -35), f + const Offset(-3, -30)],
+      const Color(0xFF1E3A5F));
+  line(c, f + const Offset(-2, -35.5), f + const Offset(2, -33.5), const Color(0x664FC3F7), .8);
+  // arm + LED head
+  line(c, f - const Offset(0, 28), f - const Offset(-6, 29), const Color(0xFFB0B7BE), 1.4);
+  oval(c, f - const Offset(-7, 28), 3, 1.4, Color.lerp(const Color(0xFFDADDE0), const Color(0xFFF8FBFF), n)!);
 }

@@ -107,7 +107,7 @@ extension FarmMore on Farm {
 
   // ------------------------------------------------------------ market stalls
   static const marketLevel = 7;
-  int get stallSlots => 4 + (has('cho_que') ? 1 : 0);
+  int get stallSlots => 4 + (has('cho_que') ? 1 : 0) + (has('buu_dien') ? 1 : 0);
   static const stallMaxQty = 20;
 
   /// Lowest and highest asking price for [qty] of [id].

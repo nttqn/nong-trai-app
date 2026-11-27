@@ -413,6 +413,26 @@ const buildings = <String, BuildingDef>{
   'dinh_lang': BuildingDef('dinh_lang', 'Đình làng', BKind.project, 3, 3, 18, 30000,
       goods: {'banhchung': 5, 'cuc': 10, 'nuocmam': 3}, unique: true, xp: 400,
       desc: 'Hội làng mỗi năm: mọi thứ lớn nhanh hơn 10%.'),
+  // second wave: cấp 20–33, where most players are
+  'tram_nuoc': BuildingDef('tram_nuoc', 'Trạm cấp nước sạch', BKind.project, 2, 2, 20, 40000,
+      goods: {'catram': 10, 'chaca': 5}, unique: true, xp: 450,
+      desc: 'Nước sạch về từng nhà, ao được thay nước: ao cá cho thu hoạch nhanh hơn 15%.'),
+  'khuyen_nong': BuildingDef('khuyen_nong', 'Trạm khuyến nông', BKind.project, 2, 2, 22, 50000,
+      goods: {'dautuong': 20, 'dauphu': 5, 'phan': 5}, unique: true, xp: 500,
+      desc: 'Cán bộ khuyến nông chỉ cách chăm vườn: cây ăn quả ra quả nhanh hơn 15%.'),
+  // no plot of its own: solar lamps all along the village road
+  'den_duong': BuildingDef('den_duong', 'Đèn đường năng lượng mặt trời', BKind.project, 0, 0, 24, 60000,
+      goods: {'suade': 10, 'chekho': 5}, unique: true, xp: 550,
+      desc: 'Đường làng sáng đèn suốt đêm: kẻ hái trộm dễ bị bắt hơn 10%.'),
+  'htx': BuildingDef('htx', 'Hợp tác xã nông nghiệp', BKind.project, 3, 2, 27, 80000,
+      goods: {'gaotam': 15, 'chekho': 5, 'suadaunanh': 5}, unique: true, xp: 650,
+      desc: 'Bà con góp sức bán chung: thương lái trả giá cao hơn 10%.'),
+  'san_bong': BuildingDef('san_bong', 'Sân thể thao thôn', BKind.project, 3, 3, 30, 110000,
+      goods: {'phomai': 5, 'chemat': 5, 'banhcom': 3}, unique: true, xp: 750,
+      desc: 'Chiều chiều đá bóng, bóng chuyền: đơn đặc biệt hằng ngày thưởng thêm 20% xu.'),
+  'buu_dien': BuildingDef('buu_dien', 'Bưu điện văn hóa xã', BKind.project, 2, 2, 33, 150000,
+      goods: {'tinhbotnghe': 5, 'chemat': 5, 'nhan': 20}, unique: true, xp: 850,
+      desc: 'Gửi hàng đi khắp nơi: thêm 1 sạp Chợ phiên, bán ở chợ được giá hơn 10%.'),
 };
 
 BuildingDef bdef(String id) => buildings[id]!;
@@ -420,6 +440,7 @@ BuildingDef bdef(String id) => buildings[id]!;
 const projectOrder = [
   'gieng', 'cong_lang', 'duong_be_tong', 'tram_bom', 'tram_dien', 'truong',
   'tram_y_te', 'cho_que', 'nha_van_hoa', 'dinh_lang',
+  'tram_nuoc', 'khuyen_nong', 'den_duong', 'htx', 'san_bong', 'buu_dien',
 ];
 
 /// Upgrades of a finished village project (to level 2, then 3).
@@ -470,6 +491,30 @@ const projectUpgrades = <String, List<ProjectUpgrade>>{
     ProjectUpgrade(25, 40000, {'banhchung': 10, 'nhan': 15}),
     ProjectUpgrade(30, 80000, {'banhcom': 10, 'hongsay': 5, 'phomai': 5}),
   ],
+  'tram_nuoc': [
+    ProjectUpgrade(26, 60000, {'cachep': 15, 'dauphu': 5}),
+    ProjectUpgrade(32, 120000, {'tom': 15, 'nuocmam': 10}),
+  ],
+  'khuyen_nong': [
+    ProjectUpgrade(28, 70000, {'nhan': 15, 'chekho': 5}),
+    ProjectUpgrade(34, 140000, {'hong': 15, 'tinhbotnghe': 5}),
+  ],
+  'den_duong': [
+    ProjectUpgrade(29, 80000, {'chemat': 5, 'gaotam': 10}),
+    ProjectUpgrade(35, 150000, {'hongsay': 5, 'to': 3}),
+  ],
+  'htx': [
+    ProjectUpgrade(32, 110000, {'banhcom': 5, 'phomai': 3}),
+    ProjectUpgrade(37, 180000, {'chieu': 3, 'hongsay': 5}),
+  ],
+  'san_bong': [
+    ProjectUpgrade(35, 150000, {'to': 5, 'tinhbotnghe': 5}),
+    ProjectUpgrade(40, 220000, {'mutcam': 3, 'chieu': 5}),
+  ],
+  'buu_dien': [
+    ProjectUpgrade(38, 200000, {'mitsay': 3, 'chaoluon': 3}),
+    ProjectUpgrade(42, 280000, {'cakho': 3, 'lua_to': 1}),
+  ],
 };
 
 /// What a project does: text with {p} for its percentage, and the base
@@ -485,6 +530,12 @@ const projectEffects = <String, (String, int)>{
   'cho_que': ('Bán ở chợ được giá hơn {p}%, thêm 1 ô đơn hàng', 15),
   'nha_van_hoa': ('Thêm 1 ô đơn hàng, đơn thưởng thêm {p}% xu', 10),
   'dinh_lang': ('Mọi thứ lớn nhanh hơn {p}%', 10),
+  'tram_nuoc': ('Ao cá cho thu hoạch nhanh hơn {p}%', 15),
+  'khuyen_nong': ('Cây ăn quả ra quả nhanh hơn {p}%', 15),
+  'den_duong': ('Kẻ hái trộm dễ bị bắt hơn {p}%', 10),
+  'htx': ('Thương lái trả giá cao hơn {p}%', 10),
+  'san_bong': ('Đơn đặc biệt hằng ngày thưởng thêm {p}% xu', 20),
+  'buu_dien': ('Thêm 1 sạp Chợ phiên, bán ở chợ được giá hơn {p}%', 10),
 };
 
 const projectMult = [1.0, 1.5, 2.0];
@@ -496,6 +547,8 @@ String projectEffect(String id, int lv) {
 
 /// Village title by number of finished projects.
 String villageTitle(int done) {
+  if (done >= 16) return 'Làng quê đáng sống';
+  if (done >= 13) return 'Nông thôn mới thông minh';
   if (done >= 10) return 'Nông thôn mới kiểu mẫu';
   if (done >= 8) return 'Nông thôn mới nâng cao';
   if (done >= 6) return 'Xã Nông thôn mới';

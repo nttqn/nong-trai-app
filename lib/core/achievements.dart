@@ -32,7 +32,8 @@ final achievements = <AchDef>[
       (f) => _sum(f, {for (final r in recipes.values) 'get:${r.product}'})),
   AchDef('order', '📋', 'Thương lái', 'Giao đơn hàng', [20, 150, 600], (f) => _s(f, 'order')),
   AchDef('daily', '⭐', 'Người giữ chữ tín', 'Giao đơn đặc biệt', [5, 30, 100], (f) => _s(f, 'daily')),
-  AchDef('project', '🏛️', 'Trưởng thôn', 'Xây công trình nông thôn mới', [3, 6, projectOrder.length],
+  // tier 3 stays at 10 (the first wave) so tiers claimed before the second wave stay valid
+  AchDef('project', '🏛️', 'Trưởng thôn', 'Xây công trình nông thôn mới', [3, 6, 10],
       (f) => f.projects.length),
   AchDef('level', '👑', 'Đại điền chủ', 'Đạt cấp', [10, 20, 30], (f) => f.level),
   AchDef('login', '📅', 'Chăm chỉ', 'Ngày nhận quà đăng nhập', [7, 30, 100], (f) => _s(f, 'login')),

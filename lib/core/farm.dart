@@ -209,7 +209,7 @@ class Farm {
     if (bdef(type).kind == BKind.tree) {
       final t = trees[type]!;
       o.start = now();
-      o.end = o.start + _dur(t.seconds, _treeSpeed);
+      o.end = o.start + treeMs(t);
     }
     _occ = null;
     return o;
@@ -359,12 +359,29 @@ class Farm {
   double get _paddySpeed => _pb('tram_bom') + _all;
   double get _factorySpeed => _pb('tram_dien') + _all;
   double get _animalSpeed => _pb('tram_y_te') + _all;
-  double get _treeSpeed => _all;
-  double get _fishSpeed => _all;
+  double get _treeSpeed => _pb('khuyen_nong') + _all;
+  double get _fishSpeed => _pb('tram_nuoc') + _all;
   double get xpBonus => _pb('cong_lang') + _pb('truong');
   double get orderBonus =>
       _pb('duong_be_tong') + _pb('nha_van_hoa') + extraHouseCount * extraHouseOrderBonus + (cardActive ? cardOrderBonus : 0);
-  double get marketBonus => _pb('cho_que');
+  double get marketBonus => _pb('cho_que') + _pb('buu_dien');
+  /// Hợp tác xã: the trader pays this much more.
+  double get traderBonus => _pb('htx');
+  /// Sân thể thao: the daily special orders pay this much more.
+  double get dailyBonus => _pb('san_bong');
+
+  /// Scales today's undelivered special orders when [dailyBonus] changes
+  /// (they were priced when the day rolled).
+  void _rescaleDaily(double before) {
+    final after = dailyBonus;
+    if (after == before) return;
+    final k = (1 + orderBonus + after) / (1 + orderBonus + before);
+    for (var i = 0; i < daily.length; i++) {
+      final o = daily[i];
+      if (o.waitUntil < 0) continue;
+      daily[i] = Order(o.id, o.who, o.need, (o.coins * k).round(), o.xp, waitUntil: o.waitUntil);
+    }
+  }
 
   /// The next upgrade of a finished project, or null at the top.
   ProjectUpgrade? nextProjectUpgrade(String id) {
@@ -389,11 +406,13 @@ class Farm {
     final err = canUpgradeProject(id);
     if (err != null) return err;
     final u = nextProjectUpgrade(id)!;
+    final dailyWas = dailyBonus;
     coins -= u.coins;
     _spend(u.goods);
     final lv = projectLevel(id) + 1;
     projectLv[id] = lv;
     stats['project_lv:$id'] = lv;
+    _rescaleDaily(dailyWas);
     _stat('project_up');
     _snd('build');
     addXp(bdef(id).xp * lv);
@@ -424,6 +443,7 @@ class Farm {
       };
   int animalMs(AnimalDef a) => _dur(a.seconds, _animalSpeed);
   int fishMs(FishDef f) => _dur(f.seconds, _fishSpeed);
+  int treeMs(TreeDef t) => _dur(t.seconds, _treeSpeed);
   int recipeMs(RecipeDef r) => _dur(r.seconds, _factorySpeed);
 
   // ---------------------------------------------------------------- economy
@@ -597,7 +617,9 @@ class Farm {
     _spend(d.goods);
     if (isGiftDeco(type)) giftDeco[type] = giftCount(type) - 1;
     if (d.kind == BKind.project) {
+      final dailyWas = dailyBonus;
       projects.add(type);
+      _rescaleDaily(dailyWas);
       _stat('project:$type');
       _ev('village_project', {'type': type, 'level': level});
     }
@@ -774,7 +796,7 @@ class Farm {
     _weekAdd(WeekKind.fruit, n);
     o.stolen = 0;
     o.start = now();
-    o.end = o.start + _dur(t.seconds, _treeSpeed);
+    o.end = o.start + treeMs(t);
     _changed();
     return null;
   }
@@ -1215,11 +1237,12 @@ class Farm {
   }
 
   /// Chance a steal is caught: 15% per scarecrow (at most 45%), plus 25%
-  /// while the guard dog is fed.
+  /// while the guard dog is fed, plus the solar street lamps; at most 90%.
   double get catchChance {
     final d = dog;
-    return math.min(.45, .15 * objs.where((o) => o.type == 'bu_nhin').length) +
-        (d != null && dogAwake(d) ? FarmMore.dogCatch : 0);
+    return math.min(.9, math.min(.45, .15 * objs.where((o) => o.type == 'bu_nhin').length) +
+        (d != null && dogAwake(d) ? FarmMore.dogCatch : 0) +
+        _pb('den_duong'));
   }
 
   /// Owner side: applies what a neighbour did while away. Returns false
@@ -1294,7 +1317,8 @@ class Farm {
       need[id] = q;
       value += p * q;
     }
-    final coins = (value * (2.1 + tier * .3) * (1 + orderBonus) * pay).round();
+    // festival orders (goods given) don't get the sports ground's bonus
+    final coins = (value * (2.1 + tier * .3) * (1 + orderBonus + (goods == null ? dailyBonus : 0)) * pay).round();
     final xpGain = math.max(5, (value / 4).round());
     return Order(nextId++, villagers[rng.nextInt(villagers.length)], need, coins, xpGain);
   }

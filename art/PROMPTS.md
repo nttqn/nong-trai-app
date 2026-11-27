@@ -482,3 +482,15 @@ Một đánh giá 4★ chê người dân vẽ bằng code (nhất là người 
 | `nha_5` | A grand traditional Vietnamese three-bay ancestral house (nhà thờ họ ba gian) on a 3x3 tile base: dark ironwood columns, a wide front veranda, a heavy curved dark-red terracotta tile roof with upturned dragon-tail eave corners, carved wooden doors, a stone-paved front yard with two big blue-and-white ceramic planters holding ornamental trees, a small incense altar by the steps. Dignified and old. |
 | `nha_kho_3` | A Vietnamese concrete storehouse (kho bê tông) on a 2x2 tile base: pale grey rendered concrete walls, a flat roof with a low parapet, a big green metal roller-shutter door on the lower-left face, a few jute rice sacks and a hand cart by the door. |
 | `nha_kho_4` | A large Vietnamese village co-operative depot (kho tổng) on a 2x2 tile base: two-storey cream-yellow plastered walls with a plain wooden sign board above a wide double sliding door on the lower-left face, a corrugated red metal roof with a skylight, stacked rice sacks, wooden crates and baskets of produce outside. Bigger than the other warehouses. |
+
+## Đợt 18 — công trình nông thôn mới đợt 2
+
+Chưa có ảnh: trong game đang vẽ tạm bằng code. Cách làm như đợt 3 (cùng phong cách, cùng góc nhìn, có đế ô đất như các công trình nông thôn mới cũ). "Đèn đường năng lượng mặt trời" không cần ảnh (đèn vẽ bằng code dọc đường làng).
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `tram_nuoc` | A small Vietnamese village clean-water station (trạm cấp nước sạch) on a 2x2 tile base: a tall pale-blue cylindrical steel water tower on four grey legs at the back, a low white pump house with a blue door and a corrugated tin roof in front, blue pipes running along the ground to a little concrete settling tank with clear water. |
+| `khuyen_nong` | A Vietnamese agricultural extension office (trạm khuyến nông) on a 2x2 tile base: a single-storey pale-green plastered building with a red tiled hip roof and a green sign board, in front a small demonstration plot with neat rows of young seedlings and a tiny white label stake, a watering can and a sack of seed by the door. |
+| `htx` | A Vietnamese agricultural co-operative (hợp tác xã nông nghiệp) on a 3x2 tile base: a long cream warehouse with a corrugated grey tin roof and a big brown sliding door on the lower-left face, a small red-tiled office at the right end, a red sign board, stacked rice sacks and a hand-drawn cart in front. |
+| `san_bong` | A village sports ground (sân thể thao thôn) on a 3x3 tile base: a flat green football pitch with white lines, centre circle and two small white goals at the ends, a red flag with a yellow star on a pole at one corner, a volleyball net post at the side, a white ball on the grass. Flat, no buildings. |
+| `buu_dien` | A Vietnamese commune post office (bưu điện văn hóa xã) on a 2x2 tile base: a single-storey warm-yellow building with a red tiled hip roof, a blue glass door and window frames on the lower-left face, a blue "BƯU ĐIỆN" style sign board without readable text, a yellow post box on a short pole by the door, a bench and a potted plant. |

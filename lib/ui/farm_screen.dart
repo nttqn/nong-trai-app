@@ -117,6 +117,8 @@ class _FarmScreenState extends State<FarmScreen>
             _openRiver();
           case 'trader':
             _openTrader();
+          case 'projects':
+            _openProjects();
           case 'fish':
             showFarmSheet(context, (_) => FishBoardSheet(farm), height: .86);
         }

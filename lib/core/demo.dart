@@ -145,6 +145,21 @@ Farm demoFarm(int stage, {int house = -1}) {
     anywhere('khung_cui');
     f.objs.last.jobs.add(Job('lua_to', now + 100000));
     anywhere('xuong_mut');
+    // the second wave of village projects
+    final inv = Map.of(f.inv);
+    for (final id in ['tram_nuoc', 'khuyen_nong', 'den_duong', 'htx', 'san_bong', 'buu_dien']) {
+      for (final e in bdef(id).goods.entries) {
+        f.inv[e.key] = (f.inv[e.key] ?? 0) + e.value;
+      }
+      if (bdef(id).w == 0) {
+        f.build(id, 0, 0);
+      } else {
+        anywhere(id);
+      }
+    }
+    f.inv
+      ..clear()
+      ..addAll(inv);
     for (final t in ['cay_cam', 'cay_mit', 'cay_cau']) {
       anywhere(t, prog: 1.2);
     }
