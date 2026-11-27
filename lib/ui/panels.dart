@@ -44,7 +44,7 @@ class ObjPanel extends StatelessWidget {
       BKind.house => o.type == 'nha' ? _house() : _extraHouse(),
       BKind.storage => _warehouse(),
       BKind.obstacle => _obstacle(),
-      _ when o.type == 'ham_chua' => _cellar(),
+      _ when paidStores.containsKey(o.type) => _cellar(),
       _ when o.type == 'cho' => _dog(),
       _ when o.type == 'san_phoi' => _yard(),
       _ => _info(),
@@ -88,7 +88,7 @@ class ObjPanel extends StatelessWidget {
     if (o.type == 'nha_phu') return 'Nhà con cháu · ${houseLevels[o.level].name}';
     if (o.def.kind == BKind.house) return houseLevels[o.level].name;
     if (o.def.kind == BKind.storage) return warehouseLevels[o.level].name;
-    if (o.type == 'ham_chua') return hamChuaLevels[o.level.clamp(0, hamChuaLevels.length - 1)].name;
+    if (paidStores.containsKey(o.type)) return paidStoreLevel(o).name;
     if (o.def.kind == BKind.pen) return '${o.def.name} (${o.count}/${animalForPen(o.type)!.maxCount})';
     return o.def.name;
   }
@@ -236,7 +236,7 @@ class ObjPanel extends StatelessWidget {
           if (locked)
             Text('🔒 Cấp ${c.level}', style: const TextStyle(fontSize: 10.5, color: red, fontWeight: FontWeight.w700))
           else ...[
-            Text('⏱ ${fmtSecs(farm.cropMs(c) ~/ 1000)}', style: const TextStyle(fontSize: 10.5, color: brownLight)),
+            timeLabel(farm.cropMs(c), c.seconds),
             Coin(c.seed, size: 10.5),
           ],
         ]),
@@ -255,7 +255,8 @@ class ObjPanel extends StatelessWidget {
         Text('Chuồng còn trống. Mua ${an.name.toLowerCase()} về nuôi nhé!',
             style: const TextStyle(color: brownLight)),
       if (!producing && o.count > 0)
-        Text('Cho ăn ${o.count} $feedName → ${o.count} ${item(an.product).name} sau ${fmtSecs(farm.animalMs(an) ~/ 1000)}',
+        Text('Cho ăn ${o.count} $feedName → ${o.count} ${item(an.product).name} sau ${fmtSecs(farm.animalMs(an) ~/ 1000)}'
+            '${speedNote(farm.animalMs(an), an.seconds)}',
             style: const TextStyle(color: brown, fontWeight: FontWeight.w600)),
       const SizedBox(height: 8),
       Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
@@ -300,8 +301,7 @@ class ObjPanel extends StatelessWidget {
                   if (farm.level < f.level)
                     Text('🔒 Cấp ${f.level}', style: const TextStyle(fontSize: 10.5, color: red))
                   else ...[
-                    Text('⏱ ${fmtSecs(farm.fishMs(f) ~/ 1000)} · ×${f.yield}',
-                        style: const TextStyle(fontSize: 10.5, color: brownLight)),
+                    timeLabel(farm.fishMs(f), f.seconds, extra: ' · ×${f.yield}'),
                     Coin(f.fry, size: 10.5),
                   ],
                 ]),
@@ -392,7 +392,7 @@ class ObjPanel extends StatelessWidget {
             Wrap(children: [
               for (final e in r.inputs.entries) NeedChip(e.key, e.value, farm.countOf(e.key), size: 22),
             ]),
-          Text('⏱ ${fmtSecs(farm.recipeMs(r) ~/ 1000)}', style: const TextStyle(fontSize: 10.5, color: brownLight)),
+          timeLabel(farm.recipeMs(r), r.seconds, size: 10.5),
         ]),
       ),
     );
@@ -422,7 +422,7 @@ class ObjPanel extends StatelessWidget {
   }
 
   Widget _cellar() {
-    final cur = hamChuaLevels[o.level.clamp(0, hamChuaLevels.length - 1)];
+    final cur = paidStoreLevel(o);
     final n = farm.nextHamChua(o);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Chứa thêm ${cur.storage} · Kho chung: ${farm.stored}/${farm.storageCap}',
@@ -638,4 +638,34 @@ class LotPanel extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// Percent faster (positive) or slower (negative, a dry spell) than the
+/// base time.
+int speedPct(int ms, int baseSecs) => baseSecs <= 0 ? 0 : ((1 - ms / (baseSecs * 1000)) * 100).round();
+
+/// " (nhanh hơn 40%)" after a time in a sentence, or nothing.
+String speedNote(int ms, int baseSecs) {
+  final p = speedPct(ms, baseSecs);
+  return p >= 1 ? ' (nhanh hơn $p%)' : p <= -1 ? ' (chậm hơn ${-p}%)' : '';
+}
+
+/// "⏱ 48s −60%": a time on a small card with how much the village
+/// projects (and season, weather) take off it, so upgrades show.
+Widget timeLabel(int ms, int baseSecs, {String extra = '', double size = 10.5}) {
+  final p = speedPct(ms, baseSecs);
+  return Text.rich(
+    TextSpan(children: [
+      TextSpan(text: '⏱ ${fmtSecs(ms ~/ 1000)}'),
+      if (p >= 1 || p <= -1)
+        TextSpan(
+          text: p > 0 ? ' −$p%' : ' +${-p}%',
+          style: TextStyle(fontWeight: FontWeight.w900, color: p > 0 ? greenDark : red),
+        ),
+      if (extra.isNotEmpty) TextSpan(text: extra),
+    ]),
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    style: TextStyle(fontSize: size, color: brownLight),
+  );
 }

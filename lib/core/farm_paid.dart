@@ -6,6 +6,7 @@
 // - Gói khởi đầu: once per farm: coins by level, +50 storage, 10 Vé Xong
 //   ngay, a lotus pot and a lantern to place.
 // - Hầm chứa: unlocks the Hầm chứa building (+250 storage while it stands).
+// - Vựa lúa (1.12.0): like Hầm chứa with twice the storage at each level.
 // - Thẻ Nhà Nông: 30 days of 5 free Xong ngay a day, +20% coins on new
 //   orders and the login gift doubled without an ad. Buying again adds 30
 //   days.
@@ -13,11 +14,12 @@
 part of 'farm.dart';
 
 const skuNoAds = 'bo_quang_cao', skuStarter = 'goi_khoi_dau', skuHamChua = 'ham_chua', skuCard = 'the_nha_nong';
-const allSkus = {skuNoAds, skuStarter, skuHamChua, skuCard};
+const skuVuaLua = 'vua_lua';
+const allSkus = {skuNoAds, skuStarter, skuHamChua, skuVuaLua, skuCard};
 
 /// Bought once per store account (restored on a new phone); the card is
 /// bought again and again.
-const oneTimeSkus = {skuNoAds, skuStarter, skuHamChua};
+const oneTimeSkus = {skuNoAds, skuStarter, skuHamChua, skuVuaLua};
 
 const hamChuaStorage = 250;
 
@@ -35,6 +37,25 @@ const hamChuaLevels = [
   HamChuaLevel('Hầm chứa lớn', 1000, 80000, 20),
   HamChuaLevel('Đại hầm chứa', 3000, 300000, 30),
 ];
+
+const vuaLuaStorage = 500;
+
+/// Vựa lúa levels: twice the Hầm chứa's storage, same levels and xu.
+const vuaLuaLevels = [
+  HamChuaLevel('Vựa lúa', vuaLuaStorage, 0, 1),
+  HamChuaLevel('Vựa lúa rộng', 1000, 20000, 10),
+  HamChuaLevel('Vựa lúa lớn', 2000, 80000, 20),
+  HamChuaLevel('Đại vựa lúa', 6000, 300000, 30),
+];
+
+/// The paid storage buildings and their level tables.
+const paidStores = {'ham_chua': hamChuaLevels, 'vua_lua': vuaLuaLevels};
+
+HamChuaLevel paidStoreLevel(Obj o) {
+  final ls = paidStores[o.type]!;
+  return ls[o.level.clamp(0, ls.length - 1)];
+}
+
 const starterStorage = 50, starterTickets = 10;
 const starterDecos = ['chau_sen', 'den_long'];
 int starterCoins(int level) => 3000 + 300 * level;
@@ -92,24 +113,26 @@ extension FarmPaid on Farm {
     return null;
   }
 
-  int get hamChuaCap {
-    final o = hamChuaObj;
-    return o == null ? 0 : hamChuaLevels[o.level.clamp(0, hamChuaLevels.length - 1)].storage;
-  }
+  /// Storage of the placed paid buildings (Hầm chứa, Vựa lúa).
+  int get hamChuaCap =>
+      objs.where((o) => paidStores.containsKey(o.type)).fold(0, (s, o) => s + paidStoreLevel(o).storage);
 
-  HamChuaLevel? nextHamChua(Obj o) => o.level + 1 < hamChuaLevels.length ? hamChuaLevels[o.level + 1] : null;
+  HamChuaLevel? nextHamChua(Obj o) {
+    final ls = paidStores[o.type]!;
+    return o.level + 1 < ls.length ? ls[o.level + 1] : null;
+  }
 
   String? upgradeHamChua(Obj o) {
     final n = nextHamChua(o);
-    if (n == null) return 'Hầm chứa đã nâng cấp tối đa';
+    if (n == null) return '${o.def.name} đã nâng cấp tối đa';
     if (level < n.level) return 'Cần đạt cấp ${n.level}';
     if (coins < n.cost) return 'Không đủ xu';
     coins -= n.cost;
     o.level++;
-    _ev('ham_chua_upgrade', {'lv': o.level + 1, 'level': level});
+    _ev('${o.type}_upgrade', {'lv': o.level + 1, 'level': level});
     _snd('build');
     addXp(30 * o.level);
-    _fx(o, '🏺 ${n.name}');
+    _fx(o, '${o.type == 'vua_lua' ? '🌾' : '🏺'} ${n.name}');
     _changed();
     return null;
   }
@@ -141,6 +164,10 @@ extension FarmPaid on Farm {
         if (hamChua) return null;
         hamChua = true;
         out.add('Mở khóa Hầm chứa (+$hamChuaStorage chỗ chứa). Vào Xây dựng → Nhà cửa để đặt.');
+      case skuVuaLua:
+        if (vuaLua) return null;
+        vuaLua = true;
+        out.add('Mở khóa Vựa lúa (+$vuaLuaStorage chỗ chứa). Vào Xây dựng → Nhà cửa để đặt.');
       case skuCard:
         final from = cardActive ? _addDays(cardUntil, 1) : _todayKey;
         cardUntil = _addDays(from, cardDays - 1);

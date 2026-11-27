@@ -89,12 +89,21 @@ class _BootState extends State<_Boot> {
             f.grantPaid(skuStarter);
             f.grantPaid(skuCard);
             f.grantPaid(skuHamChua);
+            f.grantPaid(skuVuaLua);
             final px = int.tryParse(q['px'] ?? '') ?? 14, py = int.tryParse(q['py'] ?? '') ?? 14;
             outer:
             for (var r = 0; r < 12; r++) {
               for (var y = py - r; y <= py + r; y++) {
                 for (var x = px - r; x <= px + r; x++) {
                   if (f.canPlace('ham_chua', x, y) && f.build('ham_chua', x, y) == null) break outer;
+                }
+              }
+            }
+            outer2:
+            for (var r = 0; r < 12; r++) {
+              for (var y = py - r; y <= py + r; y++) {
+                for (var x = px - r; x <= px + r; x++) {
+                  if (f.canPlace('vua_lua', x, y) && f.build('vua_lua', x, y) == null) break outer2;
                 }
               }
             }

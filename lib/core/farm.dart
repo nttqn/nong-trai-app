@@ -136,7 +136,7 @@ class Farm {
   /// Paid packs (farm_paid.dart): Gói khởi đầu taken, Hầm chứa unlocked,
   /// Thẻ Nhà Nông's last day (day key, 0 = never), its free Xong ngay used
   /// today, Vé Xong ngay held, and storage given by packs.
-  bool starterTaken = false, hamChua = false;
+  bool starterTaken = false, hamChua = false, vuaLua = false;
   int cardUntil = 0, cardUseDay = 0, cardUsed = 0, tickets = 0, paidStorage = 0;
   /// Sự kiện tuần (farm_week.dart): the week (its Monday's day key),
   /// points made in it and milestones claimed. [weekCarried]: milestones
@@ -362,6 +362,17 @@ class Farm {
   double get _treeSpeed => _pb('khuyen_nong') + _all;
   double get _fishSpeed => _pb('tram_nuoc') + _all;
   double get xpBonus => _pb('cong_lang') + _pb('truong');
+
+  /// How much faster the village projects make each kind of work, for the
+  /// "Đang được giảm" line of the projects sheet.
+  List<(String, double)> get speedSummary => [
+        ('Ruộng lúa', _paddySpeed),
+        ('Rau màu', _bedSpeed),
+        ('Vật nuôi', _animalSpeed),
+        ('Máy chế biến', _factorySpeed),
+        ('Cây ăn quả', _treeSpeed),
+        ('Ao cá', _fishSpeed),
+      ];
   double get orderBonus =>
       _pb('duong_be_tong') + _pb('nha_van_hoa') + extraHouseCount * extraHouseOrderBonus + (cardActive ? cardOrderBonus : 0);
   double get marketBonus => _pb('cho_que') + _pb('buu_dien');
@@ -591,6 +602,7 @@ class Farm {
       return giftCount(type) > 0 ? null : 'Quà sự kiện tuần: đạt mốc cuối để nhận';
     }
     if (type == 'ham_chua' && !hamChua) return 'Mở bằng gói Hầm chứa trong Cửa hàng';
+    if (type == 'vua_lua' && !vuaLua) return 'Mở bằng gói Vựa lúa trong Cửa hàng';
     if (level < d.level) return 'Cần đạt cấp ${d.level}';
     if (d.unique && (projects.contains(type) || objs.any((o) => o.type == type))) {
       return 'Đã xây rồi';
@@ -654,7 +666,7 @@ class Farm {
     final k = o.def.kind;
     if (k == BKind.storage) return stored <= storageCap - warehouseLevels[o.level].storage;
     if (o.type == 'san_phoi' && yard.isNotEmpty) return false; // grain on it
-    if (o.type == 'ham_chua') return false; // a paid building stays
+    if (o.type == 'ham_chua' || o.type == 'vua_lua') return false; // a paid building stays
     return k == BKind.paddy || k == BKind.bed || k == BKind.tree || k == BKind.deco || k == BKind.pen || k == BKind.pond;
   }
 
@@ -1453,9 +1465,9 @@ class Farm {
         if (moonKey.isNotEmpty) 'moon': moonKey,
         if (festKey.isNotEmpty) 'fest': {'k': festKey, 'o': [for (final o in fest) o.toJson()]},
         if (giftDeco.isNotEmpty) 'gift': giftDeco,
-        if (starterTaken || hamChua || cardUntil != 0 || tickets != 0 || paidStorage != 0)
+        if (starterTaken || hamChua || vuaLua || cardUntil != 0 || tickets != 0 || paidStorage != 0)
           'paid': {
-            's': starterTaken ? 1 : 0, 'h': hamChua ? 1 : 0, 'c': cardUntil, 'cd': cardUseDay, 'cu': cardUsed,
+            's': starterTaken ? 1 : 0, 'h': hamChua ? 1 : 0, if (vuaLua) 'v': 1, 'c': cardUntil, 'cd': cardUseDay, 'cu': cardUsed,
             't': tickets, 'st': paidStorage,
           },
         if (mem.isNotEmpty) 'mem': mem,
@@ -1545,6 +1557,7 @@ class Farm {
       if (pd != null) {
         f.starterTaken = pd['s'] == 1;
         f.hamChua = pd['h'] == 1;
+        f.vuaLua = pd['v'] == 1;
         f.cardUntil = (pd['c'] as num?)?.toInt() ?? 0;
         f.cardUseDay = (pd['cd'] as num?)?.toInt() ?? 0;
         f.cardUsed = (pd['cu'] as num?)?.toInt() ?? 0;

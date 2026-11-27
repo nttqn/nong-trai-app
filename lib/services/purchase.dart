@@ -34,12 +34,13 @@ String productName(String sku) => switch (sku) {
       skuNoAds => 'Bỏ quảng cáo',
       skuStarter => 'Gói khởi đầu',
       skuHamChua => 'Hầm chứa',
+      skuVuaLua => 'Vựa lúa',
       skuCard => 'Thẻ Nhà Nông 30 ngày',
       _ => sku,
     };
 
 /// Google Play purchases (1.6.0), adapted from kiem-hiep-app (live there):
-/// Bỏ quảng cáo, Gói khởi đầu and Hầm chứa are non-consumables, restored
+/// Bỏ quảng cáo, Gói khởi đầu, Hầm chứa and Vựa lúa are non-consumables, restored
 /// on every start; Thẻ Nhà Nông is a consumable bought again each month.
 ///
 /// No server checks receipts; each Android purchase's Play signature is
@@ -146,6 +147,7 @@ class PurchaseService {
   static const _demoPrices = {
     skuStarter: '22.000 ₫',
     skuHamChua: '79.000 ₫',
+    skuVuaLua: '135.000 ₫',
     skuCard: '49.000 ₫',
     skuNoAds: '49.000 ₫',
   };
@@ -157,6 +159,7 @@ class PurchaseService {
       skuNoAds => AdsService.instance.adFree.value,
       skuStarter => f?.starterTaken ?? false,
       skuHamChua => f?.hamChua ?? false,
+      skuVuaLua => f?.vuaLua ?? false,
       _ => false,
     };
   }
@@ -320,6 +323,10 @@ class PurchaseService {
     _queue.clear();
     if (_owned.contains(skuHamChua) && !f.hamChua) {
       f.hamChua = true;
+      touched = true;
+    }
+    if (_owned.contains(skuVuaLua) && !f.vuaLua) {
+      f.vuaLua = true;
       touched = true;
     }
     if (_cardUntil > f.cardUntil) {

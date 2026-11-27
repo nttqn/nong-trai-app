@@ -1,8 +1,9 @@
-// Cửa hàng (1.6.0): the four paid packs, restore and purchase history.
+// Cửa hàng (1.6.0): the paid packs, restore and purchase history.
 
 import 'package:flutter/material.dart';
 
 import '../core/farm.dart';
+import '../render/farm_painter.dart';
 import '../services/ads.dart';
 import '../services/purchase.dart';
 import 'widgets.dart';
@@ -47,6 +48,19 @@ class PaidShopSheet extends StatelessWidget {
                   'Đặt ở đâu tùy thích (Xây dựng → Nhà cửa)',
                 ],
                 owned: farm.hamChua,
+              ),
+              _Pack(
+                sku: skuVuaLua,
+                icon: '🛖',
+                title: 'Vựa lúa',
+                tag: 'Mua 1 lần · gấp đôi Hầm chứa',
+                lines: const [
+                  'Mở khóa công trình Vựa lúa sàn gỗ',
+                  '+$vuaLuaStorage chỗ chứa, thêm vào cả kho chung',
+                  'Nâng cấp bằng xu: 1000 → 2000 → 6000 chỗ chứa',
+                  'Dùng cùng lúc với Hầm chứa (Xây dựng → Nhà cửa)',
+                ],
+                owned: farm.vuaLua,
               ),
               _Pack(
                 sku: skuCard,
@@ -133,6 +147,51 @@ void _info(BuildContext context, String title, String body) => showDialog<void>(
       ),
     );
 
+/// The pack's picture: `assets/iap/<sku>.png` (made by tool/iap_icons.ps1
+/// from the Play icons). A pack without one yet shows its building drawn
+/// on the same warm background, or else its emoji.
+class _PackPicture extends StatelessWidget {
+  final String sku, emoji;
+  const _PackPicture(this.sku, this.emoji);
+
+  static const _size = 64.0;
+  static const _buildings = {skuVuaLua: 'vua_lua', skuHamChua: 'ham_chua'};
+  // the painter only needs a farm for context; one blank farm will do
+  static final _farm = Farm.fresh();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget fallback() {
+      final b = _buildings[sku];
+      return DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(colors: [Color(0xFFFFF9E4), Color(0xFFEEC878)], radius: .9),
+        ),
+        child: b == null
+            ? Center(child: Text(emoji, style: const TextStyle(fontSize: 34)))
+            : Padding(
+                padding: const EdgeInsets.all(4),
+                child: CustomPaint(painter: ObjPreviewPainter(b, _farm)),
+              ),
+      );
+    }
+
+    return Container(
+      width: _size,
+      height: _size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 4, offset: Offset(0, 2))],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Image.asset('assets/iap/$sku.png',
+            width: _size, height: _size, fit: BoxFit.cover, errorBuilder: (_, _, _) => fallback()),
+      ),
+    );
+  }
+}
+
 class _Pack extends StatelessWidget {
   final String sku, icon, title, tag;
   final List<String> lines;
@@ -148,8 +207,8 @@ class _Pack extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: cardDeco(color: Colors.white),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(icon, style: const TextStyle(fontSize: 34)),
-        const SizedBox(width: 10),
+        _PackPicture(sku, icon),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(color: brown, fontWeight: FontWeight.w900, fontSize: 16)),

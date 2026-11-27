@@ -88,6 +88,9 @@ void drawObj(Canvas c, Iso iso, Farm farm, Obj o, double t) {
         // its own art when there is some (PROMPTS.md batch 14), else the
         // brick warehouse's, else a laterite-stone cellar drawn in code
         if (!sprite('ham_chua') && !sprite('nha_kho_1')) _cellar(c, iso, x, y);
+      } else if (o.type == 'vua_lua') {
+        // its own art when there is some (PROMPTS.md đợt 19)
+        if (!sprite('vua_lua')) _granary(c, iso, x, y);
       } else if (!sprite(o.type)) {
         _deco(c, iso, o.type, x, y, foot, t, o.id);
       }
@@ -124,6 +127,72 @@ void _cellar(Canvas c, Iso iso, double x, double y) {
   // a few jars and sacks by the door
   oval(c, iso.p(x + .5, y + 2.05, 4), 4, 5, const Color(0xFF8D5A3A));
   oval(c, iso.p(x + 1.55, y + 2.05, 4), 5, 4, const Color(0xFFE8D9A8));
+}
+
+/// Code-drawn Vựa lúa: a raised wooden granary on stilts, a big woven
+/// bamboo bin (cót) of paddy with a conical thatch hat, sacks by the ladder.
+void _granary(Canvas c, Iso iso, double x, double y) {
+  const post = Color(0xFF6D4C30), floor = Color(0xFFA67C52), cot = Color(0xFFD9B97A);
+  fillPoly(c, diamond(iso, x + .05, y + .05, 1.9, 1.9), const Color(0xFFC9B48A));
+  shadow(c, iso.p(x + 1, y + 1), 38, 16);
+  // stilts on flat stones
+  for (final (px, py) in [(.25, .25), (1.75, .25), (1.75, 1.75), (.25, 1.75)]) {
+    final f = iso.p(x + px, y + py);
+    oval(c, f, 5, 2.4, const Color(0xFF9E9E9E));
+    line(c, f, f - const Offset(0, 14), post, 3.2);
+  }
+  // wooden floor
+  box(c, iso, x + .15, y + .15, 1.7, 1.7, 14, 18, floor, shade(floor, -.1), shade(floor, -.22));
+  // the woven bin (cót): a tall cylinder of plaited bamboo under a
+  // conical thatch hat, the way paddy is kept in the countryside
+  const r = 30.0, h = 36.0;
+  final m = iso.p(x + 1, y + 1, 18);
+  c.drawRect(Rect.fromLTWH(m.dx - r, m.dy - h, r * 2, h), Paint()..color = cot);
+  oval(c, m, r, r * .45, cot);
+  // shading on the right half
+  c.drawRect(Rect.fromLTWH(m.dx + r * .35, m.dy - h, r * .65, h), Paint()..color = const Color(0x22000000));
+  for (var i = 1; i < 7; i++) {
+    final yy = m.dy - i * h / 7;
+    line(c, Offset(m.dx - r, yy), Offset(m.dx + r, yy), shade(cot, -.2), .9);
+  }
+  for (var i = -4; i <= 4; i++) {
+    final dx = i * r / 4.6;
+    line(c, Offset(m.dx + dx, m.dy - h), Offset(m.dx + dx, m.dy + r * .45 * math.sqrt(1 - (dx / r) * (dx / r))),
+        shade(cot, -.12), .6);
+  }
+  // a rope band
+  line(c, Offset(m.dx - r, m.dy - h * .55), Offset(m.dx + r, m.dy - h * .55), const Color(0xFF8D6E4C), 2);
+  // conical thatch hat
+  final top = m - Offset(0, h);
+  final apex = top - const Offset(0, 34);
+  const thatch = Color(0xFFD4A94F);
+  final hat = Path()
+    ..moveTo(top.dx - r - 6, top.dy + 2)
+    ..quadraticBezierTo(top.dx, top.dy + r * .55 + 6, top.dx + r + 6, top.dy + 2)
+    ..lineTo(apex.dx, apex.dy)
+    ..close();
+  pathFill(c, hat, thatch);
+  final shadeHat = Path()
+    ..moveTo(apex.dx, apex.dy)
+    ..lineTo(top.dx + r + 6, top.dy + 2)
+    ..quadraticBezierTo(top.dx + r * .5, top.dy + r * .5, top.dx + 4, top.dy + r * .55 + 5)
+    ..close();
+  pathFill(c, shadeHat, shade(thatch, -.15));
+  for (var i = -3; i <= 3; i++) {
+    final e = Offset(top.dx + i * (r + 6) / 3.4, top.dy + 2 + (r * .5) * (1 - (i * i) / 12));
+    line(c, apex, Offset.lerp(apex, e, .96)!, shade(thatch, -.25), .7);
+  }
+  oval(c, apex + const Offset(0, 2), 3, 2, shade(thatch, -.3));
+  // ladder and sacks in front
+  final l0 = iso.p(x + .8, y + 2.15), l1 = iso.p(x + .8, y + 1.85, 16);
+  line(c, l0 + const Offset(-4, 0), l1 + const Offset(-4, 0), post, 1.6);
+  line(c, l0 + const Offset(4, 0), l1 + const Offset(4, 0), post, 1.6);
+  for (var i = 1; i < 4; i++) {
+    final q = Offset.lerp(l0, l1, i / 4)!;
+    line(c, q + const Offset(-4, 0), q + const Offset(4, 0), post, 1.2);
+  }
+  oval(c, iso.p(x + 1.45, y + 2.1, 4), 5.5, 4.5, const Color(0xFFF5E6C4));
+  oval(c, iso.p(x + 1.7, y + 2.0, 4), 5, 4, const Color(0xFFEBD9AE));
 }
 
 /// Code-drawn warehouse: wooden barn, brick walls from level 1, a bigger

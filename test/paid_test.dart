@@ -58,6 +58,42 @@ void main() {
     expect(reload(f).storageCap, cap + 3000);
   });
 
+  test('Vựa lúa: twice the Hầm chứa at every level, alongside it, restored', () {
+    final f = farm()..coins = 100000;
+    expect(f.canBuy('vua_lua'), isNotNull);
+    expect(f.grantPaid(skuVuaLua), isNotNull);
+    expect(f.grantPaid(skuVuaLua), isNull); // one-time
+    f.grantPaid(skuHamChua);
+    final cap = f.storageCap;
+    for (final t in ['ham_chua', 'vua_lua']) {
+      var placed = false;
+      for (var y = 0; y < mapSize && !placed; y++) {
+        for (var x = 0; x < mapSize && !placed; x++) {
+          if (f.canPlace(t, x, y)) placed = f.build(t, x, y) == null;
+        }
+      }
+      expect(placed, isTrue, reason: t);
+    }
+    expect(f.storageCap, cap + hamChuaStorage + vuaLuaStorage);
+    final v = f.objs.firstWhere((o) => o.type == 'vua_lua');
+    expect(f.canRemove(v), isFalse);
+    expect(f.canBuy('vua_lua'), isNotNull); // only one
+    for (var i = 0; i < hamChuaLevels.length; i++) {
+      expect(vuaLuaLevels[i].storage, hamChuaLevels[i].storage * 2);
+    }
+    f.level = 30;
+    f.coins = 1000000;
+    for (final want in [1000, 2000, 6000]) {
+      expect(f.upgradeHamChua(v), isNull);
+      expect(f.storageCap, cap + hamChuaStorage + want);
+    }
+    expect(f.upgradeHamChua(v), isNotNull); // max
+    final g = reload(f);
+    expect(g.vuaLua, isTrue);
+    expect(g.storageCap, cap + hamChuaStorage + 6000);
+    expect(oneTimeSkus.contains(skuVuaLua) && allSkus.contains(skuVuaLua), isTrue);
+  });
+
   test('pens and ponds can be demolished', () {
     final f = farm()..coins = 100000..level = 10;
     for (final t in ['chuong_ga', 'ao']) {

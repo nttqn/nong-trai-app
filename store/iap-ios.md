@@ -17,6 +17,7 @@ Review Screenshot (bắt buộc, mỗi sản phẩm một ảnh): dùng chung `s
 |---|---|---|---|---|
 | mlc_goi_khoi_dau | Non-Consumable | Starter Pack | 22.000 ₫ | 25.000 ₫ (0.99 USD) |
 | mlc_ham_chua | Non-Consumable | Laterite Cellar | 79.000 ₫ | 79.000 ₫ (2.99 USD) |
+| mlc_vua_lua | Non-Consumable | Rice Granary | 135.000 ₫ | mức VND gần 135.000 ₫ nhất (≈ 4.99 USD) |
 | mlc_the_nha_nong | Consumable | Farmer Card 30 days | 49.000 ₫ | 49.000 ₫ (1.99 USD) |
 | mlc_bo_quang_cao | Non-Consumable | Remove Ads | 49.000 ₫ | 49.000 ₫ (1.99 USD) |
 
@@ -35,6 +36,10 @@ Thêm 2 ngôn ngữ: **Vietnamese** và **English (U.S.)**.
 ### mlc_ham_chua
 - VI — Display Name: `Hầm chứa đá ong` · Description: `Thêm 250 chỗ chứa, nâng cấp tới 3000`
 - EN — Display Name: `Laterite Cellar` · Description: `+250 storage, upgradable up to 3000`
+
+### mlc_vua_lua
+- VI — Display Name: `Vựa lúa` · Description: `Thêm 500 chỗ chứa, nâng cấp tới 6000`
+- EN — Display Name: `Rice Granary` · Description: `+500 storage, upgradable up to 6000`
 
 ### mlc_the_nha_nong
 - VI — Display Name: `Thẻ Nhà Nông 30 ngày` · Description: `30 ngày: 5 lượt Xong ngay mỗi ngày, +20% xu`

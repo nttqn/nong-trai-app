@@ -280,6 +280,8 @@ const buildings = <String, BuildingDef>{
       desc: 'Bò sữa ăn rơm, cho sữa.', xp: 22),
   'ham_chua': BuildingDef('ham_chua', 'Hầm chứa', BKind.deco, 2, 2, 1, 0,
       desc: 'Hầm đá ong mát lạnh: thêm 250 chỗ chứa, nâng cấp bằng xu lên 500, 1000, 3000. Mở bằng gói Hầm chứa trong Cửa hàng.', unique: true),
+  'vua_lua': BuildingDef('vua_lua', 'Vựa lúa', BKind.deco, 2, 2, 1, 0,
+      desc: 'Vựa lúa sàn gỗ, cót tre đầy ắp: thêm 500 chỗ chứa, nâng cấp bằng xu lên 1000, 2000, 6000. Mở bằng gói Vựa lúa trong Cửa hàng.', unique: true),
   'nha_kho': BuildingDef('nha_kho', 'Nhà kho', BKind.storage, 2, 2, 3, 600,
       desc: 'Thêm chỗ chứa nông sản cho kho chung. Nâng cấp được.', xp: 10),
   'may_xay': BuildingDef('may_xay', 'Máy xay xát', BKind.factory, 2, 2, 3, 400,

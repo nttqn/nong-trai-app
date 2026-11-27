@@ -91,6 +91,8 @@ class _FarmScreenState extends State<FarmScreen>
     // store screenshots on web: ?sheet=calendar|album|orders|shop|storage|map|chat
     // (?chat=demo fills the chat with sample lines instead of Firebase)
     if (kIsWeb && Uri.base.queryParameters['chat'] == 'demo') ChatService.instance.debugMessages = _demoChat();
+    final demoUnread = kIsWeb ? int.tryParse(Uri.base.queryParameters['unread'] ?? '') : null;
+    if (demoUnread != null) ChatService.instance.debugSetUnread(demoUnread);
     final demoSheet = kIsWeb ? Uri.base.queryParameters['sheet'] : null;
     if (demoSheet != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -134,6 +136,7 @@ class _FarmScreenState extends State<FarmScreen>
       if (name == 'order_delivered') AdsService.instance.onOrderDelivered(farm.level);
     };
     CloudSave.instance.addListener(_onCloud);
+    unawaited(ChatService.instance.watch()); // no-op until Firebase is up
     Neighbors.instance.addListener(_onNeighbors);
     PurchaseService.instance.message.addListener(_onPurchaseMessage);
     RankPrizes.instance.news.addListener(_onRankNews);
@@ -196,12 +199,14 @@ class _FarmScreenState extends State<FarmScreen>
     if (s == AppLifecycleState.paused || s == AppLifecycleState.inactive) {
       final saved = widget.save.saveNow(farm);
       if (s == AppLifecycleState.paused) {
+        ChatService.instance.unwatch();
         NotifyService.instance.scheduleFor(farm);
         // uploads wait up to ten minutes; leaving the game sends what's due
         saved.then((_) => CloudSave.instance.flush());
       }
     } else if (s == AppLifecycleState.resumed) {
       NotifyService.instance.cancelAll();
+      unawaited(ChatService.instance.watch());
       Neighbors.instance.pull(farm);
       RankPrizes.instance.settle(farm);
       _maybeLoginGift();
@@ -391,6 +396,10 @@ class _FarmScreenState extends State<FarmScreen>
   void _onCloud() {
     final cs = CloudSave.instance;
     if (!mounted) return;
+    // Firebase ready: start counting new chat messages
+    if (cs.available && WidgetsBinding.instance.lifecycleState != AppLifecycleState.paused) {
+      unawaited(ChatService.instance.watch());
+    }
     if (cs.message != null && cs.message != _cloudMsg) {
       _cloudMsg = cs.message;
       _say(cs.message!, error: true);
@@ -1189,7 +1198,11 @@ class _FarmScreenState extends State<FarmScreen>
           const SizedBox(width: 6),
           GestureDetector(
             onTap: _openChat,
-            child: _chip(const Text('💬', style: TextStyle(fontSize: 19))),
+            child: ListenableBuilder(
+              listenable: ChatService.instance,
+              builder: (_, child) => _badged(child!, ChatService.instance.unread, max: 99),
+              child: _chip(const Text('💬', style: TextStyle(fontSize: 19))),
+            ),
           ),
         ]),
         const SizedBox(height: 4),
@@ -1322,7 +1335,7 @@ class _FarmScreenState extends State<FarmScreen>
     _maybeLoginGift();
   }
 
-  Widget _badged(Widget child, int n) => Stack(clipBehavior: Clip.none, children: [
+  Widget _badged(Widget child, int n, {int max = 0}) => Stack(clipBehavior: Clip.none, children: [
         child,
         if (n > 0)
           Positioned(
@@ -1331,7 +1344,7 @@ class _FarmScreenState extends State<FarmScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(color: red, borderRadius: BorderRadius.circular(10)),
-              child: Text('$n', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
+              child: Text(max > 0 && n > max ? '$max+' : '$n', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
             ),
           ),
       ]);

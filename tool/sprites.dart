@@ -44,8 +44,10 @@ final optional = [
   'cho_thuc', 'cho_ngu',
   // batch 13: villagers
   'nguoi_ganh', 'nguoi_xe_dap', 'nguoi_chan_vit', 'be_thoi_sao', 'nguoi_cay_lua', 'nguoi_cuoc_dat', 'tre_tha_dieu', 'tre_chay', 'thuyen_cheo',
-  // batch 14: paid building
-  'ham_chua',
+  // batch 14 + 19: paid buildings
+  'ham_chua', 'vua_lua',
+  // batch 18: second wave of village projects
+  'tram_nuoc', 'khuyen_nong', 'htx', 'san_bong', 'buu_dien',
   // batch 9: drying yard states and festival gifts
   'san_phoi', 'san_phoi_thoc', 'san_phoi_bat', 'san_phoi_kho',
   'cay_neu', 'den_long', 'cay_du', 'gio_qua', 'chau_sen', 'den_ong_sao', 'coi_gia',
@@ -57,7 +59,7 @@ final optional = [
 /// Max width by on-map size: about 3x the largest zoom on a 3x phone.
 int maxWidthFor(String key) {
   const animals = {'ga', 'vit', 'lon', 'trau', 'bo', 'de'};
-  const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa'};
+  const big = {'cho_que', 'dinh_lang', 'truong', 'nha_van_hoa', 'htx', 'san_bong'};
   if (animals.contains(key) || animals.any((a) => key == '${a}_an' || key == '${a}_nam')) return 160;
   if (key.startsWith('nguoi_') || key.startsWith('tre_') || key == 'be_thoi_sao') return 160; // villagers walking about
   if (key == 'thuyen_cheo') return 256; // the river sampan with its boatman
@@ -65,6 +67,7 @@ int maxWidthFor(String key) {
   if (key == 'ho_sen') return 768; // one picture for the whole lake
   if (key.startsWith('cau_') || key.startsWith('san_phoi') || key == 'cay_du') return 400;
   if (key == 'nha_tam' || key == 'ham_chua' || key == 'ao_sen' || key == 'xe_bo') return 400;
+  if (const {'vua_lua', 'tram_nuoc', 'khuyen_nong', 'buu_dien'}.contains(key)) return 400;
   if (key.startsWith('nha_') || big.contains(key)) return 512;
   if (key.startsWith('nha_kho')) return 400;
   if (key.startsWith('chuong_') || const {'ao', 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca',

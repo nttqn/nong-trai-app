@@ -18,7 +18,9 @@ import 'cloud.dart';
 /// * `chat/bans/{uid}`: set by hand in the Firebase console to mute someone.
 /// * `chat/reports/{msgId}/{uid}`: reports, read in the console.
 ///
-/// The connection is only open while the chat sheet is.
+/// While the game is in the foreground a small listener also watches for
+/// messages newer than the last one this player saw, for the red count on
+/// the 💬 button: each new message is downloaded once per online player.
 class ChatService extends ChangeNotifier {
   ChatService._();
   static final ChatService instance = ChatService._();
@@ -47,6 +49,17 @@ class ChatService extends ChangeNotifier {
   final List<StreamSubscription<DatabaseEvent>> _subs = [];
   int _opens = 0;
 
+  // ---- unread count
+  /// Id of the newest message this player has seen (push ids sort by time);
+  /// '' until the first look.
+  String? _seen;
+  final Set<String> _unread = {};
+  final List<StreamSubscription<DatabaseEvent>> _watchSubs = [];
+  bool _watching = false;
+
+  /// New messages from others since the chat was last open.
+  int get unread => _unread.length;
+
   CloudSave get _cloud => CloudSave.instance;
   bool get available => debugMessages != null || _cloud.available;
   bool get canSend => debugMessages != null || _cloud.user != null;
@@ -71,6 +84,7 @@ class ChatService extends ChangeNotifier {
       blocked.addAll(prefs.getStringList('chat_blocked') ?? const []);
       reported.addAll(prefs.getStringList('chat_reported') ?? const []);
       rulesAccepted = prefs.getBool('chat_rules') ?? false;
+      _seen = prefs.getString('chat_seen');
     } catch (_) {}
   }
 
@@ -90,10 +104,86 @@ class ChatService extends ChangeNotifier {
     await _savePrefs();
   }
 
+  /// A made-up count for web screenshots (`?unread=`).
+  void debugSetUnread(int n) {
+    _unread
+      ..clear()
+      ..addAll([for (var i = 0; i < n; i++) 'demo$i']);
+    notifyListeners();
+  }
+
+  /// Watches for new messages while the game is in front.
+  Future<void> watch() async {
+    if (_watching || debugMessages != null || !_cloud.available) return;
+    _watching = true;
+    await _load();
+    try {
+      final db = _db;
+      db.goOnline();
+      final ref = db.ref('chat/msgs');
+      if (_seen == null) {
+        // first run: what is already there counts as seen
+        final last = await ref.orderByKey().limitToLast(1).get().timeout(const Duration(seconds: 15));
+        _seen = last.children.isEmpty ? '' : last.children.last.key ?? '';
+        await _saveSeen();
+      }
+      if (!_watching) return;
+      final from = _seen!;
+      final q = from.isEmpty ? ref.orderByKey().limitToLast(chatShown) : ref.orderByKey().startAfter(from).limitToLast(chatShown);
+      _watchSubs.add(q.onChildAdded.listen((e) {
+        final m = ChatMsg.fromMap(e.snapshot.key ?? '', e.snapshot.value);
+        if (m == null || _opens > 0) return;
+        if (m.id.compareTo(_seen ?? '') <= 0) return;
+        if (m.uid == myUid || blocked.contains(m.uid) || reported.contains(m.id)) return;
+        if (_unread.add(m.id)) notifyListeners();
+      }, onError: (Object e) => debugPrint('chat watch failed: $e')));
+      _watchSubs.add(q.onChildRemoved.listen((e) {
+        if (_unread.remove(e.snapshot.key)) notifyListeners();
+      }, onError: (Object e) => debugPrint('chat watch failed: $e')));
+    } catch (e) {
+      debugPrint('chat watch failed: $e');
+      _watching = false;
+    }
+  }
+
+  /// Stops watching (the game went to the background).
+  void unwatch() {
+    if (!_watching) return;
+    _watching = false;
+    for (final s in _watchSubs) {
+      s.cancel();
+    }
+    _watchSubs.clear();
+    if (_opens == 0 && debugMessages == null && _cloud.available) _db.goOffline();
+  }
+
+  /// Everything shown in the open sheet counts as seen.
+  void _markSeen() {
+    if (messages.isNotEmpty && messages.last.id.compareTo(_seen ?? '') > 0) {
+      _seen = messages.last.id;
+      unawaited(_saveSeen());
+    }
+    if (_unread.isNotEmpty) {
+      _unread.clear();
+      notifyListeners();
+    }
+  }
+
+  Future<void> _saveSeen() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('chat_seen', _seen ?? '');
+    } catch (_) {}
+  }
+
   /// Starts listening (the chat sheet opened).
   Future<void> open() async {
     _opens++;
     if (_opens > 1) return;
+    if (_unread.isNotEmpty) {
+      _unread.clear();
+      notifyListeners();
+    }
     await _load();
     final dbg = debugMessages;
     if (dbg != null) {
@@ -170,11 +260,12 @@ class ChatService extends ChangeNotifier {
     if (_opens == 0) return;
     _opens--;
     if (_opens > 0) return;
+    _markSeen();
     for (final s in _subs) {
       s.cancel();
     }
     _subs.clear();
-    if (debugMessages == null && _cloud.available) _db.goOffline();
+    if (!_watching && debugMessages == null && _cloud.available) _db.goOffline();
   }
 
   /// Sends [raw] from [farm]; null when sent, else why not.

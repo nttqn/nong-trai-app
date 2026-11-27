@@ -59,6 +59,13 @@ $c = New-Canvas
 Draw-Art $c[1] 'ham_chua' 256 430 430 400
 Save $c 'ham_chua'
 
+# 2b. Vựa lúa (needs art_src/vua_lua.png, PROMPTS.md đợt 19)
+if (Test-Path 'art_src/vua_lua.png') {
+  $c = New-Canvas
+  Draw-Art $c[1] 'vua_lua' 256 440 440 410
+  Save $c 'vua_lua'
+}
+
 # 3. Thẻ Nhà Nông: rice sheaf with a basket of grain
 $c = New-Canvas
 Draw-Art $c[1] 'item_rom' 300 400 260 330
@@ -84,3 +91,19 @@ $g.DrawEllipse($rp, 76, 70, 360, 360)
 $rp.StartCap = 'Flat'
 $g.DrawLine($rp, 138, 132, 374, 368)
 Save $c 'bo_quang_cao'
+
+# In-game shop pictures (ui/paid_sheet.dart): 192 px copies in assets/iap/.
+if (-not $ios) {
+  $assets = Join-Path (Get-Location) 'assets/iap'
+  New-Item -ItemType Directory -Force $assets | Out-Null
+  foreach ($f in Get-ChildItem "$out/*.png") {
+    $src = [System.Drawing.Bitmap]::FromFile($f.FullName)
+    $b = New-Object System.Drawing.Bitmap 192, 192, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $g = [System.Drawing.Graphics]::FromImage($b)
+    $g.InterpolationMode = 'HighQualityBicubic'; $g.PixelOffsetMode = 'HighQuality'; $g.SmoothingMode = 'AntiAlias'
+    $g.DrawImage($src, 0, 0, 192, 192)
+    $g.Dispose(); $src.Dispose()
+    $b.Save((Join-Path $assets $f.Name), [System.Drawing.Imaging.ImageFormat]::Png); $b.Dispose()
+    "assets/iap/$($f.Name)"
+  }
+}

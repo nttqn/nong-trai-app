@@ -485,7 +485,7 @@ Một đánh giá 4★ chê người dân vẽ bằng code (nhất là người 
 
 ## Đợt 18 — công trình nông thôn mới đợt 2
 
-Chưa có ảnh: trong game đang vẽ tạm bằng code. Cách làm như đợt 3 (cùng phong cách, cùng góc nhìn, có đế ô đất như các công trình nông thôn mới cũ). "Đèn đường năng lượng mặt trời" không cần ảnh (đèn vẽ bằng code dọc đường làng).
+Đã có ảnh (2026-11-27). Cách làm như đợt 3 (cùng phong cách, cùng góc nhìn, có đế ô đất như các công trình nông thôn mới cũ). "Đèn đường năng lượng mặt trời" không cần ảnh (đèn vẽ bằng code dọc đường làng).
 
 | Tên file | Lời nhắc riêng |
 |---|---|
@@ -494,3 +494,11 @@ Chưa có ảnh: trong game đang vẽ tạm bằng code. Cách làm như đợt
 | `htx` | A Vietnamese agricultural co-operative (hợp tác xã nông nghiệp) on a 3x2 tile base: a long cream warehouse with a corrugated grey tin roof and a big brown sliding door on the lower-left face, a small red-tiled office at the right end, a red sign board, stacked rice sacks and a hand-drawn cart in front. |
 | `san_bong` | A village sports ground (sân thể thao thôn) on a 3x3 tile base: a flat green football pitch with white lines, centre circle and two small white goals at the ends, a red flag with a yellow star on a pole at one corner, a volleyball net post at the side, a white ball on the grass. Flat, no buildings. |
 | `buu_dien` | A Vietnamese commune post office (bưu điện văn hóa xã) on a 2x2 tile base: a single-storey warm-yellow building with a red tiled hip roof, a blue glass door and window frames on the lower-left face, a blue "BƯU ĐIỆN" style sign board without readable text, a yellow post box on a short pole by the door, a bench and a potted plant. |
+
+## Đợt 19 — Vựa lúa (công trình trả phí)
+
+Đã có ảnh (2026-11-27). Cùng phong cách, góc nhìn như `ham_chua` (đợt 14). Có ảnh thì `tool/iap_icons.ps1` tự làm luôn icon gói `vua_lua`.
+
+| Tên file | Lời nhắc riêng |
+|---|---|
+| `vua_lua` | A traditional Vietnamese raised rice granary (vựa lúa) on a 2x2 tile base: a dark wooden floor on short stilts resting on flat stones, inside it a huge round woven-bamboo rice bin (cót) heaped with golden paddy, a thick golden thatched hip roof on four wooden corner posts, a small bamboo ladder at the front, jute rice sacks and a round winnowing basket beside it. Bigger and richer-looking than the cellar (premium building). |

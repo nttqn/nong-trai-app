@@ -26,7 +26,7 @@ class _ShopSheetState extends State<ShopSheet> {
   static const tabs = [
     ('Trồng trọt', ['ruong', 'luong', 'san_phoi', 'cay_chuoi', 'cay_xoai', 'cay_dua', 'cay_buoi', 'cay_vai', 'cay_nhan', 'cay_hong', 'cay_cam', 'cay_mit', 'cay_cau']),
     ('Chăn nuôi', ['chuong_ga', 'chuong_vit', 'chuong_lon', 'chuong_trau', 'chuong_bo', 'chuong_de', 'vuon_ong', 'nha_tam', 'ao']),
-    ('Nhà cửa', ['nha_phu', 'nha_kho', 'ham_chua']),
+    ('Nhà cửa', ['nha_phu', 'nha_kho', 'ham_chua', 'vua_lua']),
     ('Chế biến', [ 'may_xay', 'lo_banh', 'xuong_mia', 'xuong_ca', 'xuong_dau', 'xuong_che', 'khung_cui', 'xuong_mut']),
     ('Trang trí', ['hang_rao', 'duong_gach', 'tre', 'rom_dong', 'chum', 'bu_nhin', 'cho', 'chong_tre', 'cong_ngo', 'hoa_dao',
       'gian_hoa', 'cay_da', 'cot_den', 'ao_sen', 'cay_mai', 'hon_non_bo']),
@@ -100,7 +100,12 @@ class _ShopSheetState extends State<ShopSheet> {
           if (id == 'ham_chua' && !f.hamChua)
             const Text('🛍️ Gói Cửa hàng', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFFC62828)))
           else if (id == 'ham_chua')
-            Text(f.canBuy(id) == null ? '+$hamChuaStorage chỗ chứa' : 'Đã xây · ${f.hamChuaCap}',
+            Text(f.canBuy(id) == null ? '+$hamChuaStorage chỗ chứa' : 'Đã xây · ${f.hamChuaObj == null ? 0 : paidStoreLevel(f.hamChuaObj!).storage}',
+                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: greenDark))
+          else if (id == 'vua_lua' && !f.vuaLua)
+            const Text('🛍️ Gói Cửa hàng', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFFC62828)))
+          else if (id == 'vua_lua')
+            Text(f.canBuy(id) == null ? '+$vuaLuaStorage chỗ chứa' : 'Đã xây',
                 style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: greenDark))
           else if (isGiftDeco(id))
             Text('🎁 ${festivalDecos.contains(id) ? 'Quà lễ hội' : 'Quà sự kiện'} ×${f.giftCount(id)}',
@@ -463,6 +468,11 @@ class _ProjectsSheetState extends State<ProjectsSheet> {
                     style: const TextStyle(fontWeight: FontWeight.w900, color: brown, fontSize: 16)),
                 Text('Đã hoàn thành $done/${projectOrder.length} công trình',
                     style: const TextStyle(color: brownLight, fontSize: 12.5)),
+                if (f.speedSummary.any((e) => e.$2 > 0))
+                  Text(
+                    'Đang nhanh hơn: ${[for (final (n, v) in f.speedSummary) if (v > 0) '$n ${(v * 100).round()}%'].join(' · ')}',
+                    style: const TextStyle(color: greenDark, fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
               ]),
             ),
           ]),
